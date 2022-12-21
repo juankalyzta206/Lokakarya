@@ -25,7 +25,7 @@ public class TransaksiNasabahService {
 	@Autowired
 	MasterBankRepository masterBankRepository;
 	
-	public TransaksiNasabahWrapper getByNoRek(Long idTransaksiNasabah) {
+	public TransaksiNasabahWrapper getByidTransaksiNasabah(Long idTransaksiNasabah) {
 		TransaksiNasabah transaksinasabah = transaksiNasabahRepository.getReferenceById(idTransaksiNasabah);
 		return toWrapper(transaksinasabah);
 	}
