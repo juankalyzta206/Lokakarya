@@ -33,6 +33,7 @@ public class MasterBankService {
 		wrapper.setAlamat(entity.getAlamat());
 		wrapper.setNotlp(entity.getNotlp());
 		wrapper.setSaldo(entity.getSaldo());
+		wrapper.setUserId(entity.getUserId());
 		return wrapper;
 	}
 	
@@ -60,6 +61,7 @@ public class MasterBankService {
 		entity.setAlamat(wrapper.getAlamat());
 		entity.setNotlp(wrapper.getNotlp());
 		entity.setSaldo(wrapper.getSaldo());
+		entity.setUserId(wrapper.getUserId());
 		return entity;
 	}
 	

@@ -60,7 +60,7 @@ public class TransaksiNasabahService {
 	
 	private TransaksiNasabah toEntity(TransaksiNasabahWrapper wrapper) {
 		TransaksiNasabah entity = new TransaksiNasabah();
-		if (wrapper.getNorek() != null) {
+		if (wrapper.getIdTransaksiNasabah() != null) {
 			entity = transaksiNasabahRepository.getReferenceById(wrapper.getIdTransaksiNasabah());
 		}
 		entity.setIdTransaksiNasabah(wrapper.getIdTransaksiNasabah());

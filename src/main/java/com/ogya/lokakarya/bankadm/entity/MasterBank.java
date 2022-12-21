@@ -16,6 +16,7 @@ private String nama;
 private String alamat;
 private Long notlp;
 private Long saldo;
+private Long userId;
 
 @Id
 @GeneratedValue(generator = "MASTERBANK_GEN", strategy = GenerationType.SEQUENCE)
@@ -58,6 +59,14 @@ public Long getSaldo() {
 }
 public void setSaldo(long saldo) {
 	this.saldo = saldo;
+}
+
+@Column(name = "USER_ID")
+public Long getUserId() {
+	return userId;
+}
+public void setUserId(Long userId) {
+	this.userId = userId;
 }
 
 

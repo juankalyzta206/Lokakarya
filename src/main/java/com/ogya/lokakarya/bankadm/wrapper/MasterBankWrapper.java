@@ -6,6 +6,7 @@ public class MasterBankWrapper {
 	private String alamat;
 	private Long notlp;
 	private Long saldo;
+	private Long userId;
 	public Long getNorek() {
 		return norek;
 	}
@@ -36,11 +37,17 @@ public class MasterBankWrapper {
 	public void setSaldo(Long saldo) {
 		this.saldo = saldo;
 	}
+	
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 	@Override
 	public String toString() {
 		return "MasterBankWrapper [norek=" + norek + ", nama=" + nama + ", alamat=" + alamat + ", notlp=" + notlp
-				+ ", saldo=" + saldo + "]";
+				+ ", saldo=" + saldo + ", userId=" + userId + "]";
 	}
-	
 	
 }
