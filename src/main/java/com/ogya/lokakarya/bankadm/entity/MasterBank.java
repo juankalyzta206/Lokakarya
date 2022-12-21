@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.entity;
+package com.ogya.lokakarya.bankadm.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

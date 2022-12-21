@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.controller;
+package com.ogya.lokakarya.bankadm.controller;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.repository.TransaksiNasabahRepository;
-import com.ogya.lokakarya.service.TransaksiNasabahService;
-import com.ogya.lokakarya.util.DataResponse;
-import com.ogya.lokakarya.util.DataResponseList;
-import com.ogya.lokakarya.wrapper.TransaksiNasabahWrapper;
+import com.ogya.lokakarya.bankadm.repository.TransaksiNasabahRepository;
+import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
+import com.ogya.lokakarya.bankadm.util.DataResponse;
+import com.ogya.lokakarya.bankadm.util.DataResponseList;
+import com.ogya.lokakarya.bankadm.wrapper.TransaksiNasabahWrapper;
 
 @RestController
 @RequestMapping(value = "/transfernasabah")

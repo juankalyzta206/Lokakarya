@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.service;
+package com.ogya.lokakarya.bankadm.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +10,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
-import com.ogya.lokakarya.entity.MasterBank;
-import com.ogya.lokakarya.repository.MasterBankRepository;
-import com.ogya.lokakarya.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
+import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 
 
 @Service

@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.util;
+package com.ogya.lokakarya.bankadm.util;
 
 
 public class DataResponsePagination<E, U> extends DataResponseList<E> {

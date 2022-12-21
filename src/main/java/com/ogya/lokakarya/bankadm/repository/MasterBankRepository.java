@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.repository;
+package com.ogya.lokakarya.bankadm.repository;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.ogya.lokakarya.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
 
 public interface MasterBankRepository extends JpaRepository<MasterBank, Long> {
 	

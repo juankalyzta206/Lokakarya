@@ -1,21 +1,23 @@
-package com.ogya.lokakarya.wrapper;
+package com.ogya.lokakarya.bankadm.wrapper;
 
 import java.util.Date;
 
-public class HistoryBankWrapper {
-	private Long idHistoryBank;
+
+public class TransaksiNasabahWrapper {
+	private Long idTransaksiNasabah;
 	private Long norek;
 	private String nama;
 	private Date tanggel;
+	private String status;
 	private Long uang;
 	private Long statusKet;
 	private Long NoRekTujuan;
 	private Long no_tlp;
-	public Long getIdHistoryBank() {
-		return idHistoryBank;
+	public Long getIdTransaksiNasabah() {
+		return idTransaksiNasabah;
 	}
-	public void setIdHistoryBank(Long idHistoryBank) {
-		this.idHistoryBank = idHistoryBank;
+	public void setIdTransaksiNasabah(Long idTransaksiNasabah) {
+		this.idTransaksiNasabah = idTransaksiNasabah;
 	}
 	public Long getNorek() {
 		return norek;
@@ -34,6 +36,12 @@ public class HistoryBankWrapper {
 	}
 	public void setTanggel(Date tanggel) {
 		this.tanggel = tanggel;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	public Long getUang() {
 		return uang;
@@ -61,11 +69,10 @@ public class HistoryBankWrapper {
 	}
 	@Override
 	public String toString() {
-		return "HistoryBankWrapper [idHistoryBank=" + idHistoryBank + ", norek=" + norek + ", nama=" + nama
-				+ ", tanggel=" + tanggel + ", uang=" + uang + ", statusKet=" + statusKet + ", NoRekTujuan="
-				+ NoRekTujuan + ", no_tlp=" + no_tlp + "]";
+		return "TransaksiNasabahWrapper [idTransaksiNasabah=" + idTransaksiNasabah + ", norek=" + norek + ", nama="
+				+ nama + ", tanggel=" + tanggel + ", status=" + status + ", uang=" + uang + ", statusKet=" + statusKet
+				+ ", NoRekTujuan=" + NoRekTujuan + ", no_tlp=" + no_tlp + "]";
 	}
-
 	
 	
 }

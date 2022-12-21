@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.entity;
+package com.ogya.lokakarya.bankadm.entity;
 
 import java.util.Date;
 
@@ -15,36 +15,27 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "HISTORY_BANK")
-public class HistoryBank {
-	
-	private Long idHistoryBank;
+@Table(name = "transaksi_nasabah")
+public class TransaksiNasabah {
+	private Long idTransaksiNasabah;
 	private MasterBank rekening;
-	private String nama;
 	private Date tanggel;
+	private String status;
 	private Long uang;
 	private Long statusKet;
 	private Long NoRekTujuan;
 	private Long no_tlp;
 	
 	@Id
-	@GeneratedValue(generator = "HISTORYBANK_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "HISTORYBANK_GEN", sequenceName = "HISTORYBANK_SEQ", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(generator = "TRANSAKSINASABAH_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "TRANSAKSINASABAH_GEN", sequenceName = "TRANSAKSINASABAH_SEQ", initialValue = 1, allocationSize = 1)
 
-	public Long getIdHistoryBank() {
-		return idHistoryBank;
-	}
-	public void setIdHistoryBank(Long idHistoryBank) {
-		this.idHistoryBank = idHistoryBank;
-	}
 	
-	@Column(name = "TANGGAL")
-	@Temporal(TemporalType.DATE)
-	public Date getTanggel() {
-		return tanggel;
+	public Long getIdTransaksiNasabah() {
+		return idTransaksiNasabah;
 	}
-	public void setTanggel(Date tanggel) {
-		this.tanggel = tanggel;
+	public void setIdTransaksiNasabah(Long idTransaksiNasabah) {
+		this.idTransaksiNasabah = idTransaksiNasabah;
 	}
 	
 	@ManyToOne
@@ -56,16 +47,24 @@ public class HistoryBank {
 		this.rekening = rekening;
 	}
 	
-	
-	@Column(name = "NAMA")
-	public String getNama() {
-		return nama;
+	@Column(name = "TANGGAL")
+	@Temporal(TemporalType.DATE)
+	public Date getTanggel() {
+		return tanggel;
 	}
-	public void setNama(String nama) {
-		this.nama = nama;
+	public void setTanggel(Date tanggel) {
+		this.tanggel = tanggel;
 	}
 	
-	@Column(name = "uang")
+	@Column(name = "STATUS")
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	@Column(name = "UANG")
 	public Long getUang() {
 		return uang;
 	}
@@ -96,7 +95,7 @@ public class HistoryBank {
 	public void setNo_tlp(Long no_tlp) {
 		this.no_tlp = no_tlp;
 	}
-	
+
 	
 	
 }

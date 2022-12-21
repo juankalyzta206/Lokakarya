@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.entity;
+package com.ogya.lokakarya.bankadm.entity;
 
 import java.util.Date;
 
@@ -15,36 +15,27 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "transaksi_nasabah")
-public class TransaksiNasabah {
-	private Long idTransaksiNasabah;
+@Table(name = "HISTORY_BANK")
+public class HistoryBank {
+	
+	private Long idHistoryBank;
 	private MasterBank rekening;
+	private String nama;
 	private Date tanggel;
-	private String status;
 	private Long uang;
 	private Long statusKet;
 	private Long NoRekTujuan;
 	private Long no_tlp;
 	
 	@Id
-	@GeneratedValue(generator = "TRANSAKSINASABAH_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "TRANSAKSINASABAH_GEN", sequenceName = "TRANSAKSINASABAH_SEQ", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(generator = "HISTORYBANK_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "HISTORYBANK_GEN", sequenceName = "HISTORYBANK_SEQ", initialValue = 1, allocationSize = 1)
 
-	
-	public Long getIdTransaksiNasabah() {
-		return idTransaksiNasabah;
+	public Long getIdHistoryBank() {
+		return idHistoryBank;
 	}
-	public void setIdTransaksiNasabah(Long idTransaksiNasabah) {
-		this.idTransaksiNasabah = idTransaksiNasabah;
-	}
-	
-	@ManyToOne
-	@JoinColumn(name = "norek")
-	public MasterBank getRekening() {
-		return rekening;
-	}
-	public void setRekening(MasterBank rekening) {
-		this.rekening = rekening;
+	public void setIdHistoryBank(Long idHistoryBank) {
+		this.idHistoryBank = idHistoryBank;
 	}
 	
 	@Column(name = "TANGGAL")
@@ -56,15 +47,25 @@ public class TransaksiNasabah {
 		this.tanggel = tanggel;
 	}
 	
-	@Column(name = "STATUS")
-	public String getStatus() {
-		return status;
+	@ManyToOne
+	@JoinColumn(name = "norek")
+	public MasterBank getRekening() {
+		return rekening;
 	}
-	public void setStatus(String status) {
-		this.status = status;
+	public void setRekening(MasterBank rekening) {
+		this.rekening = rekening;
 	}
 	
-	@Column(name = "UANG")
+	
+	@Column(name = "NAMA")
+	public String getNama() {
+		return nama;
+	}
+	public void setNama(String nama) {
+		this.nama = nama;
+	}
+	
+	@Column(name = "uang")
 	public Long getUang() {
 		return uang;
 	}
@@ -95,7 +96,7 @@ public class TransaksiNasabah {
 	public void setNo_tlp(Long no_tlp) {
 		this.no_tlp = no_tlp;
 	}
-
+	
 	
 	
 }

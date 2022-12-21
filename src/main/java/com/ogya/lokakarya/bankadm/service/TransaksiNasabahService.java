@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.service;
+package com.ogya.lokakarya.bankadm.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
-import com.ogya.lokakarya.entity.MasterBank;
-import com.ogya.lokakarya.entity.TransaksiNasabah;
-import com.ogya.lokakarya.repository.MasterBankRepository;
-import com.ogya.lokakarya.repository.TransaksiNasabahRepository;
-import com.ogya.lokakarya.wrapper.TransaksiNasabahWrapper;
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.entity.TransaksiNasabah;
+import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
+import com.ogya.lokakarya.bankadm.repository.TransaksiNasabahRepository;
+import com.ogya.lokakarya.bankadm.wrapper.TransaksiNasabahWrapper;
 
 @Service
 @Transactional

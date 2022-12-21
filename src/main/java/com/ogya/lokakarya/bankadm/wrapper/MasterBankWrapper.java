@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.wrapper;
+package com.ogya.lokakarya.bankadm.wrapper;
 
 public class MasterBankWrapper {
 	private Long norek;
