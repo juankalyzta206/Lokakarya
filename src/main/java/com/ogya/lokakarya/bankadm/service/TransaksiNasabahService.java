@@ -42,8 +42,7 @@ public class TransaksiNasabahService {
 	@Autowired
 	HistoryTelkomRepository historyTelkomRepo;
 
-	// -------------------------------------------cek
-	// saldo----------------------------------------
+	// -------------------------------------------ceksaldo----------------------------------------
 	public MasterBankWrapper cekSaldo(Long rekening) {
 		if (masterBankRepo.findById(rekening).isPresent()) {
 			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
@@ -70,20 +69,21 @@ public class TransaksiNasabahService {
 						.findByTagihanPelanggan(masterPelanggan.getIdPelanggan());
 
 				for (int i = 0; i < transaksiTelkom.size(); i++) {
-					BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
-					wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
-					wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
-					wrapper.setNamaPelanggan(masterPelanggan.getNama());
-					wrapper.setNoTelepon(masterPelanggan.getNoTelp());
-					wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
-					wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
-					wrapper.setTagihan(transaksiTelkom.get(i).getUang());
-					wrapper.setStatus(transaksiTelkom.get(i).getStatus());
-					wrapper.setNoRekening(rekAsal);
-					wrapper.setNamaRekening(masterBank.getNama());
-					wrapper.setSaldo(masterBank.getSaldo());
-					wrapperList.add(wrapper);
-
+					if (transaksiTelkom.get(i).getStatus() == 1) {
+						BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+						wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
+						wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+						wrapper.setNamaPelanggan(masterPelanggan.getNama());
+						wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+						wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+						wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+						wrapper.setTagihan(transaksiTelkom.get(i).getUang());
+						wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+						wrapper.setNoRekening(rekAsal);
+						wrapper.setNamaRekening(masterBank.getNama());
+						wrapper.setSaldo(masterBank.getSaldo());
+						wrapperList.add(wrapper);
+					}
 				}
 			} else {
 				throw new BusinessException("No telepon tidak terdaftar");
@@ -185,7 +185,7 @@ public class TransaksiNasabahService {
 	public TransferWrapper transfer(Long rekTujuan, Long rekAsal, Long nominal) {
 
 		if (masterBankRepo.findById(rekAsal).isPresent() && masterBankRepo.findById(rekTujuan).isPresent()) {
-			
+
 			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
 			MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
 			TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
@@ -194,43 +194,43 @@ public class TransaksiNasabahService {
 
 				if (nominal >= 10000) {
 
-						if (pengirim.getSaldo() - nominal >= 50000) {
+					if (pengirim.getSaldo() - nominal >= 50000) {
 
-							transaksiNasabah.setNorekDituju(rekTujuan);
-							transaksiNasabah.setStatus("K");
-							transaksiNasabah.setStatusKet((byte) 3);
-							transaksiNasabah.setUang(nominal);
-							transaksiNasabah.setMasterBank(pengirim);
-							transaksiNasabah.setNoTlp(pengirim.getNotlp());
-							transaksiNasabahRepo.save(transaksiNasabah);
+						transaksiNasabah.setNorekDituju(rekTujuan);
+						transaksiNasabah.setStatus("K");
+						transaksiNasabah.setStatusKet((byte) 3);
+						transaksiNasabah.setUang(nominal);
+						transaksiNasabah.setMasterBank(pengirim);
+						transaksiNasabah.setNoTlp(pengirim.getNotlp());
+						transaksiNasabahRepo.save(transaksiNasabah);
 
-							pengirim.setSaldo(pengirim.getSaldo() - nominal);
-							masterBankRepo.save(pengirim);
+						pengirim.setSaldo(pengirim.getSaldo() - nominal);
+						masterBankRepo.save(pengirim);
 
-							masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
+						masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
 
-							HistoryBank historyBank = new HistoryBank();
-							historyBank.setNama(pengirim.getNama());
-							historyBank.setRekening(pengirim);
-							historyBank.setNoRekTujuan(rekTujuan);
-							historyBank.setStatusKet((byte) 3);
-							historyBank.setUang(nominal);
-							historyBankRepo.save(historyBank);
+						HistoryBank historyBank = new HistoryBank();
+						historyBank.setNama(pengirim.getNama());
+						historyBank.setRekening(pengirim);
+						historyBank.setNoRekTujuan(rekTujuan);
+						historyBank.setStatusKet((byte) 3);
+						historyBank.setUang(nominal);
+						historyBankRepo.save(historyBank);
 
-							TransferWrapper transfer = new TransferWrapper();
-							transfer.setRekAsal(rekAsal);
-							transfer.setNamaPengirim(pengirim.getNama());
-							transfer.setRekTujuan(rekTujuan);
-							transfer.setNamaPenerima(tujuan.getNama());
-							transfer.setNominal(nominal);
-							transfer.setTanggal(transaksiNasabah.getTanggal());
-							transfer.setSaldoPengirim(pengirim.getSaldo());
-							transfer.setSaldoPenerima(tujuan.getSaldo());
-							return transfer;
+						TransferWrapper transfer = new TransferWrapper();
+						transfer.setRekAsal(rekAsal);
+						transfer.setNamaPengirim(pengirim.getNama());
+						transfer.setRekTujuan(rekTujuan);
+						transfer.setNamaPenerima(tujuan.getNama());
+						transfer.setNominal(nominal);
+						transfer.setTanggal(transaksiNasabah.getTanggal());
+						transfer.setSaldoPengirim(pengirim.getSaldo());
+						transfer.setSaldoPenerima(tujuan.getSaldo());
+						return transfer;
 
-						} else {
-							throw new BusinessException("Saldo Anda tidak cukup");
-						}
+					} else {
+						throw new BusinessException("Saldo Anda tidak cukup");
+					}
 				} else {
 					throw new BusinessException("Nominal transaksi minimal 10000");
 				}
@@ -242,7 +242,7 @@ public class TransaksiNasabahService {
 		}
 	}
 
-	// --------------------------------------BayarTelpon----------------------------------------------
+	// --------------------------------------BayarTelponTotal----------------------------------------------
 	public List<BayarTeleponWrapper> bayarTelpon(Long rekAsal, Long noTelpon) {
 		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
 
@@ -304,6 +304,88 @@ public class TransaksiNasabahService {
 							wrapper.setSaldo(masterBank.getSaldo());
 							wrapper.setTanggal(historyBank.getTanggal());
 							wrapperList.add(wrapper);
+						}
+					}
+
+				} else {
+					throw new BusinessException("Saldo Anda tidak cukup");
+				}
+			} else {
+				throw new BusinessException("No telepon tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
+
+		return wrapperList;
+	}
+
+	// --------------------------------------BayarTelponPerBulan----------------------------------------------
+	public List<BayarTeleponWrapper> bayarTelponPerbulan(Long rekAsal, Long noTelpon, Byte bulanTagihan) {
+		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
+
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+
+			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
+				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
+				List<TransaksiTelkom> transaksiTelkom = transaksiTelkomRepo
+						.findByTagihanPelanggan(masterPelanggan.getIdPelanggan());
+
+				Long tagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
+
+				if (masterBank.getSaldo() - tagihan >= 50000) {
+
+					masterBank.setSaldo(masterBank.getSaldo() - tagihan);
+					masterBankRepo.save(masterBank);
+
+					HistoryBank historyBank = new HistoryBank();
+					historyBank.setNama(masterBank.getNama());
+					historyBank.setRekening(masterBank);
+					historyBank.setStatusKet((byte) 4);
+					historyBank.setUang(tagihan);
+					historyBank.setNoTlp(masterBank.getNotlp());
+					historyBankRepo.save(historyBank);
+
+					for (int i = 0; i < transaksiTelkom.size(); i++) {
+						if (transaksiTelkom.get(i).getStatus() == 1) {
+							if (transaksiTelkom.get(i).getBulanTagihan() == bulanTagihan) {
+
+								HistoryTelkom historyTelkom = new HistoryTelkom();
+								historyTelkom.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+								historyTelkom.setIdPelanggan(masterPelanggan);
+								historyTelkom.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+								historyTelkom.setUang(transaksiTelkom.get(i).getUang());
+								historyTelkom.setIdHistory(historyTelkom.getIdHistory());
+								historyTelkomRepo.save(historyTelkom);
+
+								TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
+								transaksiNasabah.setStatus("K");
+								transaksiNasabah.setStatusKet((byte) 4);
+								transaksiNasabah.setUang(transaksiTelkom.get(i).getUang());
+								transaksiNasabah.setMasterBank(masterBank);
+								transaksiNasabahRepo.save(transaksiNasabah);
+
+								transaksiTelkom.get(i).setStatus((byte) 2);
+								transaksiTelkomRepo.save(transaksiTelkom.get(i));
+
+								BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+								wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
+								wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+								wrapper.setNamaPelanggan(masterPelanggan.getNama());
+								wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+								wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+								wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+								wrapper.setTagihan(transaksiTelkom.get(i).getUang());
+								wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+								wrapper.setNoRekening(rekAsal);
+								wrapper.setNamaRekening(masterBank.getNama());
+								wrapper.setSaldo(masterBank.getSaldo());
+								wrapper.setTanggal(historyBank.getTanggal());
+								wrapperList.add(wrapper);
+							} else {
+								throw new BusinessException("Tidak ada tagihan bulan ini");
+							}
 						}
 					}
 

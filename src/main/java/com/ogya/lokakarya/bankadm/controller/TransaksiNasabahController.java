@@ -33,6 +33,12 @@ public class TransaksiNasabahController {
 	public DataResponseList<BayarTeleponWrapper> bayarTelpon(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelpon) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelpon(rekAsal, noTelpon));
 	}
+	
+	@PostMapping(path = "/bayarTelponPerbulan")
+	public DataResponseList<BayarTeleponWrapper> bayarTelponPerbulan(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelpon,
+			@RequestParam("Bulan Tagihan") Byte bulanTagihan) {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan));
+	}
 
 	@GetMapping(path = "/cekSaldo")
 	public DataResponse<MasterBankWrapper> cekSaldo(@RequestParam("Nomor Rekening") Long norek) {
