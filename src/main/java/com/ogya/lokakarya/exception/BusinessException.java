@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.bankadm.exception;
+package com.ogya.lokakarya.exception;
 
 public class BusinessException extends RuntimeException{
 

@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.service.HistoryBankService;
-import com.ogya.lokakarya.bankadm.util.DataResponse;
-import com.ogya.lokakarya.bankadm.util.DataResponseList;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
+import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/historybank")
@@ -36,6 +38,44 @@ public class HistoryBankController {
 	@GetMapping(path = "/getById")
 	public DataResponse<HistoryBankWrapper> getByidTransaksiNasabah(@RequestParam("id") Long idHistoryBank) {
 		return new DataResponse<HistoryBankWrapper>(historyBankService.getByidHistoryBank(idHistoryBank));
+	}
+	
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findAllWithPagination(@RequestParam("page") 
+	int page, @RequestParam("size") int size) {
+		return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findAllWithPagination(page, size));
+	}
+	
+	
+	@GetMapping(path = "/getByStatusKet")
+	public DataResponseList<HistoryBankWrapper> getByStatusKetTransaksiNasabah(@RequestParam("statusKet") Byte statusKet) {
+		return new DataResponseList<HistoryBankWrapper>(historyBankService.getBystatusKet(statusKet));
+	}
+	
+	@GetMapping(path = "/findByStatusKetPagination")
+	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findByStatusKetPagination(@RequestParam("statusKet") Byte statusKet ,@RequestParam("page") 
+	int page, @RequestParam("size") int size) {
+		return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findByStatusKetPagination(statusKet, page, size));
+	}
+	
+	@GetMapping(path = "/sumStatus1")
+	public Long sumStatus1() {
+		return historyBankService.sumStatus1();
+	}
+	
+	@GetMapping(path = "/sumStatus2")
+	public Long sumStatus2() {
+		return historyBankService.sumStatus2();
+	}
+	
+	@GetMapping(path = "/sumStatus3")
+	public Long sumStatus3() {
+		return historyBankService.sumStatus3();
+	}
+	
+	@GetMapping(path = "/sumStatus4")
+	public Long sumStatus4() {
+		return historyBankService.sumStatus4();
 	}
 	
 	@GetMapping(path = "/findAllPlan")

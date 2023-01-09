@@ -2,86 +2,321 @@ package com.ogya.lokakarya.bankadm.service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.entity.TransaksiNasabah;
+import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.repository.TransaksiNasabahRepository;
-import com.ogya.lokakarya.bankadm.wrapper.TransaksiNasabahWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
+import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
+import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
+import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
+import com.ogya.lokakarya.telepon.repository.HistoryTelkomRepository;
+import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
+import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
+import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 
 @Service
 @Transactional
 public class TransaksiNasabahService {
 	@Autowired
-	TransaksiNasabahRepository transaksiNasabahRepository;
+	MasterBankRepository masterBankRepo;
 	@Autowired
-	MasterBankRepository masterBankRepository;
-	
-	public TransaksiNasabahWrapper getByidTransaksiNasabah(Long idTransaksiNasabah) {
-		TransaksiNasabah transaksinasabah = transaksiNasabahRepository.getReferenceById(idTransaksiNasabah);
-		return toWrapper(transaksinasabah);
+	TransaksiNasabahRepository transaksiNasabahRepo;
+	@Autowired
+	HistoryBankRepository historyBankRepo;
+	@Autowired
+	MasterPelangganRepository masterPelangganRepo;
+	@Autowired
+	TransaksiTelkomRepository transaksiTelkomRepo;
+	@Autowired
+	HistoryTelkomRepository historyTelkomRepo;
+
+	// -------------------------------------------cek
+	// saldo----------------------------------------
+	public MasterBankWrapper cekSaldo(Long rekening) {
+		if (masterBankRepo.findById(rekening).isPresent()) {
+			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			MasterBankWrapper wrapper = new MasterBankWrapper();
+			wrapper.setNorek(nasabah.getNorek());
+			wrapper.setNama(nasabah.getNama());
+			wrapper.setSaldo(nasabah.getSaldo());
+			return wrapper;
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
 	}
-	
-	private TransaksiNasabahWrapper toWrapper(TransaksiNasabah entity) {
-		TransaksiNasabahWrapper wrapper = new TransaksiNasabahWrapper();
-		wrapper.setIdTransaksiNasabah(entity.getIdTransaksiNasabah());
-		wrapper.setNorek(entity.getRekening() != null ? entity.getRekening().getNorek() : null);
-		wrapper.setNama(entity.getRekening() != null ? entity.getRekening().getNama() : null);
-		wrapper.setTanggel(entity.getTanggel());
-		wrapper.setStatus(entity.getStatus());
-		wrapper.setUang(entity.getUang());
-		wrapper.setStatusKet(entity.getStatusKet());
-		wrapper.setNoRekTujuan(entity.getNoRekTujuan());
-		wrapper.setNo_tlp(entity.getNo_tlp());
-		return wrapper;
-	}
-	
-	private List<TransaksiNasabahWrapper> toWrapperList(List<TransaksiNasabah> entityList){
-		List<TransaksiNasabahWrapper> wrapperList = new ArrayList<TransaksiNasabahWrapper>();
-		for(TransaksiNasabah entity : entityList) {
-			TransaksiNasabahWrapper wrapper = toWrapper(entity);
-			wrapperList.add(wrapper);
+
+	// -----------------------------------findByNoTelp-----------------------------------
+	public List<BayarTeleponWrapper> findByNoTelpon(Long rekAsal, Long noTelpon) {
+		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
+
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+
+			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
+				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
+				List<TransaksiTelkom> transaksiTelkom = transaksiTelkomRepo
+						.findByTagihanPelanggan(masterPelanggan.getIdPelanggan());
+
+				for (int i = 0; i < transaksiTelkom.size(); i++) {
+					BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+					wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
+					wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+					wrapper.setNamaPelanggan(masterPelanggan.getNama());
+					wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+					wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+					wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+					wrapper.setTagihan(transaksiTelkom.get(i).getUang());
+					wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+					wrapper.setNoRekening(rekAsal);
+					wrapper.setNamaRekening(masterBank.getNama());
+					wrapper.setSaldo(masterBank.getSaldo());
+					wrapperList.add(wrapper);
+
+				}
+			} else {
+				throw new BusinessException("No telepon tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
 		}
 		return wrapperList;
 	}
-	
-	public List<TransaksiNasabahWrapper> findAll() {
-		List<TransaksiNasabah> employeeList = transaksiNasabahRepository.findAll(Sort.by(Order.by("idTransaksiNasabah")).descending());
-		return toWrapperList(employeeList);
-	}
-	
-	private TransaksiNasabah toEntity(TransaksiNasabahWrapper wrapper) {
-		TransaksiNasabah entity = new TransaksiNasabah();
-		if (wrapper.getIdTransaksiNasabah() != null) {
-			entity = transaksiNasabahRepository.getReferenceById(wrapper.getIdTransaksiNasabah());
+
+	// ------------------------------------setor----------------------------------------
+	public SetorAmbilWrapper setor(Long rekening, Long nominal) {
+		if (masterBankRepo.findById(rekening).isPresent()) {
+
+			if (nominal >= 10000) {
+
+				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+				TransaksiNasabah transaksi = new TransaksiNasabah();
+
+				nasabah.setSaldo(nasabah.getSaldo() + nominal);
+				masterBankRepo.save(nasabah);
+
+				transaksi.setMasterBank(nasabah);
+				transaksi.setStatus("D");
+				transaksi.setUang(nominal);
+				transaksi.setStatusKet((byte) 1);
+				transaksiNasabahRepo.save(transaksi);
+
+				HistoryBank historyBank = new HistoryBank();
+				historyBank.setNama(nasabah.getNama());
+				historyBank.setRekening(nasabah);
+				historyBank.setStatusKet((byte) 1);
+				historyBank.setUang(nominal);
+				historyBankRepo.save(historyBank);
+
+				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+				wrapper.setNamaNasabah(nasabah.getNama());
+				wrapper.setNominal(nominal);
+				wrapper.setNomorRekening(rekening);
+				wrapper.setSaldo(nasabah.getSaldo());
+				wrapper.setTanggal(transaksi.getTanggal());
+
+				return wrapper;
+
+			} else {
+				throw new BusinessException("Nominal transaksi minimal 10000");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
 		}
-		entity.setIdTransaksiNasabah(wrapper.getIdTransaksiNasabah());
-		Optional<MasterBank> optionalRek = masterBankRepository.findById(wrapper.getNorek());
-		MasterBank rekening = optionalRek.isPresent() ? optionalRek.get() : null;
-		entity.setRekening(rekening);
-		entity.setTanggel(wrapper.getTanggel());
-		entity.setStatus(wrapper.getStatus());
-		entity.setUang(wrapper.getUang());
-		entity.setStatusKet(wrapper.getStatusKet());
-		entity.setNoRekTujuan(wrapper.getNoRekTujuan());
-		entity.setNo_tlp(wrapper.getNo_tlp());
-		return entity;
 	}
-	
-	public TransaksiNasabahWrapper save(TransaksiNasabahWrapper wrapper) {
-		TransaksiNasabah employee = transaksiNasabahRepository.save(toEntity(wrapper));
-		return toWrapper(employee);
+
+	// ----------------------------------tarik ---------------------------
+	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
+
+		if (masterBankRepo.findById(rekening).isPresent()) {
+			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			TransaksiNasabah transaksi = new TransaksiNasabah();
+			HistoryBank historyBank = new HistoryBank();
+
+			if (nominal >= 10000) {
+
+				if (nasabah.getSaldo() - nominal >= 50000) {
+					nasabah.setSaldo(nasabah.getSaldo() - nominal);
+					masterBankRepo.save(nasabah);
+
+					transaksi.setMasterBank(nasabah);
+					transaksi.setStatus("K");
+					transaksi.setUang(nominal);
+					transaksi.setStatusKet((byte) 2);
+					transaksiNasabahRepo.save(transaksi);
+
+					historyBank.setNama(nasabah.getNama());
+					historyBank.setRekening(nasabah);
+					historyBank.setStatusKet((byte) 2);
+					historyBank.setUang(nominal);
+					historyBankRepo.save(historyBank);
+
+					SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+					wrapper.setNamaNasabah(nasabah.getNama());
+					wrapper.setNominal(nominal);
+					wrapper.setNomorRekening(rekening);
+					wrapper.setSaldo(nasabah.getSaldo());
+					wrapper.setTanggal(transaksi.getTanggal());
+					return wrapper;
+
+				} else {
+					throw new BusinessException("Saldo Anda tidak cukup");
+				}
+			} else {
+				throw new BusinessException("Nominal transaksi minimal 10000");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
 	}
-	
-	public void delete(Long idTransaksiNasabah) {
-		transaksiNasabahRepository.deleteById(idTransaksiNasabah);
+
+	// -------------------------------------Transfer-------------------------------------------------
+	public TransferWrapper transfer(Long rekTujuan, Long rekAsal, Long nominal) {
+
+		if (masterBankRepo.findById(rekAsal).isPresent() && masterBankRepo.findById(rekTujuan).isPresent()) {
+			
+			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
+			MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
+			TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
+
+			if (pengirim != tujuan) {
+
+				if (nominal >= 10000) {
+
+						if (pengirim.getSaldo() - nominal >= 50000) {
+
+							transaksiNasabah.setNorekDituju(rekTujuan);
+							transaksiNasabah.setStatus("K");
+							transaksiNasabah.setStatusKet((byte) 3);
+							transaksiNasabah.setUang(nominal);
+							transaksiNasabah.setMasterBank(pengirim);
+							transaksiNasabah.setNoTlp(pengirim.getNotlp());
+							transaksiNasabahRepo.save(transaksiNasabah);
+
+							pengirim.setSaldo(pengirim.getSaldo() - nominal);
+							masterBankRepo.save(pengirim);
+
+							masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
+
+							HistoryBank historyBank = new HistoryBank();
+							historyBank.setNama(pengirim.getNama());
+							historyBank.setRekening(pengirim);
+							historyBank.setNoRekTujuan(rekTujuan);
+							historyBank.setStatusKet((byte) 3);
+							historyBank.setUang(nominal);
+							historyBankRepo.save(historyBank);
+
+							TransferWrapper transfer = new TransferWrapper();
+							transfer.setRekAsal(rekAsal);
+							transfer.setNamaPengirim(pengirim.getNama());
+							transfer.setRekTujuan(rekTujuan);
+							transfer.setNamaPenerima(tujuan.getNama());
+							transfer.setNominal(nominal);
+							transfer.setTanggal(transaksiNasabah.getTanggal());
+							transfer.setSaldoPengirim(pengirim.getSaldo());
+							transfer.setSaldoPenerima(tujuan.getSaldo());
+							return transfer;
+
+						} else {
+							throw new BusinessException("Saldo Anda tidak cukup");
+						}
+				} else {
+					throw new BusinessException("Nominal transaksi minimal 10000");
+				}
+			} else {
+				throw new BusinessException("Nomor rekening tidak boleh sama");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
+	}
+
+	// --------------------------------------BayarTelpon----------------------------------------------
+	public List<BayarTeleponWrapper> bayarTelpon(Long rekAsal, Long noTelpon) {
+		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
+
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+
+			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
+				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
+				List<TransaksiTelkom> transaksiTelkom = transaksiTelkomRepo
+						.findByTagihanPelanggan(masterPelanggan.getIdPelanggan());
+
+				Long tagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
+
+				if (masterBank.getSaldo() - tagihan >= 50000) {
+
+					masterBank.setSaldo(masterBank.getSaldo() - tagihan);
+					masterBankRepo.save(masterBank);
+
+					HistoryBank historyBank = new HistoryBank();
+					historyBank.setNama(masterBank.getNama());
+					historyBank.setRekening(masterBank);
+					historyBank.setStatusKet((byte) 4);
+					historyBank.setUang(tagihan);
+					historyBank.setNoTlp(masterBank.getNotlp());
+					historyBankRepo.save(historyBank);
+
+					for (int i = 0; i < transaksiTelkom.size(); i++) {
+						if (transaksiTelkom.get(i).getStatus() == 1) {
+
+							HistoryTelkom historyTelkom = new HistoryTelkom();
+							historyTelkom.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+							historyTelkom.setIdPelanggan(masterPelanggan);
+							historyTelkom.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+							historyTelkom.setUang(transaksiTelkom.get(i).getUang());
+							historyTelkom.setIdHistory(historyTelkom.getIdHistory());
+							historyTelkomRepo.save(historyTelkom);
+
+							TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
+							transaksiNasabah.setStatus("K");
+							transaksiNasabah.setStatusKet((byte) 4);
+							transaksiNasabah.setUang(transaksiTelkom.get(i).getUang());
+							transaksiNasabah.setMasterBank(masterBank);
+							transaksiNasabahRepo.save(transaksiNasabah);
+
+							transaksiTelkom.get(i).setStatus((byte) 2);
+							transaksiTelkomRepo.save(transaksiTelkom.get(i));
+
+							BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+							wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
+							wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+							wrapper.setNamaPelanggan(masterPelanggan.getNama());
+							wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+							wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+							wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+							wrapper.setTagihan(transaksiTelkom.get(i).getUang());
+							wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+							wrapper.setNoRekening(rekAsal);
+							wrapper.setNamaRekening(masterBank.getNama());
+							wrapper.setSaldo(masterBank.getSaldo());
+							wrapper.setTanggal(historyBank.getTanggal());
+							wrapperList.add(wrapper);
+						}
+					}
+
+				} else {
+					throw new BusinessException("Saldo Anda tidak cukup");
+				}
+			} else {
+				throw new BusinessException("No telepon tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
+
+		return wrapperList;
 	}
 }

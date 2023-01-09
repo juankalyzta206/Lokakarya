@@ -1,67 +1,56 @@
 package com.ogya.lokakarya.bankadm.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.bankadm.repository.TransaksiNasabahRepository;
 import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
-import com.ogya.lokakarya.bankadm.util.DataResponse;
-import com.ogya.lokakarya.bankadm.util.DataResponseList;
-import com.ogya.lokakarya.bankadm.wrapper.TransaksiNasabahWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
+import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
+import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
+import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
-@RequestMapping(value = "/transfernasabah")
-@CrossOrigin()
+@RequestMapping(value = "/transaksiNasabah")
+@CrossOrigin
 public class TransaksiNasabahController {
 	@Autowired
-	TransaksiNasabahRepository transaksiNasabahRepository;
-	@Autowired
 	TransaksiNasabahService transaksiNasabahService;
-	
-	@GetMapping(path = "/getByIdPlan")
-	public TransaksiNasabahWrapper getByidTransaksiNasabahPlan(@RequestParam("id") Long idTransaksiNasabah) {
-		return transaksiNasabahService.getByidTransaksiNasabah(idTransaksiNasabah);
-	}
-	
-	@GetMapping(path = "/getById")
-	public DataResponse<TransaksiNasabahWrapper> getByidTransaksiNasabah(@RequestParam("id") Long idTransaksiNasabah) {
-		return new DataResponse<TransaksiNasabahWrapper>(transaksiNasabahService.getByidTransaksiNasabah(idTransaksiNasabah));
-	}
-	
-	@GetMapping(path = "/findAllPlan")
-	public List<TransaksiNasabahWrapper> findAllPlan() {
-		return transaksiNasabahService.findAll();
-	}
-	
-	@GetMapping(path = "/findAll")
-	public DataResponseList<TransaksiNasabahWrapper> findAll() {
-		return new DataResponseList<TransaksiNasabahWrapper>(transaksiNasabahService.findAll());
-	}
-	
-	@PostMapping(path = "/")
-	public DataResponse<TransaksiNasabahWrapper> save(@RequestBody TransaksiNasabahWrapper wrapper){
-		return new DataResponse<TransaksiNasabahWrapper>(transaksiNasabahService.save(wrapper));
-	}
-	
-	@PutMapping(path = "/")
-	public DataResponse<TransaksiNasabahWrapper> update(@RequestBody TransaksiNasabahWrapper wrapper){
-		return new DataResponse<TransaksiNasabahWrapper>(transaksiNasabahService.save(wrapper));
-	}
-	
-	@DeleteMapping(path = "/deleteById") 
-	public String deleteId(@RequestParam("id")  Long norek) {
-		transaksiNasabahService.delete(norek);
-		return "Rekening "+norek+" Berhasil di delete";
+
+	@PostMapping(path = "/transfer")
+	public DataResponse<TransferWrapper> transfer(@RequestParam("Nomor Rekening Asal") Long rekAsal,
+												  @RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) {
+		return new DataResponse<TransferWrapper>(transaksiNasabahService.transfer(rekTujuan, rekAsal, nominal));
 	}
 
+	@PostMapping(path = "/bayarTelpon")
+	public DataResponseList<BayarTeleponWrapper> bayarTelpon(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelpon) {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelpon(rekAsal, noTelpon));
+	}
+
+	@GetMapping(path = "/cekSaldo")
+	public DataResponse<MasterBankWrapper> cekSaldo(@RequestParam("Nomor Rekening") Long norek) {
+		return new DataResponse<MasterBankWrapper>(transaksiNasabahService.cekSaldo(norek));
+	}
+
+	@PostMapping(path = "/setor")
+	public DataResponse<SetorAmbilWrapper> setor(@RequestParam("Nomor Rekening") Long norek, @RequestParam("Nominal") Long nominal) {
+		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.setor(norek, nominal));
+	}
+
+	@PostMapping(path = "/tarik")
+	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek, @RequestParam("Nominal") Long nominal) {
+		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.tarik(norek, nominal));
+	}
+
+	@GetMapping(path = "/findByNoRekAndNoTelp")
+	public DataResponseList<BayarTeleponWrapper> findByNoTelp(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelp) {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findByNoTelpon(rekAsal, noTelp));
+	}
 }

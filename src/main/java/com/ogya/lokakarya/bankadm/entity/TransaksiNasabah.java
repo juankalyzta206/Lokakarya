@@ -1,7 +1,6 @@
 package com.ogya.lokakarya.bankadm.entity;
 
 import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,28 +8,27 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "transaksi_nasabah")
+@Table(name="TRANSAKSI_NASABAH")
 public class TransaksiNasabah {
 	private Long idTransaksiNasabah;
-	private MasterBank rekening;
-	private Date tanggel;
+	private MasterBank masterBank;
+	private Date tanggal;
 	private String status;
 	private Long uang;
-	private Long statusKet;
-	private Long NoRekTujuan;
-	private Long no_tlp;
+	private Byte statusKet;
+	private Long norekDituju;
+	private Long noTlp;
 	
 	@Id
-	@GeneratedValue(generator = "TRANSAKSINASABAH_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "TRANSAKSINASABAH_GEN", sequenceName = "TRANSAKSINASABAH_SEQ", initialValue = 1, allocationSize = 1)
-
-	
+	@GeneratedValue(generator = "TRANSAKSI_NASABAH_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "TRANSAKSI_NASABAH_GEN", sequenceName = "TRANSFER_NASABAH_SEQ", initialValue = 1, allocationSize = 1)
 	public Long getIdTransaksiNasabah() {
 		return idTransaksiNasabah;
 	}
@@ -39,24 +37,24 @@ public class TransaksiNasabah {
 	}
 	
 	@ManyToOne
-	@JoinColumn(name = "norek")
-	public MasterBank getRekening() {
-		return rekening;
+	@JoinColumn(name="NOREK")
+	public MasterBank getMasterBank() {
+		return masterBank;
 	}
-	public void setRekening(MasterBank rekening) {
-		this.rekening = rekening;
-	}
-	
-	@Column(name = "TANGGAL")
-	@Temporal(TemporalType.DATE)
-	public Date getTanggel() {
-		return tanggel;
-	}
-	public void setTanggel(Date tanggel) {
-		this.tanggel = tanggel;
+	public void setMasterBank(MasterBank masterBank) {
+		this.masterBank = masterBank;
 	}
 	
-	@Column(name = "STATUS")
+	@Column(name="TANGGAL")
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getTanggal() {
+		return tanggal;
+	}
+	public void setTanggal(Date tanggal) {
+		this.tanggal = tanggal;
+	}
+	
+	@Column(name="STATUS")
 	public String getStatus() {
 		return status;
 	}
@@ -64,7 +62,7 @@ public class TransaksiNasabah {
 		this.status = status;
 	}
 	
-	@Column(name = "UANG")
+	@Column(name="UANG")
 	public Long getUang() {
 		return uang;
 	}
@@ -72,30 +70,33 @@ public class TransaksiNasabah {
 		this.uang = uang;
 	}
 	
-	@Column(name = "STATUS_KET")
-	public Long getStatusKet() {
+	@Column(name="STATUS_KET")
+	public Byte getStatusKet() {
 		return statusKet;
 	}
-	public void setStatusKet(Long statusKet) {
+	public void setStatusKet(Byte statusKet) {
 		this.statusKet = statusKet;
 	}
 	
-	@Column(name = "NOREK_DITUJU")
-	public Long getNoRekTujuan() {
-		return NoRekTujuan;
+	@Column(name="NOREK_DITUJU")
+	public Long getNorekDituju() {
+		return norekDituju;
 	}
-	public void setNoRekTujuan(Long noRekTujuan) {
-		NoRekTujuan = noRekTujuan;
+	public void setNorekDituju(Long norekDituju) {
+		this.norekDituju = norekDituju;
 	}
 	
-	@Column(name = "NO_TLP")
-	public Long getNo_tlp() {
-		return no_tlp;
+	@Column(name="NO_TLP")
+	public Long getNoTlp() {
+		return noTlp;
 	}
-	public void setNo_tlp(Long no_tlp) {
-		this.no_tlp = no_tlp;
+	public void setNoTlp(Long noTlp) {
+		this.noTlp = noTlp;
 	}
 
-	
+	@PrePersist
+	private void onCreate() {
+		tanggal = new Date();
+	}
 	
 }

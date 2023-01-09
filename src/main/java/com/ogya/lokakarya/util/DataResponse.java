@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.bankadm.util;
+package com.ogya.lokakarya.util;
 
 public class DataResponse<T> {
 	
@@ -60,3 +60,4 @@ public class DataResponse<T> {
 	
 
 }
+

@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.service.MasterBankService;
-import com.ogya.lokakarya.bankadm.util.DataResponse;
-import com.ogya.lokakarya.bankadm.util.DataResponseList;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/masterbank")
@@ -43,6 +45,12 @@ public class MasterBankController {
 		return masterBankService.findAll();
 	}
 	
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPagination(@RequestParam("page") 
+	int page, @RequestParam("size") int size) {
+		return new DataResponsePagination<MasterBankWrapper, MasterBank>(masterBankService.findAllWithPagination(page, size));
+	}
+	
 	@GetMapping(path = "/findAll")
 	public DataResponseList<MasterBankWrapper> findAll() {
 		return new DataResponseList<MasterBankWrapper>(masterBankService.findAll());
@@ -59,8 +67,7 @@ public class MasterBankController {
 	}
 	
 	@DeleteMapping(path = "/deleteById") 
-	public String deleteId(@RequestParam("id")  Long norek) {
+	public void deleteId(@RequestParam("id")  Long norek) {
 		masterBankService.delete(norek);
-		return "Rekening "+norek+" Berhasil di delete";
 	}
 }

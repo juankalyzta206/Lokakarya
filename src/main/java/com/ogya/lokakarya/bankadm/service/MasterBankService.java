@@ -6,6 +6,9 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,8 @@ import org.springframework.stereotype.Service;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.util.PaginationList;
 
 
 @Service
@@ -71,8 +76,23 @@ public class MasterBankService {
 	}
 	
 	public void delete(Long norek) {
-			masterBankRepository.deleteById(norek);
-	}
+		if(masterBankRepository.isExistMasterBank(norek) != 0)
+				if (masterBankRepository.isExistHistoyBank(norek) == 0) {
+					masterBankRepository.deleteById(norek);
+				} else {
+					throw new BusinessException("NASABAH cannot deleted. REK. NUMBER is still used in the HISTORY table");
+				}else {
+					throw new BusinessException("NASABAH with REK. NUMBER inputed is not Exist!");
+				}
 	
+}
+	
+	public PaginationList<MasterBankWrapper, MasterBank> findAllWithPagination(int page, int size){
+		Pageable paging = PageRequest.of(page, size);
+		Page<MasterBank> bankPage = masterBankRepository.findAll(paging);
+		List<MasterBank> bankList =  bankPage.getContent();
+		List<MasterBankWrapper> bookWrapperList = toWrapperList(bankList);
+		return new PaginationList<MasterBankWrapper, MasterBank>(bookWrapperList, bankPage);
+	}
 }
 

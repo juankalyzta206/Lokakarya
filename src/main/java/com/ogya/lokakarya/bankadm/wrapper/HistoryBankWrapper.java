@@ -6,11 +6,12 @@ public class HistoryBankWrapper {
 	private Long idHistoryBank;
 	private Long norek;
 	private String nama;
-	private Date tanggel;
+	private Date tanggal;
 	private Long uang;
-	private Long statusKet;
+	private Byte statusKet;
 	private Long NoRekTujuan;
-	private Long no_tlp;
+	private Long noTlp;
+	
 	public Long getIdHistoryBank() {
 		return idHistoryBank;
 	}
@@ -29,11 +30,11 @@ public class HistoryBankWrapper {
 	public void setNama(String nama) {
 		this.nama = nama;
 	}
-	public Date getTanggel() {
-		return tanggel;
+	public Date getTanggal() {
+		return tanggal;
 	}
-	public void setTanggel(Date tanggel) {
-		this.tanggel = tanggel;
+	public void setTanggal(Date tanggal) {
+		this.tanggal = tanggal;
 	}
 	public Long getUang() {
 		return uang;
@@ -41,10 +42,10 @@ public class HistoryBankWrapper {
 	public void setUang(Long uang) {
 		this.uang = uang;
 	}
-	public Long getStatusKet() {
+	public Byte getStatusKet() {
 		return statusKet;
 	}
-	public void setStatusKet(Long statusKet) {
+	public void setStatusKet(Byte statusKet) {
 		this.statusKet = statusKet;
 	}
 	public Long getNoRekTujuan() {
@@ -53,17 +54,17 @@ public class HistoryBankWrapper {
 	public void setNoRekTujuan(Long noRekTujuan) {
 		NoRekTujuan = noRekTujuan;
 	}
-	public Long getNo_tlp() {
-		return no_tlp;
+	public Long getNoTlp() {
+		return noTlp;
 	}
-	public void setNo_tlp(Long no_tlp) {
-		this.no_tlp = no_tlp;
+	public void setNoTlp(Long noTlp) {
+		this.noTlp = noTlp;
 	}
 	@Override
 	public String toString() {
 		return "HistoryBankWrapper [idHistoryBank=" + idHistoryBank + ", norek=" + norek + ", nama=" + nama
-				+ ", tanggel=" + tanggel + ", uang=" + uang + ", statusKet=" + statusKet + ", NoRekTujuan="
-				+ NoRekTujuan + ", no_tlp=" + no_tlp + "]";
+				+ ", tanggel=" + tanggal + ", uang=" + uang + ", statusKet=" + statusKet + ", NoRekTujuan="
+				+ NoRekTujuan + ", noTlp=" + noTlp + "]";
 	}
 
 	

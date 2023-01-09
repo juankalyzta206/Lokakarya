@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -21,15 +22,15 @@ public class HistoryBank {
 	private Long idHistoryBank;
 	private MasterBank rekening;
 	private String nama;
-	private Date tanggel;
+	private Date tanggal;
 	private Long uang;
-	private Long statusKet;
+	private Byte statusKet;
 	private Long NoRekTujuan;
-	private Long no_tlp;
+	private Long noTlp;
 	
 	@Id
-	@GeneratedValue(generator = "HISTORYBANK_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "HISTORYBANK_GEN", sequenceName = "HISTORYBANK_SEQ", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(generator = "HISTORY_BANK_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "HISTORY_BANK_GEN", sequenceName = "HISTORY_BANK_SEQ", initialValue = 1, allocationSize = 1)
 
 	public Long getIdHistoryBank() {
 		return idHistoryBank;
@@ -39,12 +40,12 @@ public class HistoryBank {
 	}
 	
 	@Column(name = "TANGGAL")
-	@Temporal(TemporalType.DATE)
-	public Date getTanggel() {
-		return tanggel;
+	@Temporal(TemporalType.TIMESTAMP)
+	public Date getTanggal() {
+		return tanggal;
 	}
-	public void setTanggel(Date tanggel) {
-		this.tanggel = tanggel;
+	public void setTanggal(Date tanggel) {
+		this.tanggal = tanggel;
 	}
 	
 	@ManyToOne
@@ -74,10 +75,10 @@ public class HistoryBank {
 	}
 	
 	@Column(name = "STATUS_KET")
-	public Long getStatusKet() {
+	public Byte getStatusKet() {
 		return statusKet;
 	}
-	public void setStatusKet(Long statusKet) {
+	public void setStatusKet(Byte statusKet) {
 		this.statusKet = statusKet;
 	}
 	
@@ -90,13 +91,16 @@ public class HistoryBank {
 	}
 	
 	@Column(name = "NO_TLP")
-	public Long getNo_tlp() {
-		return no_tlp;
+	public Long getNoTlp() {
+		return noTlp;
 	}
-	public void setNo_tlp(Long no_tlp) {
-		this.no_tlp = no_tlp;
+	public void setNoTlp(Long noTlp) {
+		this.noTlp = noTlp;
 	}
 	
-	
+	@PrePersist
+	private void onCreate() {
+	    tanggal = new Date();
+	}
 	
 }

@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.bankadm.util;
+package com.ogya.lokakarya.util;
 
 import java.util.List;
 
