@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lokakarya-k8s-demo-deployment
+  labels:
+    app: lokakarya-k8s-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lokakarya-k8s-demo
+  template:
+    metadata:
+      labels: 
+       app: lokakarya-k8s-demo
+    spec:
+      containers:
+      - name: lokakarya-k8s-demo
+        image: kalyzta23/lokakarya-ogya-batch8
+        ports:
+         - containerPort: 8080
+ 
