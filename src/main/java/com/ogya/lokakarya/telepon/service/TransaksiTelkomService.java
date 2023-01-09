@@ -8,6 +8,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -54,6 +58,13 @@ public class TransaksiTelkomService {
 	}
 	//service untuk memasukkan/mengubah entity 
 	public TransaksiTelkomWrapper save(TransaksiTelkomWrapper wrapper) {
+//		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findAll();
+//		for (TransaksiTelkom entity : transaksiTelkomList) {
+//			TransaksiTelkomWrapper wrapperJumper = toWrapper(entity);
+//			if(wrapperJumper.getIdPelanggan() == wrapper.getIdPelanggan() && wrapperJumper.getTahunTagihan() == wrapper.getTahunTagihan() && wrapperJumper.getBulanTagihan() == wrapper.getBulanTagihan()) {
+//				throw new BusinessException("bulan tagihan tidak boleh sama");
+//			}
+//		}
 		TransaksiTelkom transaksiTelkom = transaksiTelkomRepository.save(toEntity(wrapper));
 		//kondisional jika nilai status 2, maka service juga akan memasukkan nilai kedalam tabel history
 		if(wrapper.getStatus() == 2) {
@@ -81,6 +92,9 @@ public class TransaksiTelkomService {
 		wrapper.setStatus(entity.getStatus());
 		wrapper.setIdTransaksi(entity.getIdTransaksi());
 		wrapper.setIdPelanggan(entity.getIdPelanggan() != null? entity.getIdPelanggan().getIdPelanggan() : null);
+		//Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
+		//MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
+		//wrapper.setNama(masterPelanggan.getNama());
 		return wrapper;
 	}
 	//method dalam service untuk memasukkan nilai kedalam entity
@@ -88,6 +102,9 @@ public class TransaksiTelkomService {
 		TransaksiTelkom entity = new TransaksiTelkom();
 		if (wrapper.getIdTransaksi() != null) {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
+		}
+		if(wrapper.getBulanTagihan() == null) {
+			throw new BusinessException("bulan tagihan tidak boleh null");
 		}
 		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
 		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null ;
@@ -110,6 +127,9 @@ public class TransaksiTelkomService {
 		if (wrapper.getIdHistory() != null) {
 			entity = historyRepository.getReferenceById(wrapper.getIdHistory());
 		}
+		if (wrapper.getBulanTagihan() == null) {
+			throw new BusinessException("Bulan tagihan tidak boleh null");
+		}
 		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
 		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
 		entity.setIdPelanggan(masterPelanggan);
@@ -118,15 +138,23 @@ public class TransaksiTelkomService {
 		entity.setTahunTagihan(wrapper.getTahunTagihan());
 		entity.setTanggalBayar(wrapper.getTanggalBayar());
 		entity.setUang(wrapper.getUang());
+		
 		return entity;
 	}
 	//method dalam service untuk menampilkan semua list
 	private List<TransaksiTelkomWrapper> toWrapperList(List<TransaksiTelkom> entityList) {
 		List<TransaksiTelkomWrapper> wrapperList = new ArrayList<TransaksiTelkomWrapper>();
 		for (TransaksiTelkom entity : entityList) {
-			TransaksiTelkomWrapper wrapper = toWrapper(entity);
+			TransaksiTelkomWrapper wrapper = toWrapper(entity);			
 			wrapperList.add(wrapper);
 		}
 		return wrapperList;
+	}
+	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPagination(int page, int size){
+		Pageable paging = PageRequest.of(page, size);
+		Page<TransaksiTelkom> transaksiTelkomPage = transaksiTelkomRepository.findAll(paging);
+		List<TransaksiTelkom> transaksiTelkomList =  transaksiTelkomPage.getContent();
+		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = toWrapperList(transaksiTelkomList);
+		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList, transaksiTelkomPage);
 	}
 }

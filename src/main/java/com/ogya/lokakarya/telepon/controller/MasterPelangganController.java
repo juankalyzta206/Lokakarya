@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/masterpelanggan")
@@ -40,5 +42,10 @@ public class MasterPelangganController {
 	@DeleteMapping(path = "/deleteById")
 	public void delete(@RequestParam("id") Long masterPelangganId) {
 		masterPelangganService.deleteById(masterPelangganId);
+	}
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size));
 	}
 }

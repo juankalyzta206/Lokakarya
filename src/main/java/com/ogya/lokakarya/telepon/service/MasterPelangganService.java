@@ -7,6 +7,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.util.PaginationList;
+
 
 
 @Service
@@ -87,4 +92,14 @@ public class MasterPelangganService {
 		}
 		return wrapperList;
 	}
+	
+	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size){
+		Pageable paging = PageRequest.of(page, size);
+		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging);
+		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+	}
+	
+	
 }

@@ -2,6 +2,8 @@ package com.ogya.lokakarya.telepon.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +28,7 @@ public interface TransaksiTelkomRepository extends JpaRepository<TransaksiTelkom
 	
 	@Query(value = "SELECT STATUS FROM TRANSAKSI_TELKOM WHERE ID_PELANGGAN = :idPelanggan", nativeQuery = true)
 	List<Integer> statusTagihan (@Param("idPelanggan") Long idPelanggan);
-
+	
+	Page<TransaksiTelkom> findAll(Pageable page);
 	
 }

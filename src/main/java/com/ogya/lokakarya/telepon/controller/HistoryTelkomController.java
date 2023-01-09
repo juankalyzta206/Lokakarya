@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.service.HistoryService;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/historytelkom")
@@ -43,5 +45,10 @@ public class HistoryTelkomController {
 	@GetMapping(path = "/sumAll")
 	public Long sumAll() {
 		return historyService.sumAll();
+	}
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<HistoryWrapper, HistoryTelkom> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<HistoryWrapper, HistoryTelkom>(historyService.findAllWithPagination(page, size));
 	}
 }

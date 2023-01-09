@@ -7,6 +7,10 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
@@ -14,6 +18,7 @@ import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -51,6 +56,9 @@ public class HistoryService {
 		wrapper.setTahunTagihan(entity.getTahunTagihan());
 		wrapper.setUang(entity.getUang());
 		wrapper.setIdPelanggan(entity.getIdPelanggan() != null ? entity.getIdPelanggan().getIdPelanggan() : null);
+//		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
+//		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
+//		wrapper.setNama(masterPelanggan.getNama());
 		return wrapper;
 	}
 	//method dalam service untuk memasukkan nilai kedalam entity
@@ -77,5 +85,12 @@ public class HistoryService {
 			wrapperList.add(wrapper);
 		}
 		return wrapperList;
+	}
+	public PaginationList<HistoryWrapper, HistoryTelkom> findAllWithPagination(int page, int size){
+		Pageable paging = PageRequest.of(page, size, Sort.by("tanggalBayar").descending());
+		Page<HistoryTelkom> historyPage = historyRepository.findAll(paging);
+		List<HistoryTelkom> historyList =  historyPage.getContent();
+		List<HistoryWrapper> historyWrapperList = toWrapperList(historyList);
+		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyWrapperList, historyPage);
 	}
 }

@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 import com.ogya.lokakarya.telepon.service.TransaksiTelkomService;
 import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/transaksitelkom")
@@ -52,5 +54,9 @@ public class TransaksiTelkomController {
 	public Long sumAll() {
 		return transaksiTelkomService.sumAll();
 	}
-
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomService.findAllWithPagination(page, size));
+	}
 }
