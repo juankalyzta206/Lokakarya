@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.service.LoginService;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
 import com.ogya.lokakarya.usermanagement.wrapper.LoginWrapper;
@@ -20,6 +21,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 
 @RestController
@@ -32,6 +34,12 @@ public class UsersController {
 	@Autowired
 	UsersService userService;
 	
+	
+	// findAllPagination
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<UsersWrapper, Users> findAllWithPagination(@RequestParam("page") int page,				@RequestParam("size") int size) {
+		return new DataResponsePagination<UsersWrapper, Users>(userService.findAllWithPagination(page, size));
+	}
 	
 	@GetMapping(path = "/findAllPlan")
 	public List<UsersWrapper> findAllPlan() {

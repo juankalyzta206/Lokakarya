@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.usermanagement.entity.RoleMenu;
 import com.ogya.lokakarya.usermanagement.service.RoleMenuService;
 import com.ogya.lokakarya.usermanagement.wrapper.RoleMenuWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 
 @RestController
@@ -26,6 +28,13 @@ public class RoleMenuController {
 	@Autowired
 	RoleMenuService roleMenuService;
 	
+	// findAllPagination
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<RoleMenuWrapper, RoleMenu> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<RoleMenuWrapper, RoleMenu>(roleMenuService.findAllWithPagination(page, size));
+	}
+		
 	
 	@GetMapping(path = "/findAllPlan")
 	public List<RoleMenuWrapper> findAllPlan() {

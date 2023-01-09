@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 import com.ogya.lokakarya.usermanagement.service.SubMenuService;
 import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 
 @RestController
@@ -26,6 +28,12 @@ public class SubMenuController {
 	@Autowired
 	SubMenuService subMenuService;
 	
+	
+	// findAllPagination
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPagination(@RequestParam("page") int page,				@RequestParam("size") int size) {
+		return new DataResponsePagination<SubMenuWrapper, SubMenu>(subMenuService.findAllWithPagination(page, size));
+	}
 	
 	@GetMapping(path = "/findAllPlan")
 	public List<SubMenuWrapper> findAllPlan() {

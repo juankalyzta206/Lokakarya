@@ -1,11 +1,18 @@
 package com.ogya.lokakarya.usermanagement.service;
 
+import java.security.SecureRandom;
+import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -16,6 +23,7 @@ import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -25,6 +33,24 @@ public class UsersService {
 	
 	@Autowired
 	HakAksesRepository hakAksesRepository;
+	
+//	SecureRandom random = new SecureRandom();
+//	byte[] salt = new byte[16];
+//	random.nextBytes(salt);
+//	
+//	KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+//	SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+//	
+//	byte[] hash = factory.generateSecret(spec).getEncoded();
+	
+	
+	public PaginationList<UsersWrapper, Users> findAllWithPagination(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
+		Page<Users> usersPage = usersRepository.findAll(paging);
+		List<Users> usersList = usersPage.getContent();
+		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
+		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
+	}
 	
 	
 	public List<UsersWrapper> findByEmailAndPassword(String email, String password) {

@@ -6,6 +6,9 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.MenuWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -21,7 +25,14 @@ public class MenuService {
 	@Autowired
 	MenuRepository menuRepository;
 	
-
+	public PaginationList<MenuWrapper, Menu> findAllWithPagination(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
+		Page<Menu> menuPage = menuRepository.findAll(paging);
+		List<Menu> menuList = menuPage.getContent();
+		List<MenuWrapper> menuWrapperList = toWrapperList(menuList);
+		return new PaginationList<MenuWrapper, Menu>(menuWrapperList, menuPage);
+	}
+	
 	private MenuWrapper toWrapper(Menu entity) {
 		MenuWrapper wrapper = new MenuWrapper();
 		wrapper.setSubMenu(entity.getSubMenu());

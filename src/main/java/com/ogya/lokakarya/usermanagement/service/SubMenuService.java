@@ -7,6 +7,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.SubMenuRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -26,6 +30,15 @@ public class SubMenuService {
 	
 	@Autowired
 	MenuRepository menuRepository;
+	
+	public PaginationList<SubMenuWrapper, SubMenu> findAllWithPagination(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
+		Page<SubMenu> subMenuPage = subMenuRepository.findAll(paging);
+		List<SubMenu> subMenuList = subMenuPage.getContent();
+		List<SubMenuWrapper> subMenuWrapperList = toWrapperList(subMenuList);
+		return new PaginationList<SubMenuWrapper, SubMenu>(subMenuWrapperList, subMenuPage);
+	}
+	
 	
 	private SubMenuWrapper toWrapper(SubMenu entity) {
 		SubMenuWrapper wrapper = new SubMenuWrapper();

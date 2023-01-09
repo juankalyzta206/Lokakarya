@@ -7,6 +7,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.RoleMenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RoleMenuWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -32,6 +36,14 @@ public class RoleMenuService {
 	@Autowired
 	RolesRepository rolesRepository;
 
+	public PaginationList<RoleMenuWrapper, RoleMenu> findAllWithPagination(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
+		Page<RoleMenu> roleMenuPage = roleMenuRepository.findAll(paging);
+		List<RoleMenu> roleMenuList = roleMenuPage.getContent();
+		List<RoleMenuWrapper> roleMenuWrapperList = toWrapperList(roleMenuList);
+		return new PaginationList<RoleMenuWrapper, RoleMenu>(roleMenuWrapperList, roleMenuPage);
+	}
+	
 	private RoleMenuWrapper toWrapper(RoleMenu entity) {
 		RoleMenuWrapper wrapper = new RoleMenuWrapper();
 		wrapper.setRoleMenuId(entity.getRoleMenuId());

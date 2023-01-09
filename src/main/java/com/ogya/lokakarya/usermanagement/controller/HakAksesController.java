@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ogya.lokakarya.usermanagement.entity.HakAkses;
 import com.ogya.lokakarya.usermanagement.service.HakAksesService;
 import com.ogya.lokakarya.usermanagement.wrapper.HakAksesWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
+import com.ogya.lokakarya.util.DataResponsePagination;
 
 
 @RestController
@@ -25,6 +27,13 @@ import com.ogya.lokakarya.util.DataResponseList;
 public class HakAksesController {
 	@Autowired
 	HakAksesService hakAksesService;
+	
+	// findAllPagination
+	@GetMapping(path = "/findAllWithPagination")
+	public DataResponsePagination<HakAksesWrapper, HakAkses> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<HakAksesWrapper, HakAkses>(hakAksesService.findAllWithPagination(page, size));
+	}
 	
 	
 	@GetMapping(path = "/findAllPlan")

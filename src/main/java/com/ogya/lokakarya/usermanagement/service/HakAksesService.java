@@ -7,6 +7,9 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.LoginRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.HakAksesWrapper;
+import com.ogya.lokakarya.util.PaginationList;
 
 @Service
 @Transactional
@@ -32,6 +36,14 @@ public class HakAksesService {
 	@Autowired
 	RolesRepository rolesRepository;
 
+	public PaginationList<HakAksesWrapper, HakAkses> findAllWithPagination(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
+		Page<HakAkses> hakAksesPage = hakAksesRepository.findAll(paging);
+		List<HakAkses> hakAksesList = hakAksesPage.getContent();
+		List<HakAksesWrapper> hakAksesWrapperList = toWrapperList(hakAksesList);
+		return new PaginationList<HakAksesWrapper, HakAkses>(hakAksesWrapperList, hakAksesPage);
+	}
+	
 	private HakAksesWrapper toWrapper(HakAkses entity) {
 		HakAksesWrapper wrapper = new HakAksesWrapper();
 		wrapper.setHakAksesId(entity.getHakAksesId());
@@ -87,7 +99,7 @@ public class HakAksesService {
 		if (hakAksesRepository.isExistUser(wrapper.getUserId()) == 0) {
 			throw new BusinessException("Cannot add hak akses, User ID not exist");
 		}
-		if (hakAksesRepository.isExistRole(wrapper.getUserId()) == 0) {
+		if (hakAksesRepository.isExistRole(wrapper.getRoleId()) == 0) {
 			throw new BusinessException("Cannot add hak akses, Role ID not exist");
 		}
 		HakAkses hakAkses = hakAksesRepository.save(toEntity(wrapper));
