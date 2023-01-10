@@ -59,4 +59,9 @@ public class TransaksiNasabahController {
 	public DataResponseList<BayarTeleponWrapper> findByNoTelp(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findByNoTelpon(rekAsal, noTelp));
 	}
+	
+	@GetMapping(path = "/findTotalTagihan")
+	public DataResponseList<BayarTeleponWrapper> findTotalTagihan(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelp) {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findTotalTagihan(rekAsal, noTelp));
+	}
 }

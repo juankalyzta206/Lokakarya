@@ -94,6 +94,36 @@ public class TransaksiNasabahService {
 		return wrapperList;
 	}
 
+	// -----------------------------------findTotalTagihan-----------------------------------
+	public List<BayarTeleponWrapper> findTotalTagihan(Long rekAsal, Long noTelpon) {
+		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
+
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+
+			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
+				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
+				Long totalTagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
+
+				BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+				wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+				wrapper.setNamaPelanggan(masterPelanggan.getNama());
+				wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+				wrapper.setTagihan(totalTagihan);
+				wrapper.setNoRekening(rekAsal);
+				wrapper.setNamaRekening(masterBank.getNama());
+				wrapper.setSaldo(masterBank.getSaldo());
+				wrapperList.add(wrapper);
+				
+			} else {
+				throw new BusinessException("Nomor telepon tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Nomor rekening tidak terdaftar");
+		}
+		return wrapperList;
+	}
+
 	// ------------------------------------setor----------------------------------------
 	public SetorAmbilWrapper setor(Long rekening, Long nominal) {
 		if (masterBankRepo.findById(rekening).isPresent()) {
