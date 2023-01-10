@@ -116,7 +116,6 @@ public class TransaksiNasabahService {
 				historyBank.setNama(nasabah.getNama());
 				historyBank.setRekening(nasabah);
 				historyBank.setStatusKet((byte) 1);
-				historyBank.setUang(nominal);
 				historyBankRepo.save(historyBank);
 
 				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
@@ -216,6 +215,7 @@ public class TransaksiNasabahService {
 							historyBank.setNoRekTujuan(rekTujuan);
 							historyBank.setStatusKet((byte) 3);
 							historyBank.setUang(nominal);
+							historyBank.setNamaTujuan(tujuan.getNama());
 							historyBankRepo.save(historyBank);
 
 							TransferWrapper transfer = new TransferWrapper();
@@ -293,23 +293,18 @@ public class TransaksiNasabahService {
 
 							transaksiTelkom.get(i).setStatus((byte) 2);
 							transaksiTelkomRepo.save(transaksiTelkom.get(i));
-
-							BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
-							wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
-							wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
-							wrapper.setNamaPelanggan(masterPelanggan.getNama());
-							wrapper.setNoTelepon(masterPelanggan.getNoTelp());
-							wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
-							wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
-							wrapper.setTagihan(transaksiTelkom.get(i).getUang());
-							wrapper.setStatus(transaksiTelkom.get(i).getStatus());
-							wrapper.setNoRekening(rekAsal);
-							wrapper.setNamaRekening(masterBank.getNama());
-							wrapper.setSaldo(masterBank.getSaldo());
-							wrapper.setTanggal(historyBank.getTanggal());
-							wrapperList.add(wrapper);
 						}
 					}
+					BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+					wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+					wrapper.setNamaPelanggan(masterPelanggan.getNama());
+					wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+					wrapper.setTagihan(tagihan);
+					wrapper.setNoRekening(rekAsal);
+					wrapper.setNamaRekening(masterBank.getNama());
+					wrapper.setSaldo(masterBank.getSaldo());
+					wrapper.setTanggal(historyBank.getTanggal());
+					wrapperList.add(wrapper);
 
 				} else {
 					throw new BusinessException("Saldo Anda tidak cukup");
@@ -387,6 +382,8 @@ public class TransaksiNasabahService {
 								wrapper.setSaldo(masterBank.getSaldo());
 								wrapper.setTanggal(historyBank.getTanggal());
 								wrapperList.add(wrapper);
+							} else {
+								throw new BusinessException("Tidak ada tagihan bulan ini");
 							}
 						}
 					}
