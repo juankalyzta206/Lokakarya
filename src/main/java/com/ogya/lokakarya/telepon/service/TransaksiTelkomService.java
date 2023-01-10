@@ -147,7 +147,6 @@ public class TransaksiTelkomService {
 		entity.setTahunTagihan(wrapper.getTahunTagihan());
 		entity.setTanggalBayar(wrapper.getTanggalBayar());
 		entity.setUang(wrapper.getUang());
-		
 		return entity;
 	}
 	//method dalam service untuk menampilkan semua list
