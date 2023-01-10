@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
-import com.ogya.lokakarya.usermanagement.repository.RolesLoginRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
@@ -23,9 +22,6 @@ import com.ogya.lokakarya.util.PaginationList;
 @Service
 @Transactional
 public class RolesService {
-	@Autowired
-	RolesLoginRepository rolesLoginRepository;
-	
 	@Autowired
 	RolesRepository rolesRepository;
 	

@@ -21,6 +21,7 @@ import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.PaginationList;
@@ -43,6 +44,28 @@ public class UsersService {
 //	
 //	byte[] hash = factory.generateSecret(spec).getEncoded();
 	
+	
+	public List<UsersLoginWrapper> findByEmailOrUsernameAndPassword(String identity, String password) {
+		if (usersRepository.isRegisteredEmail(identity) == 0) {
+			if (usersRepository.isRegisteredUsername(identity) == 0) {
+				throw new BusinessException("Email or Username is not Registered");
+			} else {
+				if (usersRepository.isMatchUsername(identity, password) == 0) {
+					throw new BusinessException("Wrong Password");
+				} else {
+					List<Users> loginList = usersRepository.findByUsernameAndPassword(identity, password);
+					return toWrapperListLogin(loginList);
+				}
+			}
+		} else {
+			if (usersRepository.isMatchEmail(identity, password) == 0) {
+				throw new BusinessException("Wrong Password");
+			} else {
+				List<Users> loginList = usersRepository.findByEmailAndPassword(identity, password);
+				return toWrapperListLogin(loginList);
+			}
+		}
+	}
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
@@ -77,11 +100,38 @@ public class UsersService {
 		return wrapper;
 	}
 	
+	private UsersLoginWrapper toWrapperLogin(Users entity) {
+		UsersLoginWrapper wrapper = new UsersLoginWrapper();
+		wrapper.setUserId(entity.getUserId());
+		wrapper.setUsername(entity.getUsername());
+		wrapper.setPassword(entity.getPassword());
+		wrapper.setHakAkses(entity.getHakAkses());		
+		wrapper.setNama(entity.getNama());
+		wrapper.setAlamat(entity.getAlamat());
+		wrapper.setEmail(entity.getEmail());
+		wrapper.setTelp(entity.getTelp());
+		wrapper.setProgramName(entity.getProgramName());
+		wrapper.setCreatedDate(entity.getCreatedDate());
+		wrapper.setCreatedBy(entity.getCreatedBy());
+		wrapper.setUpdatedDate(entity.getUpdatedDate());
+		wrapper.setUpdatedBy(entity.getUpdatedBy());
+		return wrapper;
+	}
+	
 
 	private List<UsersWrapper> toWrapperList(List<Users> entityList) {
 		List<UsersWrapper> wrapperList = new ArrayList<UsersWrapper>();
 		for (Users entity : entityList) {
 			UsersWrapper wrapper = toWrapper(entity);
+			wrapperList.add(wrapper);
+		}
+		return wrapperList;
+	}
+	
+	private List<UsersLoginWrapper> toWrapperListLogin(List<Users> entityList) {
+		List<UsersLoginWrapper> wrapperList = new ArrayList<UsersLoginWrapper>();
+		for (Users entity : entityList) {
+			UsersLoginWrapper wrapper = toWrapperLogin(entity);
 			wrapperList.add(wrapper);
 		}
 		return wrapperList;

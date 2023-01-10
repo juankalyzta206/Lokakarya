@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 
 
@@ -30,5 +31,7 @@ public interface TransaksiTelkomRepository extends JpaRepository<TransaksiTelkom
 	List<Integer> statusTagihan (@Param("idPelanggan") Long idPelanggan);
 	
 	Page<TransaksiTelkom> findAll(Pageable page);
+	
+	TransaksiTelkom findByidPelanggan(MasterPelanggan idPelanggan);
 	
 }

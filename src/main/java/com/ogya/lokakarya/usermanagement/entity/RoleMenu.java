@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "ROLE_MENU")
 public class RoleMenu {
 	private Long roleMenuId;
-	private RolesLogin roles;
-	private MenuLogin menu;
+	private Roles roles;
+	private Menu menu;
 	private String isActive;
 	private String programName;
 	private Date createdDate;
@@ -42,20 +42,20 @@ public class RoleMenu {
 	@ManyToOne
 	@JoinColumn(name = "ROLE_ID")
 	@JsonIgnore
-	public RolesLogin getRoles() {
+	public Roles getRoles() {
 		return roles;
 	}
-	public void setRoles(RolesLogin roles) {
+	public void setRoles(Roles roles) {
 		this.roles = roles;
 	}
 	
 	//--------------------------------------------------------------------------------------------------------
 	@ManyToOne
 	@JoinColumn(name = "MENU_ID")
-	public MenuLogin getMenu() {
+	public Menu getMenu() {
 		return menu;
 	}
-	public void setMenu(MenuLogin menu) {
+	public void setMenu(Menu menu) {
 		this.menu = menu;
 	}
 		

@@ -58,13 +58,12 @@ public class TransaksiTelkomService {
 	}
 	//service untuk memasukkan/mengubah entity 
 	public TransaksiTelkomWrapper save(TransaksiTelkomWrapper wrapper) {
-//		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findAll();
-//		for (TransaksiTelkom entity : transaksiTelkomList) {
-//			TransaksiTelkomWrapper wrapperJumper = toWrapper(entity);
-//			if(wrapperJumper.getIdPelanggan() == wrapper.getIdPelanggan() && wrapperJumper.getTahunTagihan() == wrapper.getTahunTagihan() && wrapperJumper.getBulanTagihan() == wrapper.getBulanTagihan()) {
-//				throw new BusinessException("bulan tagihan tidak boleh sama");
-//			}
-//		}
+		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findByTagihanPelanggan(wrapper.getIdPelanggan());
+		for(TransaksiTelkom entity : transaksiTelkomList) {
+			if(entity.getIdPelanggan().getIdPelanggan() == wrapper.getIdPelanggan() && entity.getTahunTagihan().equals(wrapper.getTahunTagihan())  && entity.getBulanTagihan() == wrapper.getBulanTagihan()) {
+				throw new BusinessException("bulan tagihan tidak boleh sama");
+			}
+		}
 		TransaksiTelkom transaksiTelkom = transaksiTelkomRepository.save(toEntity(wrapper));
 		//kondisional jika nilai status 2, maka service juga akan memasukkan nilai kedalam tabel history
 		if(wrapper.getStatus() == 2) {

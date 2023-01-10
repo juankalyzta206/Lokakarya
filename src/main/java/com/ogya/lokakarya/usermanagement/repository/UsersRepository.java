@@ -13,6 +13,24 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 public interface UsersRepository extends JpaRepository<Users, Long>{
 	List<Users> findByEmailAndPassword (String email, String password);
 	List<Users> findByUserId (Long userId);
+	List<Users> findByUsernameAndPassword (String username, String password);
+	
+	@Query(value="SELECT COUNT(*) FROM USERS u WHERE u.EMAIL = :email", 
+			nativeQuery = true)
+	Long isRegisteredEmail(@Param("email") String email);
+	
+	@Query(value="SELECT COUNT(*) FROM USERS u WHERE u.USERNAME = :username", 
+			nativeQuery = true)
+	Long isRegisteredUsername(@Param("username") String username);
+	
+	@Query(value="SELECT COUNT(*) FROM USERS u WHERE u.EMAIL = :email AND u.password = :password", 
+			nativeQuery = true)
+	Long isMatchEmail(@Param("email") String email, @Param("password") String password);
+	
+	@Query(value="SELECT COUNT(*) FROM USERS u WHERE u.USERNAME = :username AND u.password = :password", 
+			nativeQuery = true)
+	Long isMatchUsername(@Param("username") String username, @Param("password") String password);
+
 	
 	@Query(value="SELECT COUNT(1) FROM USERS u WHERE u.USERNAME = :username", 
 			nativeQuery = true)

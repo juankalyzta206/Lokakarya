@@ -15,12 +15,12 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.usermanagement.entity.MenuLogin;
+import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.RoleMenu;
-import com.ogya.lokakarya.usermanagement.entity.RolesLogin;
-import com.ogya.lokakarya.usermanagement.repository.MenuLoginRepository;
+import com.ogya.lokakarya.usermanagement.entity.Roles;
+import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.RoleMenuRepository;
-import com.ogya.lokakarya.usermanagement.repository.RolesLoginRepository;
+import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RoleMenuWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 
@@ -31,10 +31,10 @@ public class RoleMenuService {
 	RoleMenuRepository roleMenuRepository;
 	
 	@Autowired
-	MenuLoginRepository menuRepository;
+	RolesRepository rolesRepository;
 	
 	@Autowired
-	RolesLoginRepository rolesRepository;
+	MenuRepository menuRepository;
 
 	public PaginationList<RoleMenuWrapper, RoleMenu> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
@@ -79,11 +79,11 @@ public class RoleMenuService {
 		if (wrapper.getRoleMenuId() != null) {
 			entity = roleMenuRepository.getReferenceById(wrapper.getRoleMenuId());
 		}
-		Optional<RolesLogin> optionalRoles = rolesRepository.findById(wrapper.getRoleId());
-		RolesLogin roles = optionalRoles.isPresent() ? optionalRoles.get() : null;
+		Optional<Roles> optionalRoles = rolesRepository.findById(wrapper.getRoleId());
+		Roles roles = optionalRoles.isPresent() ? optionalRoles.get() : null;
 		entity.setRoles(roles);
-		Optional<MenuLogin> optionalMenu = menuRepository.findById(wrapper.getMenuId());
-		MenuLogin menu = optionalMenu.isPresent() ? optionalMenu.get() : null;
+		Optional<Menu> optionalMenu = menuRepository.findById(wrapper.getMenuId());
+		Menu menu = optionalMenu.isPresent() ? optionalMenu.get() : null;
 		entity.setMenu(menu);
 		entity.setIsActive(wrapper.getIsActive());
 		entity.setProgramName(wrapper.getProgramName());
