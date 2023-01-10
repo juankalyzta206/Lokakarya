@@ -26,6 +26,7 @@ public class HistoryBank {
 	private Long uang;
 	private Byte statusKet;
 	private Long NoRekTujuan;
+	private String NamaTujuan;
 	private Long noTlp;
 	
 	@Id
@@ -98,6 +99,14 @@ public class HistoryBank {
 		this.noTlp = noTlp;
 	}
 	
+	
+	
+	public String getNamaTujuan() {
+		return NamaTujuan;
+	}
+	public void setNamaTujuan(String namaTujuan) {
+		NamaTujuan = namaTujuan;
+	}
 	@PrePersist
 	private void onCreate() {
 	    tanggal = new Date();

@@ -10,6 +10,7 @@ public class HistoryBankWrapper {
 	private Long uang;
 	private Byte statusKet;
 	private Long NoRekTujuan;
+	private String NamaTujuan;
 	private Long noTlp;
 	
 	public Long getIdHistoryBank() {
@@ -54,6 +55,15 @@ public class HistoryBankWrapper {
 	public void setNoRekTujuan(Long noRekTujuan) {
 		NoRekTujuan = noRekTujuan;
 	}
+	
+	
+	
+	public String getNamaTujuan() {
+		return NamaTujuan;
+	}
+	public void setNamaTujuan(String namaTujuan) {
+		NamaTujuan = namaTujuan;
+	}
 	public Long getNoTlp() {
 		return noTlp;
 	}
@@ -63,9 +73,10 @@ public class HistoryBankWrapper {
 	@Override
 	public String toString() {
 		return "HistoryBankWrapper [idHistoryBank=" + idHistoryBank + ", norek=" + norek + ", nama=" + nama
-				+ ", tanggel=" + tanggal + ", uang=" + uang + ", statusKet=" + statusKet + ", NoRekTujuan="
-				+ NoRekTujuan + ", noTlp=" + noTlp + "]";
+				+ ", tanggal=" + tanggal + ", uang=" + uang + ", statusKet=" + statusKet + ", NoRekTujuan="
+				+ NoRekTujuan + ", NamaTujuan=" + NamaTujuan + ", noTlp=" + noTlp + "]";
 	}
+	
 
 	
 	
