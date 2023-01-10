@@ -412,8 +412,6 @@ public class TransaksiNasabahService {
 								wrapper.setSaldo(masterBank.getSaldo());
 								wrapper.setTanggal(historyBank.getTanggal());
 								wrapperList.add(wrapper);
-							} else {
-								throw new BusinessException("Tidak ada tagihan bulan ini");
 							}
 						}
 					}
