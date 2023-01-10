@@ -23,7 +23,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/historybank")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class HistoryBankController {
 	@Autowired
 	HistoryBankRepository historyBankRepository;
