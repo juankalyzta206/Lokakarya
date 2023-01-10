@@ -1,35 +1,42 @@
 package com.ogya.lokakarya.usermanagement.entity;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+
+
 @Entity
-@Table(name = "ROLES")
-public class Roles {
-	private Long roleId;
+@Table(name = "MENU")
+public class MenuLogin {
+	private Long menuId;
 	private String nama;
+	private String icon;
+	private String url;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-
+	private Set<SubMenu> subMenu = new HashSet<SubMenu>(0);
 	
 	@Id
-	@GeneratedValue(generator = "ROLES_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "ROLES_GEN", sequenceName = "ROLES_SEQ", initialValue = 1, allocationSize = 1)
-	public Long getRoleId() {
-		return roleId;
+	@GeneratedValue(generator = "MENU_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "MENU_GEN", sequenceName = "MENU_SEQ", initialValue = 1, allocationSize = 1)
+	public Long getMenuId() {
+		return menuId;
 	}
-	public void setRoleId(Long roleId) {
-		this.roleId = roleId;
+	public void setMenuId(Long menuId) {
+		this.menuId = menuId;
 	}
 	
 	//--------------------------------------------------------------------------------------------------------
@@ -39,6 +46,25 @@ public class Roles {
 	}
 	public void setNama(String nama) {
 		this.nama = nama;
+	}
+
+	
+	//--------------------------------------------------------------------------------------------------------
+	@Column(name = "ICON")
+	public String getIcon() {
+		return icon;
+	}
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	//--------------------------------------------------------------------------------------------------------
+	@Column(name = "URL")
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	//--------------------------------------------------------------------------------------------------------
@@ -84,6 +110,15 @@ public class Roles {
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
+	}
+	
+	
+	@OneToMany(mappedBy = "menu")
+	public Set<SubMenu> getSubMenu() {
+		return subMenu;
+	}
+	public void setSubMenu(Set<SubMenu> subMenu) {
+		this.subMenu = subMenu;
 	}
 	
 	

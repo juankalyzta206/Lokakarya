@@ -1,9 +1,7 @@
 package com.ogya.lokakarya.usermanagement.wrapper;
 
 import java.util.Date;
-import java.util.Set;
 
-import com.ogya.lokakarya.usermanagement.entity.RoleMenu;
 
 
 public class RolesWrapper {
@@ -14,7 +12,6 @@ public class RolesWrapper {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-	private Set<RoleMenu> roleMenu;
 	
 
 	public Long getRoleId() {
@@ -77,24 +74,6 @@ public class RolesWrapper {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-	
-	
-	public Set<RoleMenu> getRoleMenu() {
-		return roleMenu;
-	}
-	public void setRoleMenu(Set<RoleMenu> roleMenu) {
-		this.roleMenu = roleMenu;
-	}
-	//--------------------------------------------------------------------------------------------------------
-	@Override
-	public String toString() {
-		return "RolesWrapper [roleId=" + roleId + ", nama=" + nama + ", programName=" + programName + ", createdDate="
-				+ createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate + ", updatedBy=" + updatedBy
-				+ "]";
-	}
-	
-	
-	
 	
 	
 	

@@ -52,7 +52,7 @@ public class TransaksiNasabahService {
 			wrapper.setSaldo(nasabah.getSaldo());
 			return wrapper;
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar.");
 		}
 	}
 
@@ -86,10 +86,10 @@ public class TransaksiNasabahService {
 					}
 				}
 			} else {
-				throw new BusinessException("No telepon tidak terdaftar");
+				throw new BusinessException("Nomor telepon tidak terdaftar");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 		return wrapperList;
 	}
@@ -129,10 +129,10 @@ public class TransaksiNasabahService {
 				return wrapper;
 
 			} else {
-				throw new BusinessException("Nominal transaksi minimal 10000");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 	}
 
@@ -174,71 +174,75 @@ public class TransaksiNasabahService {
 					throw new BusinessException("Saldo Anda tidak cukup");
 				}
 			} else {
-				throw new BusinessException("Nominal transaksi minimal 10000");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 	}
 
 	// -------------------------------------Transfer-------------------------------------------------
 	public TransferWrapper transfer(Long rekTujuan, Long rekAsal, Long nominal) {
 
-		if (masterBankRepo.findById(rekAsal).isPresent() && masterBankRepo.findById(rekTujuan).isPresent()) {
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			if (masterBankRepo.findById(rekTujuan).isPresent()) {
 
-			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
-			MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
-			TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
+				MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
+				MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
+				TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
 
-			if (pengirim != tujuan) {
+				if (pengirim != tujuan) {
 
-				if (nominal >= 10000) {
+					if (nominal >= 10000) {
 
-					if (pengirim.getSaldo() - nominal >= 50000) {
+						if (pengirim.getSaldo() - nominal >= 50000) {
 
-						transaksiNasabah.setNorekDituju(rekTujuan);
-						transaksiNasabah.setStatus("K");
-						transaksiNasabah.setStatusKet((byte) 3);
-						transaksiNasabah.setUang(nominal);
-						transaksiNasabah.setMasterBank(pengirim);
-						transaksiNasabah.setNoTlp(pengirim.getNotlp());
-						transaksiNasabahRepo.save(transaksiNasabah);
+							transaksiNasabah.setNorekDituju(rekTujuan);
+							transaksiNasabah.setStatus("K");
+							transaksiNasabah.setStatusKet((byte) 3);
+							transaksiNasabah.setUang(nominal);
+							transaksiNasabah.setMasterBank(pengirim);
+							transaksiNasabah.setNoTlp(pengirim.getNotlp());
+							transaksiNasabahRepo.save(transaksiNasabah);
 
-						pengirim.setSaldo(pengirim.getSaldo() - nominal);
-						masterBankRepo.save(pengirim);
+							pengirim.setSaldo(pengirim.getSaldo() - nominal);
+							masterBankRepo.save(pengirim);
 
-						masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
+							masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
 
-						HistoryBank historyBank = new HistoryBank();
-						historyBank.setNama(pengirim.getNama());
-						historyBank.setRekening(pengirim);
-						historyBank.setNoRekTujuan(rekTujuan);
-						historyBank.setStatusKet((byte) 3);
-						historyBank.setUang(nominal);
-						historyBankRepo.save(historyBank);
+							HistoryBank historyBank = new HistoryBank();
+							historyBank.setNama(pengirim.getNama());
+							historyBank.setRekening(pengirim);
+							historyBank.setNoRekTujuan(rekTujuan);
+							historyBank.setStatusKet((byte) 3);
+							historyBank.setUang(nominal);
+							historyBankRepo.save(historyBank);
 
-						TransferWrapper transfer = new TransferWrapper();
-						transfer.setRekAsal(rekAsal);
-						transfer.setNamaPengirim(pengirim.getNama());
-						transfer.setRekTujuan(rekTujuan);
-						transfer.setNamaPenerima(tujuan.getNama());
-						transfer.setNominal(nominal);
-						transfer.setTanggal(transaksiNasabah.getTanggal());
-						transfer.setSaldoPengirim(pengirim.getSaldo());
-						transfer.setSaldoPenerima(tujuan.getSaldo());
-						return transfer;
+							TransferWrapper transfer = new TransferWrapper();
+							transfer.setRekAsal(rekAsal);
+							transfer.setNamaPengirim(pengirim.getNama());
+							transfer.setRekTujuan(rekTujuan);
+							transfer.setNamaPenerima(tujuan.getNama());
+							transfer.setNominal(nominal);
+							transfer.setTanggal(transaksiNasabah.getTanggal());
+							transfer.setSaldoPengirim(pengirim.getSaldo());
+							transfer.setSaldoPenerima(tujuan.getSaldo());
+							return transfer;
 
+						} else {
+							throw new BusinessException("Saldo Anda tidak cukup");
+						}
 					} else {
-						throw new BusinessException("Saldo Anda tidak cukup");
+						throw new BusinessException("Nominal transaksi minimal 10.000");
 					}
 				} else {
-					throw new BusinessException("Nominal transaksi minimal 10000");
+					throw new BusinessException("Nomor rekening pemilik dan tujuan tidak boleh sama");
 				}
 			} else {
-				throw new BusinessException("Nomor rekening tidak boleh sama");
+				throw new BusinessException("Nomor rekening tujuan tidak terdaftar");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening pengirim tidak terdaftar");
 		}
 	}
 
@@ -311,10 +315,10 @@ public class TransaksiNasabahService {
 					throw new BusinessException("Saldo Anda tidak cukup");
 				}
 			} else {
-				throw new BusinessException("No telepon tidak terdaftar");
+				throw new BusinessException("Nomor telepon tidak terdaftar");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 
 		return wrapperList;
@@ -383,8 +387,6 @@ public class TransaksiNasabahService {
 								wrapper.setSaldo(masterBank.getSaldo());
 								wrapper.setTanggal(historyBank.getTanggal());
 								wrapperList.add(wrapper);
-							} else {
-								throw new BusinessException("Tidak ada tagihan bulan ini");
 							}
 						}
 					}
@@ -393,10 +395,10 @@ public class TransaksiNasabahService {
 					throw new BusinessException("Saldo Anda tidak cukup");
 				}
 			} else {
-				throw new BusinessException("No telepon tidak terdaftar");
+				throw new BusinessException("Nomor telepon tidak terdaftar");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 
 		return wrapperList;
