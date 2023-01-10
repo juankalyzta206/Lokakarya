@@ -103,7 +103,7 @@ public class TransaksiNasabahService {
 
 			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
 				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
-				Long totalTagihan = transaksiTelkomRepo.tagihanTelpon(noTelpon);
+				Long totalTagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
 
 				BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
 				wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
