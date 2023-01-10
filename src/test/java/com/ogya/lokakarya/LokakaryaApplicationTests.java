@@ -1,10 +1,10 @@
-package com.lokakarya.telepon;
+package com.ogya.lokakarya;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TeleponApplicationTests {
+class LokakaryaApplicationTests {
 
 	@Test
 	void contextLoads() {
