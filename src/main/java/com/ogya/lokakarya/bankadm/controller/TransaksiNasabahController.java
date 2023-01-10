@@ -18,7 +18,7 @@ import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
 @RequestMapping(value = "/transaksiNasabah")
-@CrossOrigin(origins = "https://lokakarya-spring-boot-production.up.railway.app")
+@CrossOrigin(origins = "*")
 public class TransaksiNasabahController {
 	@Autowired
 	TransaksiNasabahService transaksiNasabahService;
