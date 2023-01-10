@@ -1,17 +1,22 @@
 package com.ogya.lokakarya.usermanagement.entity;
 
 import java.util.Date;
-
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -29,6 +34,7 @@ public class Users  {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
+	private Set<HakAkses> hakAkses = new HashSet<HakAkses>(0);
 
 	
 	@Id
@@ -146,6 +152,15 @@ public class Users  {
 	
 	//--------------------------------------------------------------------------------------------------------
 
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
+	@JsonIgnore
+	public Set<HakAkses> getHakAkses() {
+		return this.hakAkses;
+	}
+
+	public void setHakAkses(Set<HakAkses> hakAkses) {
+		this.hakAkses = hakAkses;
+	}
 	
 
 }

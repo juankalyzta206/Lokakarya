@@ -16,11 +16,11 @@ import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.HakAkses;
-import com.ogya.lokakarya.usermanagement.entity.Login;
-import com.ogya.lokakarya.usermanagement.entity.RolesLogin;
+import com.ogya.lokakarya.usermanagement.entity.Roles;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
-import com.ogya.lokakarya.usermanagement.repository.LoginRepository;
-import com.ogya.lokakarya.usermanagement.repository.RolesLoginRepository;
+import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
+import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.HakAksesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 
@@ -31,10 +31,10 @@ public class HakAksesService {
 	HakAksesRepository hakAksesRepository;
 	
 	@Autowired
-	LoginRepository usersRepository;
+	UsersRepository usersRepository;
 	
 	@Autowired
-	RolesLoginRepository rolesRepository;
+	RolesRepository rolesRepository;
 
 	public PaginationList<HakAksesWrapper, HakAkses> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
@@ -78,11 +78,11 @@ public class HakAksesService {
 		if (wrapper.getHakAksesId() != null) {
 			entity = hakAksesRepository.getReferenceById(wrapper.getHakAksesId());
 		}
-		Optional<Login> optionalUsers = usersRepository.findById(wrapper.getUserId());
-		Login users = optionalUsers.isPresent() ? optionalUsers.get() : null;
+		Optional<Users> optionalUsers = usersRepository.findById(wrapper.getUserId());
+		Users users = optionalUsers.isPresent() ? optionalUsers.get() : null;
 		entity.setUsers(users);
-		Optional<RolesLogin> optionalRoles = rolesRepository.findById(wrapper.getRoleId());
-		RolesLogin roles = optionalRoles.isPresent() ? optionalRoles.get() : null;
+		Optional<Roles> optionalRoles = rolesRepository.findById(wrapper.getRoleId());
+		Roles roles = optionalRoles.isPresent() ? optionalRoles.get() : null;
 		entity.setRoles(roles);
 		entity.setProgramName(wrapper.getProgramName());
 		entity.setCreatedDate(wrapper.getCreatedDate());

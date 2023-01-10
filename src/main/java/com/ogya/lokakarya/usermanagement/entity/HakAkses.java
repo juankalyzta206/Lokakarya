@@ -19,8 +19,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name = "HAK_AKSES")
 public class HakAkses  {
 	private Long hakAksesId;
-	private Login users;
-	private RolesLogin roles;
+	private Users users;
+	private Roles roles;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
@@ -42,20 +42,20 @@ public class HakAkses  {
 	@ManyToOne
 	@JoinColumn(name = "USER_ID")
 	@JsonIgnore
-	public Login getUsers() {
+	public Users getUsers() {
 		return users;
 	}
-	public void setUsers(Login users) {
+	public void setUsers(Users users) {
 		this.users = users;
 	}
 	
 	//--------------------------------------------------------------------------------------------------------
 	@ManyToOne
 	@JoinColumn(name = "ROLE_ID")
-	public RolesLogin getRoles() {
+	public Roles getRoles() {
 		return roles;
 	}
-	public void setRoles(RolesLogin roles) {
+	public void setRoles(Roles roles) {
 		this.roles = roles;
 	}
 	

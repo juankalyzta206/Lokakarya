@@ -15,9 +15,9 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.usermanagement.entity.MenuLogin;
+import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.SubMenu;
-import com.ogya.lokakarya.usermanagement.repository.MenuLoginRepository;
+import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.SubMenuRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;
 import com.ogya.lokakarya.util.PaginationList;
@@ -29,7 +29,7 @@ public class SubMenuService {
 	SubMenuRepository subMenuRepository;
 	
 	@Autowired
-	MenuLoginRepository menuRepository;
+	MenuRepository menuRepository;
 	
 	public PaginationList<SubMenuWrapper, SubMenu> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
@@ -75,8 +75,8 @@ public class SubMenuService {
 		if (wrapper.getSubMenuId() != null) {
 			entity = subMenuRepository.getReferenceById(wrapper.getSubMenuId());
 		}
-		Optional<MenuLogin> optionalMenu = menuRepository.findById(wrapper.getMenuId());
-		MenuLogin menu = optionalMenu.isPresent() ? optionalMenu.get() : null;
+		Optional<Menu> optionalMenu = menuRepository.findById(wrapper.getMenuId());
+		Menu menu = optionalMenu.isPresent() ? optionalMenu.get() : null;
 		entity.setMenu(menu);
 		entity.setNama(wrapper.getNama());
 		entity.setIcon(wrapper.getIcon());

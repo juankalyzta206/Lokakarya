@@ -14,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.service.LoginService;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
-import com.ogya.lokakarya.usermanagement.wrapper.LoginWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
@@ -28,9 +27,6 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 @RequestMapping(value = "/users")
 @CrossOrigin()
 public class UsersController {
-	@Autowired
-	LoginService loginService;
-	
 	@Autowired
 	UsersService userService;
 	
@@ -80,8 +76,8 @@ public class UsersController {
 	
 	
 	@GetMapping(path = "/login")
-	public DataResponseList<LoginWrapper> findAll(@RequestParam("identity") String identity, @RequestParam("password") String password) {
-		return new DataResponseList<LoginWrapper>(loginService.findByEmailOrUsernameAndPassword(identity, password));
+	public DataResponseList<UsersLoginWrapper> findAll(@RequestParam("identity") String identity, @RequestParam("password") String password) {
+		return new DataResponseList<UsersLoginWrapper>(userService.findByEmailOrUsernameAndPassword(identity, password));
 	}
 	
 	
