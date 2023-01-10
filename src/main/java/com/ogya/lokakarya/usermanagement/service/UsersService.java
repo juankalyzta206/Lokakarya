@@ -47,7 +47,7 @@ public class UsersService {
 			if (usersRepository.isRegisteredUsername(identity) == 0) {
 				throw new BusinessException("Email or Username is not Registered");
 			} else {
-				String databasePassword = usersRepository.hashedPassword(identity);
+				String databasePassword = usersRepository.hashedPasswordUsername(identity);
 				if (!matchPassword(password, databasePassword)) {
 					throw new BusinessException("Wrong Password");
 				} else {
@@ -56,7 +56,7 @@ public class UsersService {
 				}
 			}
 		} else {
-			String databasePassword = usersRepository.hashedPassword(identity);
+			String databasePassword = usersRepository.hashedPasswordEmail(identity);
 			if (!matchPassword(password, databasePassword)) {
 				throw new BusinessException("Wrong Password");
 			} else {

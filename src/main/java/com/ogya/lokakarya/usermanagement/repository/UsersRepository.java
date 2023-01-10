@@ -33,7 +33,11 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 
 	@Query(value="SELECT PASSWORD FROM USERS u WHERE u.USERNAME = :username", 
 			nativeQuery = true)
-	String hashedPassword(@Param("username") String username);
+	String hashedPasswordUsername(@Param("username") String username);
+	
+	@Query(value="SELECT PASSWORD FROM USERS u WHERE u.EMAIL = :email", 
+			nativeQuery = true)
+	String hashedPasswordEmail(@Param("email") String email);
 
 	
 	@Query(value="SELECT COUNT(1) FROM USERS u WHERE u.USERNAME = :username", 
