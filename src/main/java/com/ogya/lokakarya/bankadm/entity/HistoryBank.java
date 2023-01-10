@@ -99,14 +99,13 @@ public class HistoryBank {
 		this.noTlp = noTlp;
 	}
 	
-	
-	
 	public String getNamaTujuan() {
 		return NamaTujuan;
 	}
 	public void setNamaTujuan(String namaTujuan) {
 		NamaTujuan = namaTujuan;
 	}
+	
 	@PrePersist
 	private void onCreate() {
 	    tanggal = new Date();

@@ -116,7 +116,6 @@ public class TransaksiNasabahService {
 				historyBank.setNama(nasabah.getNama());
 				historyBank.setRekening(nasabah);
 				historyBank.setStatusKet((byte) 1);
-				historyBank.setUang(nominal);
 				historyBankRepo.save(historyBank);
 
 				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
@@ -216,6 +215,7 @@ public class TransaksiNasabahService {
 							historyBank.setNoRekTujuan(rekTujuan);
 							historyBank.setStatusKet((byte) 3);
 							historyBank.setUang(nominal);
+							historyBank.setNamaTujuan(tujuan.getNama());
 							historyBankRepo.save(historyBank);
 
 							TransferWrapper transfer = new TransferWrapper();
@@ -383,6 +383,8 @@ public class TransaksiNasabahService {
 								wrapper.setSaldo(masterBank.getSaldo());
 								wrapper.setTanggal(historyBank.getTanggal());
 								wrapperList.add(wrapper);
+							} else {
+								throw new BusinessException("Tidak ada tagihan bulan ini");
 							}
 						}
 					}
