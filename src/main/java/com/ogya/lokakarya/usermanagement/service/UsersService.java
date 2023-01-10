@@ -106,14 +106,6 @@ public class UsersService {
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setHakAkses(entity.getHakAkses());		
 		wrapper.setNama(entity.getNama());
-		wrapper.setAlamat(entity.getAlamat());
-		wrapper.setEmail(entity.getEmail());
-		wrapper.setTelp(entity.getTelp());
-		wrapper.setProgramName(entity.getProgramName());
-		wrapper.setCreatedDate(entity.getCreatedDate());
-		wrapper.setCreatedBy(entity.getCreatedBy());
-		wrapper.setUpdatedDate(entity.getUpdatedDate());
-		wrapper.setUpdatedBy(entity.getUpdatedBy());
 		return wrapper;
 	}
 	
