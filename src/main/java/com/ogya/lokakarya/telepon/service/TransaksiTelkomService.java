@@ -53,7 +53,7 @@ public class TransaksiTelkomService {
 		return toWrapperList(transaksiTelkomList);
 	}
 	public List<TransaksiTelkomWrapper> findAllStatus1(){
-		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findStatus1();
+		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findStatus1(Sort.by(Order.by("idTransaksi")).descending());
 		return toWrapperList(transaksiTelkomList);
 	}
 	//service untuk memasukkan/mengubah entity 

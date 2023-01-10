@@ -63,6 +63,7 @@ private HistoryBankWrapper toWrapper(HistoryBank entity) {
 	wrapper.setStatusKet(entity.getStatusKet());
 	wrapper.setNoRekTujuan(entity.getNoRekTujuan());
 	wrapper.setNoTlp(entity.getNoTlp());
+	wrapper.setNamaTujuan(entity.getNamaTujuan());
 	return wrapper;
 }
 
@@ -94,6 +95,7 @@ private HistoryBank toEntity(HistoryBankWrapper wrapper) {
 	entity.setStatusKet(wrapper.getStatusKet());
 	entity.setNoRekTujuan(wrapper.getNoRekTujuan());
 	entity.setNoTlp(wrapper.getNoTlp());
+	entity.setNamaTujuan(wrapper.getNamaTujuan());
 	return entity;
 }
 

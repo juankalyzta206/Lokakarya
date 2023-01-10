@@ -103,7 +103,7 @@ public class TransaksiNasabahService {
 
 			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
 				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
-				Long totalTagihan = transaksiTelkomRepo.tagihanTelpon(noTelpon);
+				Long totalTagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
 
 				BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
 				wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
@@ -412,8 +412,6 @@ public class TransaksiNasabahService {
 								wrapper.setSaldo(masterBank.getSaldo());
 								wrapper.setTanggal(historyBank.getTanggal());
 								wrapperList.add(wrapper);
-							} else {
-								throw new BusinessException("Tidak ada tagihan bulan ini");
 							}
 						}
 					}
