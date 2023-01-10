@@ -295,14 +295,10 @@ public class TransaksiNasabahService {
 							transaksiTelkomRepo.save(transaksiTelkom.get(i));
 
 							BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
-							wrapper.setIdTransaksi(transaksiTelkom.get(i).getIdTransaksi());
 							wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
 							wrapper.setNamaPelanggan(masterPelanggan.getNama());
 							wrapper.setNoTelepon(masterPelanggan.getNoTelp());
-							wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
-							wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
-							wrapper.setTagihan(transaksiTelkom.get(i).getUang());
-							wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+							wrapper.setTagihan(tagihan);
 							wrapper.setNoRekening(rekAsal);
 							wrapper.setNamaRekening(masterBank.getNama());
 							wrapper.setSaldo(masterBank.getSaldo());
