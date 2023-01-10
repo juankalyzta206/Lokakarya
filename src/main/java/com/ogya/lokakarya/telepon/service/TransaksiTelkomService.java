@@ -58,12 +58,7 @@ public class TransaksiTelkomService {
 	}
 	//service untuk memasukkan/mengubah entity 
 	public TransaksiTelkomWrapper save(TransaksiTelkomWrapper wrapper) {
-		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findByTagihanPelanggan(wrapper.getIdPelanggan());
-		for(TransaksiTelkom entity : transaksiTelkomList) {
-			if(entity.getIdPelanggan().getIdPelanggan() == wrapper.getIdPelanggan() && entity.getTahunTagihan().equals(wrapper.getTahunTagihan())  && entity.getBulanTagihan() == wrapper.getBulanTagihan()) {
-				throw new BusinessException("bulan tagihan tidak boleh sama");
-			}
-		}
+
 		TransaksiTelkom transaksiTelkom = transaksiTelkomRepository.save(toEntity(wrapper));
 		//kondisional jika nilai status 2, maka service juga akan memasukkan nilai kedalam tabel history
 		if(wrapper.getStatus() == 2) {
@@ -91,9 +86,9 @@ public class TransaksiTelkomService {
 		wrapper.setStatus(entity.getStatus());
 		wrapper.setIdTransaksi(entity.getIdTransaksi());
 		wrapper.setIdPelanggan(entity.getIdPelanggan() != null? entity.getIdPelanggan().getIdPelanggan() : null);
-		//Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
-		//MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
-		//wrapper.setNama(masterPelanggan.getNama());
+		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
+		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
+		wrapper.setNama(masterPelanggan.getNama());
 		return wrapper;
 	}
 	//method dalam service untuk memasukkan nilai kedalam entity
@@ -101,6 +96,14 @@ public class TransaksiTelkomService {
 		TransaksiTelkom entity = new TransaksiTelkom();
 		if (wrapper.getIdTransaksi() != null) {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
+		}
+		else {
+			List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository.findByTagihanPelanggan(wrapper.getIdPelanggan());
+			for(TransaksiTelkom entity1 : transaksiTelkomList) {
+				if(entity1.getIdPelanggan().getIdPelanggan() == wrapper.getIdPelanggan() && entity1.getTahunTagihan().equals(wrapper.getTahunTagihan())  && entity1.getBulanTagihan() == wrapper.getBulanTagihan()) {
+					throw new BusinessException("bulan tagihan tidak boleh sama");
+				}
+			}
 		}
 		if(wrapper.getBulanTagihan() == null) {
 			throw new BusinessException("bulan tagihan tidak boleh null");
