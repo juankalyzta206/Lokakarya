@@ -31,6 +31,10 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 			nativeQuery = true)
 	Long isMatchUsername(@Param("username") String username, @Param("password") String password);
 
+	@Query(value="SELECT PASSWORD FROM USERS u WHERE u.USERNAME = :username", 
+			nativeQuery = true)
+	String hashedPassword(@Param("username") String username);
+
 	
 	@Query(value="SELECT COUNT(1) FROM USERS u WHERE u.USERNAME = :username", 
 			nativeQuery = true)

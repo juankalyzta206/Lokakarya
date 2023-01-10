@@ -1,12 +1,9 @@
 package com.ogya.lokakarya.usermanagement.service;
 
-import java.security.SecureRandom;
-import java.security.spec.KeySpec;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,14 +12,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 
@@ -35,25 +33,25 @@ public class UsersService {
 	@Autowired
 	HakAksesRepository hakAksesRepository;
 	
-//	SecureRandom random = new SecureRandom();
-//	byte[] salt = new byte[16];
-//	random.nextBytes(salt);
-//	
-//	KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
-//	SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-//	
-//	byte[] hash = factory.generateSecret(spec).getEncoded();
+	private String hashPassword(String plainPassword) {
+        return new BCryptPasswordEncoder().encode(plainPassword);
+    }
 	
+	private Boolean matchPassword(String plainPassword, String databasePassword) {
+		return new BCryptPasswordEncoder().matches(plainPassword, databasePassword);
+	}
 	
+
 	public List<UsersLoginWrapper> findByEmailOrUsernameAndPassword(String identity, String password) {
 		if (usersRepository.isRegisteredEmail(identity) == 0) {
 			if (usersRepository.isRegisteredUsername(identity) == 0) {
 				throw new BusinessException("Email or Username is not Registered");
 			} else {
-				if (usersRepository.isMatchUsername(identity, password) == 0) {
-					throw new BusinessException("Wrong Password");
+				String databasePassword = usersRepository.hashedPassword(identity);
+				if (!matchPassword(password, databasePassword)) {
+					throw new BusinessException(databasePassword);
 				} else {
-					List<Users> loginList = usersRepository.findByUsernameAndPassword(identity, password);
+					List<Users> loginList = usersRepository.findByUsernameAndPassword(identity, databasePassword);
 					return toWrapperListLogin(loginList);
 				}
 			}
@@ -188,6 +186,7 @@ public class UsersService {
 	public UsersWrapper save(UsersWrapper wrapper) {
 		if (usersRepository.checkUsername(wrapper.getUsername())==0) {
 			if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
+				wrapper.setPassword(hashPassword(wrapper.getPassword()));
 				Users user = usersRepository.save(toEntity(wrapper));
 				return toWrapper(user);
 			} else {
@@ -203,6 +202,7 @@ public class UsersService {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkUsername(wrapper.getUsername())==0) {
 					if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
+						wrapper.setPassword(hashPassword(wrapper.getPassword()));
 						Users user = usersRepository.save(toEntityUpdate(wrapper));
 						return toWrapper(user);
 					} else {
@@ -219,6 +219,7 @@ public class UsersService {
 			}
 			if (wrapper.getSameEmail() == 1) {
 				if (usersRepository.checkUsername(wrapper.getUsername()) == 0) {
+					wrapper.setPassword(hashPassword(wrapper.getPassword()));
 					Users user = usersRepository.save(toEntityUpdate(wrapper));
 					return toWrapper(user);
 				} else {
@@ -228,6 +229,7 @@ public class UsersService {
 		} else {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
+					wrapper.setPassword(hashPassword(wrapper.getPassword()));
 					Users user = usersRepository.save(toEntityUpdate(wrapper));
 					return toWrapper(user);
 				} else {
@@ -235,6 +237,7 @@ public class UsersService {
 				}
 			}
 			if (wrapper.getSameEmail() == 1) {
+				wrapper.setPassword(hashPassword(wrapper.getPassword()));
 				Users user = usersRepository.save(toEntityUpdate(wrapper));
 				return toWrapper(user);
 			}
