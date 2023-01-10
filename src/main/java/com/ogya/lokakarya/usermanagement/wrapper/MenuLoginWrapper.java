@@ -11,11 +11,6 @@ public class MenuLoginWrapper {
 	private String nama;
 	private String icon;
 	private String url;
-	private String programName;
-	private Date createdDate;
-	private String createdBy;
-	private Date updatedDate;
-	private String updatedBy;
 	private Set<SubMenu> subMenu;
 	
 
@@ -57,50 +52,6 @@ public class MenuLoginWrapper {
 	//--------------------------------------------------------------------------------------------------------
 
 
-
-	public String getProgramName() {
-		return programName;
-	}
-	public void setProgramName(String programName) {
-		this.programName = programName;
-	}
-	//--------------------------------------------------------------------------------------------------------
-
-
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-	//--------------------------------------------------------------------------------------------------------
-
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-	//--------------------------------------------------------------------------------------------------------
-
-
-	public Date getUpdatedDate() {
-		return updatedDate;
-	}
-	public void setUpdatedDate(Date updatedDate) {
-		this.updatedDate = updatedDate;
-	}
-	//--------------------------------------------------------------------------------------------------------
-
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-	
 	
 
 	public Set<SubMenu> getSubMenu() {
@@ -109,20 +60,14 @@ public class MenuLoginWrapper {
 	public void setSubMenu(Set<SubMenu> subMenu) {
 		this.subMenu = subMenu;
 	}
+	
 	//--------------------------------------------------------------------------------------------------------
+	
 	@Override
 	public String toString() {
-		return "MenuWrapper [menuId=" + menuId + ", nama=" + nama + ", icon=" + icon + ", url=" + url + ", programName="
-				+ programName + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate="
-				+ updatedDate + ", updatedBy=" + updatedBy + ", subMenu=" + subMenu + "]";
+		return "MenuLoginWrapper [menuId=" + menuId + ", nama=" + nama + ", icon=" + icon + ", url=" + url
+				+ ", subMenu=" + subMenu + "]";
 	}
-
-
-	
-	
-
-	
-	
 	
 	
 }
