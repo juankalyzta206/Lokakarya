@@ -25,7 +25,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/users")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class UsersController {
 	@Autowired
 	UsersService userService;
