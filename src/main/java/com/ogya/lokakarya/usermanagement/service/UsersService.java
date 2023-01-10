@@ -49,7 +49,7 @@ public class UsersService {
 			} else {
 				String databasePassword = usersRepository.hashedPassword(identity);
 				if (!matchPassword(password, databasePassword)) {
-					throw new BusinessException(databasePassword);
+					throw new BusinessException("Wrong Password");
 				} else {
 					List<Users> loginList = usersRepository.findByUsernameAndPassword(identity, databasePassword);
 					return toWrapperListLogin(loginList);
