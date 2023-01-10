@@ -7,7 +7,7 @@ public class TransaksiTelkomWrapper {
 	private Integer tahunTagihan;
 	private Long uang;
 	private Byte status;
-	//private String nama;
+	private String nama;
 	public Long getIdTransaksi() {
 		return idTransaksi;
 	}
@@ -44,10 +44,10 @@ public class TransaksiTelkomWrapper {
 	public void setStatus(Byte status) {
 		this.status = status;
 	}
-//	public String getNama() {
-//		return nama;
-//	}
-//	public void setNama(String nama) {
-//		this.nama = nama;
-//	}
+	public String getNama() {
+		return nama;
+	}
+	public void setNama(String nama) {
+		this.nama = nama;
+	}
 }
