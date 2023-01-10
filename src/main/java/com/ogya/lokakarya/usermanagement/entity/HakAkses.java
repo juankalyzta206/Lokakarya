@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class HakAkses  {
 	private Long hakAksesId;
 	private Login users;
-	private Roles roles;
+	private RolesLogin roles;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
@@ -52,10 +52,10 @@ public class HakAkses  {
 	//--------------------------------------------------------------------------------------------------------
 	@ManyToOne
 	@JoinColumn(name = "ROLE_ID")
-	public Roles getRoles() {
+	public RolesLogin getRoles() {
 		return roles;
 	}
-	public void setRoles(Roles roles) {
+	public void setRoles(RolesLogin roles) {
 		this.roles = roles;
 	}
 	

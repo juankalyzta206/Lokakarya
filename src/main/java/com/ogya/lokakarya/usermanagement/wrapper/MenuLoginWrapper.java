@@ -1,84 +1,99 @@
-package com.ogya.lokakarya.usermanagement.entity;
+package com.ogya.lokakarya.usermanagement.wrapper;
 
 import java.util.Date;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 
-@Entity
-@Table(name = "ROLES")
-public class Roles {
-	private Long roleId;
+
+public class MenuLoginWrapper {
+	private Long menuId;
 	private String nama;
+	private String icon;
+	private String url;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
+	private Set<SubMenu> subMenu;
+	
 
-	
-	@Id
-	@GeneratedValue(generator = "ROLES_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "ROLES_GEN", sequenceName = "ROLES_SEQ", initialValue = 1, allocationSize = 1)
-	public Long getRoleId() {
-		return roleId;
+	public Long getMenuId() {
+		return menuId;
 	}
-	public void setRoleId(Long roleId) {
-		this.roleId = roleId;
+	public void setMenuId(Long menuId) {
+		this.menuId = menuId;
 	}
-	
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "NAMA")
+
 	public String getNama() {
 		return nama;
 	}
 	public void setNama(String nama) {
 		this.nama = nama;
 	}
-
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "PROGRAM_NAME")
+
+
+
+
+	public String getIcon() {
+		return icon;
+	}
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+	//--------------------------------------------------------------------------------------------------------
+
+
+
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	//--------------------------------------------------------------------------------------------------------
+
+
+
 	public String getProgramName() {
 		return programName;
 	}
 	public void setProgramName(String programName) {
 		this.programName = programName;
 	}
-
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "CREATED_DATE")
+
+
 	public Date getCreatedDate() {
 		return createdDate;
 	}
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
-
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "CREATED_BY")
+
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
-
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "UPDATED_DATE")
+
+
 	public Date getUpdatedDate() {
 		return updatedDate;
 	}
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
-	
 	//--------------------------------------------------------------------------------------------------------
-	@Column(name = "UPDATED_BY")
+
+
 	public String getUpdatedBy() {
 		return updatedBy;
 	}
@@ -87,9 +102,27 @@ public class Roles {
 	}
 	
 	
+
+	public Set<SubMenu> getSubMenu() {
+		return subMenu;
+	}
+	public void setSubMenu(Set<SubMenu> subMenu) {
+		this.subMenu = subMenu;
+	}
+	//--------------------------------------------------------------------------------------------------------
+	@Override
+	public String toString() {
+		return "MenuWrapper [menuId=" + menuId + ", nama=" + nama + ", icon=" + icon + ", url=" + url + ", programName="
+				+ programName + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate="
+				+ updatedDate + ", updatedBy=" + updatedBy + ", subMenu=" + subMenu + "]";
+	}
+
+
+	
+	
+
+	
+	
+	
 	
 }
-
-
-
-
