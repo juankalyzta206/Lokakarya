@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
+import com.ogya.lokakarya.usermanagement.repository.RolesLoginRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
@@ -22,6 +23,9 @@ import com.ogya.lokakarya.util.PaginationList;
 @Service
 @Transactional
 public class RolesService {
+	@Autowired
+	RolesLoginRepository rolesLoginRepository;
+	
 	@Autowired
 	RolesRepository rolesRepository;
 	
@@ -33,10 +37,8 @@ public class RolesService {
 		return new PaginationList<RolesWrapper, Roles>(rolesWrapperList, rolesPage);
 	}
 	
-
 	private RolesWrapper toWrapper(Roles entity) {
 		RolesWrapper wrapper = new RolesWrapper();
-		wrapper.setRoleMenu(entity.getRoleMenu());
 		wrapper.setRoleId(entity.getRoleId());
 		wrapper.setNama(entity.getNama());
 		wrapper.setProgramName(entity.getProgramName());
@@ -67,7 +69,6 @@ public class RolesService {
 			entity = rolesRepository.getReferenceById(wrapper.getRoleId());
 		}
 		entity.setNama(wrapper.getNama());
-		entity.setRoleMenu(wrapper.getRoleMenu());
 		entity.setProgramName(wrapper.getProgramName());
 		entity.setCreatedDate(wrapper.getCreatedDate());
 		entity.setCreatedBy(wrapper.getCreatedBy());
@@ -75,6 +76,7 @@ public class RolesService {
 		entity.setUpdatedBy(wrapper.getUpdatedBy());
 		return entity;
 	}
+	
 
 	public RolesWrapper save(RolesWrapper wrapper) {
 		Roles roles = rolesRepository.save(toEntity(wrapper));

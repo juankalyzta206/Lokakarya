@@ -1,15 +1,12 @@
 package com.ogya.lokakarya.usermanagement.entity;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -23,7 +20,6 @@ public class Roles {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-	private Set<RoleMenu> roleMenu = new HashSet<RoleMenu>(0);
 
 	
 	@Id
@@ -88,15 +84,6 @@ public class Roles {
 	}
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
-	}
-	
-	
-	@OneToMany(mappedBy = "roles")
-	public Set<RoleMenu> getRoleMenu() {
-		return roleMenu;
-	}
-	public void setRoleMenu(Set<RoleMenu> roleMenu) {
-		this.roleMenu = roleMenu;
 	}
 	
 	

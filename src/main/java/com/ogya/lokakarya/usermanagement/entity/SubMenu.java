@@ -21,7 +21,7 @@ public class SubMenu {
 	private String nama;
 	private String icon;
 	private String url;
-	private Menu menu;
+	private MenuLogin menu;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
@@ -114,10 +114,10 @@ public class SubMenu {
 	@ManyToOne
 	@JoinColumn(name = "MENU_ID")
 	@JsonIgnore
-	public Menu getMenu() {
+	public MenuLogin getMenu() {
 		return menu;
 	}
-	public void setMenu(Menu menu) {
+	public void setMenu(MenuLogin menu) {
 		this.menu = menu;
 	}
 	

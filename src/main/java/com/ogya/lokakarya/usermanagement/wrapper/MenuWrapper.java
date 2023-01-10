@@ -1,9 +1,6 @@
 package com.ogya.lokakarya.usermanagement.wrapper;
 
 import java.util.Date;
-import java.util.Set;
-
-import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 
 
 public class MenuWrapper {
@@ -16,8 +13,6 @@ public class MenuWrapper {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-	private Set<SubMenu> subMenu;
-	
 
 	public Long getMenuId() {
 		return menuId;
@@ -103,18 +98,12 @@ public class MenuWrapper {
 	
 	
 
-	public Set<SubMenu> getSubMenu() {
-		return subMenu;
-	}
-	public void setSubMenu(Set<SubMenu> subMenu) {
-		this.subMenu = subMenu;
-	}
 	//--------------------------------------------------------------------------------------------------------
 	@Override
 	public String toString() {
 		return "MenuWrapper [menuId=" + menuId + ", nama=" + nama + ", icon=" + icon + ", url=" + url + ", programName="
 				+ programName + ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate="
-				+ updatedDate + ", updatedBy=" + updatedBy + ", subMenu=" + subMenu + "]";
+				+ updatedDate + ", updatedBy=" + updatedBy + "]";
 	}
 
 

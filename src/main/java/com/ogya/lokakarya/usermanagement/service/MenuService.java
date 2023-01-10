@@ -35,7 +35,6 @@ public class MenuService {
 	
 	private MenuWrapper toWrapper(Menu entity) {
 		MenuWrapper wrapper = new MenuWrapper();
-		wrapper.setSubMenu(entity.getSubMenu());
 		wrapper.setMenuId(entity.getMenuId());
 		wrapper.setNama(entity.getNama());
 		wrapper.setIcon(entity.getIcon());
@@ -67,7 +66,6 @@ public class MenuService {
 		if (wrapper.getMenuId() != null) {
 			entity = menuRepository.getReferenceById(wrapper.getMenuId());
 		}
-		entity.setSubMenu(wrapper.getSubMenu());
 		entity.setNama(wrapper.getNama());
 		entity.setIcon(wrapper.getIcon());
 		entity.setUrl(wrapper.getUrl());
