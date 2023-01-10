@@ -56,10 +56,11 @@ public class UsersService {
 				}
 			}
 		} else {
-			if (usersRepository.isMatchEmail(identity, password) == 0) {
+			String databasePassword = usersRepository.hashedPassword(identity);
+			if (!matchPassword(password, databasePassword)) {
 				throw new BusinessException("Wrong Password");
 			} else {
-				List<Users> loginList = usersRepository.findByEmailAndPassword(identity, password);
+				List<Users> loginList = usersRepository.findByEmailAndPassword(identity, databasePassword);
 				return toWrapperListLogin(loginList);
 			}
 		}
