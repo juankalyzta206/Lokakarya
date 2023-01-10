@@ -23,7 +23,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/hakAkses")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://lokakarya-spring-boot-production.up.railway.app")
 public class HakAksesController {
 	@Autowired
 	HakAksesService hakAksesService;

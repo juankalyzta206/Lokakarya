@@ -21,7 +21,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/masterpelanggan")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://lokakarya-spring-boot-production.up.railway.app")
 public class MasterPelangganController {
 	@Autowired
 	MasterPelangganService masterPelangganService;

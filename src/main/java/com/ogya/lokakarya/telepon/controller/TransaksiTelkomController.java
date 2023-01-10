@@ -21,7 +21,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/transaksitelkom")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://lokakarya-spring-boot-production.up.railway.app")
 public class TransaksiTelkomController {
 	@Autowired
 	TransaksiTelkomService transaksiTelkomService;
