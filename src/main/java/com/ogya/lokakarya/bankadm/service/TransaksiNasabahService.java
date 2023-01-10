@@ -52,7 +52,7 @@ public class TransaksiNasabahService {
 			wrapper.setSaldo(nasabah.getSaldo());
 			return wrapper;
 		} else {
-			throw new BusinessException("Nomor rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar.");
 		}
 	}
 
@@ -129,7 +129,7 @@ public class TransaksiNasabahService {
 				return wrapper;
 
 			} else {
-				throw new BusinessException("Nominal transaksi minimal 10000");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
 			throw new BusinessException("Nomor rekening tidak terdaftar");
@@ -174,7 +174,7 @@ public class TransaksiNasabahService {
 					throw new BusinessException("Saldo Anda tidak cukup");
 				}
 			} else {
-				throw new BusinessException("Nominal transaksi minimal 10000");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
 			throw new BusinessException("Nomor rekening tidak terdaftar");
