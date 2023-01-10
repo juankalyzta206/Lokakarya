@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,9 @@ public interface TransaksiTelkomRepository extends JpaRepository<TransaksiTelkom
 	
 	@Query(value = "SELECT * FROM TRANSAKSI_TELKOM e WHERE e.STATUS = 1 ", nativeQuery = true)
 	List<TransaksiTelkom> findStatus1();
+	
+	@Query(value = "SELECT e FROM TransaksiTelkom e WHERE e.status = 1 ")
+	List<TransaksiTelkom> findStatus1(Sort sort);
 	
 	@Query(value = "SELECT * FROM TRANSAKSI_TELKOM WHERE ID_PELANGGAN = :idPelanggan", nativeQuery = true)
 	List<TransaksiTelkom> findByTagihanPelanggan(@Param("idPelanggan") Long idPelanggan);

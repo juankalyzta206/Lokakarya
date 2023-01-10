@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
@@ -33,7 +34,7 @@ public class HistoryService {
 	}
 	//service untuk menampilkan semua list
 	public List<HistoryWrapper> findAll(){
-		List<HistoryTelkom> historyTelkomList = historyRepository.findAll();
+		List<HistoryTelkom> historyTelkomList = historyRepository.findAll(Sort.by(Order.by("idHistory")).descending());
 		return toWrapperList(historyTelkomList);
 	}
 	//service untuk memasukkan/mengubah entity
