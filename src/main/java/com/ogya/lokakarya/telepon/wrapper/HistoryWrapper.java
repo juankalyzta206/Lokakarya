@@ -9,7 +9,7 @@ public class HistoryWrapper {
 	private Byte bulanTagihan;
 	private Integer tahunTagihan;
 	private Long uang;
-	//private String nama;
+	private String nama;
 	
 
 	public Long getIdHistory() {
@@ -48,10 +48,10 @@ public class HistoryWrapper {
 	public void setUang(Long uang) {
 		this.uang = uang;
 	}
-//	public String getNama() {
-//		return nama;
-//	}
-//	public void setNama(String nama) {
-//		this.nama = nama;
-//	}
+	public String getNama() {
+		return nama;
+	}
+	public void setNama(String nama) {
+		this.nama = nama;
+	}
 }

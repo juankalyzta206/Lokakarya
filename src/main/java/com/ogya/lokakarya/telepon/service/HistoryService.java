@@ -56,9 +56,9 @@ public class HistoryService {
 		wrapper.setTahunTagihan(entity.getTahunTagihan());
 		wrapper.setUang(entity.getUang());
 		wrapper.setIdPelanggan(entity.getIdPelanggan() != null ? entity.getIdPelanggan().getIdPelanggan() : null);
-//		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
-//		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
-//		wrapper.setNama(masterPelanggan.getNama());
+		Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(wrapper.getIdPelanggan());
+		MasterPelanggan masterPelanggan = optionalMaster.isPresent() ? optionalMaster.get() : null;
+		wrapper.setNama(masterPelanggan.getNama());
 		return wrapper;
 	}
 	//method dalam service untuk memasukkan nilai kedalam entity
