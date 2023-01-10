@@ -23,7 +23,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/masterbank")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class MasterBankController {
 	@Autowired
 	MasterBankService masterBankService;

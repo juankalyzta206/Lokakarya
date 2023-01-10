@@ -18,7 +18,7 @@ import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
 @RequestMapping(value = "/transaksiNasabah")
-@CrossOrigin
+@CrossOrigin(origins = "*")
 public class TransaksiNasabahController {
 	@Autowired
 	TransaksiNasabahService transaksiNasabahService;

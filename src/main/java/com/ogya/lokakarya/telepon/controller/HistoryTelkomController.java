@@ -21,7 +21,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/historytelkom")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class HistoryTelkomController {
 	@Autowired
 	HistoryService historyService;
