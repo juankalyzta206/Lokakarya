@@ -23,7 +23,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/roleMenu")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class RoleMenuController {
 	@Autowired
 	RoleMenuService roleMenuService;

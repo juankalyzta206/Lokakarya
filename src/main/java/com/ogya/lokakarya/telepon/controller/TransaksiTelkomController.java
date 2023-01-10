@@ -21,7 +21,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/transaksitelkom")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class TransaksiTelkomController {
 	@Autowired
 	TransaksiTelkomService transaksiTelkomService;

@@ -23,7 +23,7 @@ import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
 @RequestMapping(value = "/subMenu")
-@CrossOrigin()
+@CrossOrigin(origins = "*")
 public class SubMenuController {
 	@Autowired
 	SubMenuService subMenuService;
