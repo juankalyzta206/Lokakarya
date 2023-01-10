@@ -146,6 +146,7 @@ public class TransaksiNasabahService {
 				historyBank.setNama(nasabah.getNama());
 				historyBank.setRekening(nasabah);
 				historyBank.setStatusKet((byte) 1);
+				historyBank.setUang(nominal);
 				historyBankRepo.save(historyBank);
 
 				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
