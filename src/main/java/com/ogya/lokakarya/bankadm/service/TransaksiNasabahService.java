@@ -293,19 +293,18 @@ public class TransaksiNasabahService {
 
 							transaksiTelkom.get(i).setStatus((byte) 2);
 							transaksiTelkomRepo.save(transaksiTelkom.get(i));
-
-							BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
-							wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
-							wrapper.setNamaPelanggan(masterPelanggan.getNama());
-							wrapper.setNoTelepon(masterPelanggan.getNoTelp());
-							wrapper.setTagihan(tagihan);
-							wrapper.setNoRekening(rekAsal);
-							wrapper.setNamaRekening(masterBank.getNama());
-							wrapper.setSaldo(masterBank.getSaldo());
-							wrapper.setTanggal(historyBank.getTanggal());
-							wrapperList.add(wrapper);
 						}
 					}
+					BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+					wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+					wrapper.setNamaPelanggan(masterPelanggan.getNama());
+					wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+					wrapper.setTagihan(tagihan);
+					wrapper.setNoRekening(rekAsal);
+					wrapper.setNamaRekening(masterBank.getNama());
+					wrapper.setSaldo(masterBank.getSaldo());
+					wrapper.setTanggal(historyBank.getTanggal());
+					wrapperList.add(wrapper);
 
 				} else {
 					throw new BusinessException("Saldo Anda tidak cukup");
