@@ -109,6 +109,40 @@ public class MasterPelangganService {
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
+	public <T>PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,String filter,T value ){
+		Pageable paging = PageRequest.of(page, size);
+		if(filter.equals("idPelanggan")) {
+			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllIdPelanggan(paging,value);
+			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+		}
+		else if(filter.equals("nama")) {
+			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllName(paging,value);
+			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+		}
+		else if(filter.equals("alamat")) {
+			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllAlamat(paging,value);
+			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+		}
+		else if(filter.equals("noTelp")) {
+			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllNotelp(paging,value);
+			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+		}
+		else {
+			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllUserId(paging,value);
+			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+		}
+		//Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
+	}
 	 public ByteArrayInputStream load() {
 		    List<MasterPelanggan> masterPelanggan = masterPelangganRepository.findAll();
 		    ByteArrayInputStream in = ExcelHelperMasterPelanggan.tutorialsToExcel(masterPelanggan);
