@@ -36,6 +36,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -81,6 +82,15 @@ public class UsersService {
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
+		Page<Users> usersPage = usersRepository.findAll(paging);
+		List<Users> usersList = usersPage.getContent();
+		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
+		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
+	}
+	
+	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
+		Pageable paging = PageRequest.of(0, 5);
+//		FilterWrapper filterWrapper = new FilterWrapper();
 		Page<Users> usersPage = usersRepository.findAll(paging);
 		List<Users> usersList = usersPage.getContent();
 		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);

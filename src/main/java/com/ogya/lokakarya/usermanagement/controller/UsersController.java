@@ -26,6 +26,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @RestController
@@ -38,7 +39,7 @@ public class UsersController {
 	
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
-	public DataResponsePagination<UsersWrapper, Users> findAllWithPagination(@RequestParam("page") int page,				@RequestParam("size") int size) {
+	public DataResponsePagination<UsersWrapper, Users> findAllWithPagination(@RequestParam("page") int page,@RequestParam("size") int size) {
 		return new DataResponsePagination<UsersWrapper, Users>(userService.findAllWithPagination(page, size));
 	}
 	
@@ -90,5 +91,11 @@ public class UsersController {
 		 userService.ExportToPdf(response);
 	}
 	
+	
+	// findAllPagination
+	@GetMapping(path = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<UsersWrapper, Users> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
+		return new DataResponsePagination<UsersWrapper, Users>(userService.findAllWithPaginationAndFilter(wrapper));
+	}
 	
 }
