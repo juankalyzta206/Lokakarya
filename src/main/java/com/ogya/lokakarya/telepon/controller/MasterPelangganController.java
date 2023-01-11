@@ -24,8 +24,11 @@ import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/masterpelanggan")
@@ -56,24 +59,30 @@ public class MasterPelangganController {
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size));
 	}
-	@GetMapping(path = "/findAllWithPaginationFilter")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
-			@RequestParam("size") int size,@RequestParam("idPelanggan") Long idPelanggan) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,idPelanggan));
+//	@GetMapping(path = "/findAllWithPaginationFilter")
+//	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
+//			@RequestParam("size") int size,@RequestParam("idPelanggan") Long idPelanggan) {
+//		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,idPelanggan));
+//	}
+//	@GetMapping(path = "/findAllWithPaginationFilterGeneric")
+//	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
+//			@RequestParam("size") int size,@RequestParam("filter") String filter, @RequestParam("Lvalue") Long Lvalue,@RequestParam("Svalue") String Svalue) {
+//		if(filter.equals("idPelanggan") || filter.equals("userId") ) {
+//			return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,filter,Lvalue));
+//		}
+//		else if(filter.equals("nama") || filter.equals("noTelp") || filter.equals("alamat") ) {
+//			return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,filter,Svalue));
+//		}
+//		else {
+//			throw new BusinessException("filter tidak ditemukan");
+//		}
+//	}
+	
+	@PostMapping(path = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
 	}
-	@GetMapping(path = "/findAllWithPaginationFilterGeneric")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
-			@RequestParam("size") int size,@RequestParam("filter") String filter, @RequestParam("Lvalue") Long Lvalue,@RequestParam("Svalue") String Svalue) {
-		if(filter.equals("idPelanggan") || filter.equals("userId") ) {
-			return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,filter,Lvalue));
-		}
-		else if(filter.equals("nama") || filter.equals("noTelp") || filter.equals("alamat") ) {
-			return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,filter,Svalue));
-		}
-		else {
-			throw new BusinessException("filter tidak ditemukan");
-		}
-	}
+	
     @GetMapping("/download")
     public void exportToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/octet-stream");
