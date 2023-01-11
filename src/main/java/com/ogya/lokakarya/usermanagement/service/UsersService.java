@@ -88,8 +88,8 @@ public class UsersService {
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
 	
-	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-		Pageable paging = PageRequest.of(0, 5);
+	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(int page, int size) {
+		Pageable paging = PageRequest.of(page, size);
 //		FilterWrapper filterWrapper = new FilterWrapper();
 		Page<Users> usersPage = usersRepository.findAll(paging);
 		List<Users> usersList = usersPage.getContent();
