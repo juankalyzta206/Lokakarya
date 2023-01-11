@@ -123,5 +123,28 @@ public class HistoryBankController {
         historyBankService.ExportToPdf(response);
        }
 
+	
+    @RequestMapping(value = "/exportToPdfALLSetor", method = RequestMethod.GET)
+    public void exportToPdfsetor(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfSetor(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLTarik", method = RequestMethod.GET)
+    public void exportToPdftarik(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfTarik(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLTransfer", method = RequestMethod.GET)
+    public void exportToPdftransfer(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfTransfer(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
+    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfBayarTelepon(response);
+       }
 
 }
