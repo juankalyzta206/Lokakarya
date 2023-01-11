@@ -24,6 +24,7 @@ import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -146,13 +147,19 @@ public class MasterPelangganService {
 //	}
 	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(PagingRequestWrapper wrapper){
 		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
+		for(FilterWrapper filter : wrapper.getFilters()) {
+			
+		}
 		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging);
 		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
 	
-	
+	public List<MasterPelangganWrapper> findByNama(String nama,Long idPelanggan,String alamat,Long noTelp){
+		List<MasterPelanggan> masterPelangganList = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelp(idPelanggan,nama,alamat,noTelp);
+		return toWrapperList(masterPelangganList);
+	}
 	
 	
 	
