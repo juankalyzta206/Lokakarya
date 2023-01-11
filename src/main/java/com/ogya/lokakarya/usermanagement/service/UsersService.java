@@ -92,6 +92,9 @@ public class UsersService {
 	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
 		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
 		List<FilterWrapper> filterWrapper = wrapper.getFilters();
+		for (int i=0; i<filterWrapper.size(); i++) {
+			
+		}
 //		throw new BusinessException(filterWrapper.getName());
 		Page<Users> usersPage = usersRepository.findAll(paging);
 		List<Users> usersList = usersPage.getContent();
