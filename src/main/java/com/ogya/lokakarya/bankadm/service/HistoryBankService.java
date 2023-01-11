@@ -30,7 +30,11 @@ import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -556,12 +560,19 @@ public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Excepti
 }
 
 
-public PaginationList<HistoryBankWrapper, HistoryBank> findByFilter(String keyfilter,String sortField,String sortOrder, int page, int size) {
-	Pageable paging = PageRequest.of(page, size);
-	Page<HistoryBank> historyPage = historyBankRepository.findAllFilter(keyfilter, sortField, sortOrder, paging);
-	List<HistoryBank> historyList =  historyPage.getContent();
+
+
+public PaginationList<HistoryBankWrapper, HistoryBank> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
+	Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
+	List<FilterWrapper> filterWrapper = wrapper.getFilters();
+	for (int i=0; i<filterWrapper.size(); i++) {
+		
+	}
+//	throw new BusinessException(filterWrapper.getName());
+	Page<HistoryBank> historyPage = historyBankRepository.findAll(paging);
+	List<HistoryBank> historyList = historyPage.getContent();
 	List<HistoryBankWrapper> historyWrapperList = toWrapperList(historyList);
 	return new PaginationList<HistoryBankWrapper, HistoryBank>(historyWrapperList, historyPage);
-	}
+}
 
 }
