@@ -93,10 +93,10 @@ public class UsersService {
 		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
 		List<FilterWrapper> filterWrapper = wrapper.getFilters();
 //		throw new BusinessException(filterWrapper.getName());
-//		Page<Users> usersPage = usersRepository.findAll(paging);
-//		List<Users> usersList = usersPage.getContent();
-//		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
-//		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
+		Page<Users> usersPage = usersRepository.findAll(paging);
+		List<Users> usersList = usersPage.getContent();
+		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
+		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
 	
 	
