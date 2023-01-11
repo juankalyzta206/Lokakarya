@@ -2,6 +2,8 @@ package com.ogya.lokakarya.usermanagement.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,6 +83,11 @@ public class UsersController {
 	@PostMapping(path = "/login")
 	public DataResponseList<UsersLoginWrapper> findAll(@RequestParam("identity") String identity, @RequestParam("password") String password) {
 		return new DataResponseList<UsersLoginWrapper>(userService.findByEmailOrUsernameAndPassword(identity, password));
+	}
+	
+	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
+	    public void exportToPdf(HttpServletResponse response) throws Exception {
+		 userService.ExportToPdf(response);
 	}
 	
 	
