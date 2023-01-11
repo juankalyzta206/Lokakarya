@@ -102,6 +102,13 @@ public class MasterPelangganService {
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
+	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,Long idPelanggan){
+		Pageable paging = PageRequest.of(page, size);
+		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,idPelanggan);
+		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+	}
 	 public ByteArrayInputStream load() {
 		    List<MasterPelanggan> masterPelanggan = masterPelangganRepository.findAll();
 		    ByteArrayInputStream in = ExcelHelperMasterPelanggan.tutorialsToExcel(masterPelanggan);

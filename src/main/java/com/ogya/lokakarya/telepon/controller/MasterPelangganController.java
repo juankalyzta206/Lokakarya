@@ -55,6 +55,11 @@ public class MasterPelangganController {
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size));
 	}
+	@GetMapping(path = "/findAllWithPaginationFilter")
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size,@RequestParam("idPelanggan") Long idPelanggan) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size,idPelanggan));
+	}
 //	@GetMapping("/download")
 //	  public ResponseEntity<Resource> getFile() {
 //	    String filename = "masterpelanggan.xlsx";
