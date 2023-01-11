@@ -149,6 +149,8 @@ public class HistoryBankController {
     public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
         historyBankService.ExportToPdfBayarTelepon(response);
        }
+    
+    
 
     @GetMapping(path = "/PageFilter")
     public DataResponsePagination<HistoryBankWrapper, HistoryBank> pageFilter(
@@ -157,6 +159,7 @@ public class HistoryBankController {
         @RequestParam("sortOrder") String order ,
         @RequestParam("page") int page, 
         @RequestParam("size") int size) {
+    	
         return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findByFilter(keyfilter,field,order, page, size));
     }
 
