@@ -69,10 +69,10 @@ public class UsersController {
 		userService.delete(userId);
 	}
 	
-//	@PostMapping(path = "/register")
-//	public DataResponse<LoginWrapper> register(@RequestBody LoginWrapper wrapper){
-//		return new DataResponse<LoginWrapper>(loginService.save(wrapper));
-//	}
+	@PostMapping(path = "/register")
+	public DataResponse<UsersWrapper> register(@RequestBody UsersWrapper wrapper){
+		return new DataResponse<UsersWrapper>(userService.save(wrapper));
+	}
 	
 	
 	@PostMapping(path = "/login")

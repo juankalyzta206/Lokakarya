@@ -10,7 +10,7 @@ public class UsersWrapper {
 	private String nama;
 	private String alamat;
 	private String email;
-	private String telp;
+	private Long telp;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
@@ -66,10 +66,10 @@ public class UsersWrapper {
 	}	
 	//--------------------------------------------------------------------------------------------------------
 
-	public String getTelp() {
+	public Long getTelp() {
 		return telp;
 	}
-	public void setTelp(String telp) {
+	public void setTelp(Long telp) {
 		this.telp = telp;
 	}	
 	//--------------------------------------------------------------------------------------------------------
