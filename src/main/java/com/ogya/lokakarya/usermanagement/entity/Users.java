@@ -17,6 +17,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ogya.lokakarya.usermanagement.entity.login.HakAksesLogin;
 
 
 @Entity
@@ -34,7 +35,7 @@ public class Users  {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-	private Set<HakAkses> hakAkses = new HashSet<HakAkses>(0);
+	private Set<HakAksesLogin> hakAkses = new HashSet<HakAksesLogin>(0);
 
 	
 	@Id
@@ -154,11 +155,11 @@ public class Users  {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
 	@JsonIgnore
-	public Set<HakAkses> getHakAkses() {
+	public Set<HakAksesLogin> getHakAkses() {
 		return this.hakAkses;
 	}
 
-	public void setHakAkses(Set<HakAkses> hakAkses) {
+	public void setHakAkses(Set<HakAksesLogin> hakAkses) {
 		this.hakAkses = hakAkses;
 	}
 	

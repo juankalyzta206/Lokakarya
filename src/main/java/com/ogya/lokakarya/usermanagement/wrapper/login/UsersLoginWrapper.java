@@ -1,13 +1,13 @@
-package com.ogya.lokakarya.usermanagement.wrapper;
+package com.ogya.lokakarya.usermanagement.wrapper.login;
 
 import java.util.Set;
 
-import com.ogya.lokakarya.usermanagement.entity.HakAkses;
+import com.ogya.lokakarya.usermanagement.entity.login.HakAksesLogin;
 
 public class UsersLoginWrapper {
 	private String username;
 	private String nama;
-	private Set<HakAkses> hakAkses;
+	private Set<HakAksesLogin> hakAkses;
 	
 
 	//--------------------------------------------------------------------------------------------------------
@@ -28,10 +28,10 @@ public class UsersLoginWrapper {
 	}	
 	//--------------------------------------------------------------------------------------------------------
 
-	public Set<HakAkses> getHakAkses() {
+	public Set<HakAksesLogin> getHakAkses() {
 		return hakAkses;
 	}
-	public void setHakAkses(Set<HakAkses> hakAkses) {
+	public void setHakAkses(Set<HakAksesLogin> hakAkses) {
 		this.hakAkses = hakAkses;
 	}
 	//--------------------------------------------------------------------------------------------------------

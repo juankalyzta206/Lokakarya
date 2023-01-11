@@ -20,10 +20,10 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 
 @Service
