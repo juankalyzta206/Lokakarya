@@ -3,11 +3,14 @@ package com.ogya.lokakarya.usermanagement.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.util.FilterWrapper;
 
 
 public interface UsersRepository extends JpaRepository<Users, Long>{
@@ -51,4 +54,25 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 	@Query(value="SELECT COUNT(*) FROM HAK_AKSES ha WHERE ha.USER_ID = :userId", 
 			nativeQuery = true)
 	Long isExistHakAkses(@Param("userId") Long userId);
+	
+	
+	@Query(value = "SELECT * FROM USERS u "
+			+ "WHERE LOWER(u.USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:username),'%')) "
+			+ "AND LOWER(u.NAMA) LIKE LOWER(CONCAT(CONCAT('%',:nama),'%')) "
+			+ "AND LOWER(u.EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:email),'%')) "
+			,
+	           countQuery = "SELECT COUNT(*) FROM USERS u "
+	           		+ "WHERE LOWER(u.USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:username),'%')) "
+	           		+ "AND LOWER(u.NAMA) LIKE LOWER(CONCAT(CONCAT('%',:nama),'%')) "
+	    			+ "AND LOWER(u.EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:email),'%')) "
+	    			,
+	           nativeQuery = true)
+	Page<Users> findAllWithPaginationAndFilter(@Param("username") String username,  
+			@Param("nama") String nama,
+			@Param("email") String email,
+//			@Param("sortField") String sortField,
+			Pageable paging);
+	
+
+	
 }

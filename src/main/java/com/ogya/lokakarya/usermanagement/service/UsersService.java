@@ -90,17 +90,34 @@ public class UsersService {
 	}
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
-		List<FilterWrapper> filterWrapper = wrapper.getFilters();
-		for (int i=0; i<filterWrapper.size(); i++) {
-			
+		Pageable paging;
+		if (wrapper.getSortOrder() == "ASC") {
+			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).ascending());
+		} else {
+			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).descending());
 		}
-//		throw new BusinessException(filterWrapper.getName());
-		Page<Users> usersPage = usersRepository.findAll(paging);
+		List<FilterWrapper> filterWrapper = wrapper.getFilters();
+		String username = "";
+		String nama = "";
+		String email = "";
+		for (int i=0; i<filterWrapper.size(); i++) {
+			switch(filterWrapper.get(i).getName().toLowerCase()) {
+			  case "username":
+			     username = filterWrapper.get(i).getValue();
+			  case "nama":
+				 nama = filterWrapper.get(i).getValue();
+			  case "email":
+				 email = filterWrapper.get(i).getValue();
+			  default:
+			    // code block
+			}
+		}
+		Page<Users> usersPage = usersRepository.findAllWithPaginationAndFilter(username,nama,email,paging);
 		List<Users> usersList = usersPage.getContent();
 		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
+	
 	
 	
 	public List<UsersWrapper> findByEmailAndPassword(String email, String password) {
