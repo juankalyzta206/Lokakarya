@@ -120,7 +120,7 @@ public class MasterBankService {
 	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 	    title.setAlignment(Element.ALIGN_CENTER);
 	    pdfDoc.add(title);
-	    
+	    //
 	    // Add the generation date
 	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
