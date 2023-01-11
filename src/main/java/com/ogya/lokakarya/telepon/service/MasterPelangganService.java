@@ -1,5 +1,6 @@
 package com.ogya.lokakarya.telepon.service;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
+import com.ogya.lokakarya.telepon.helper.ExcelHelperMasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
@@ -100,6 +102,13 @@ public class MasterPelangganService {
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
-	
+	 public ByteArrayInputStream load() {
+		    List<MasterPelanggan> masterPelanggan = masterPelangganRepository.findAll();
+		    ByteArrayInputStream in = ExcelHelperMasterPelanggan.tutorialsToExcel(masterPelanggan);
+		    return in;
+		  }
+	    public List<MasterPelanggan> listAll() {
+	        return masterPelangganRepository.findAll();
+	    }
 	
 }
