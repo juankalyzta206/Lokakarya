@@ -5,6 +5,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -136,5 +139,15 @@ public class HistoryBankController {
     public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
         historyBankService.ExportToPdfBayarTelepon(response);
        }
+
+    @GetMapping(path = "/PageFilter")
+    public DataResponsePagination<HistoryBankWrapper, HistoryBank> pageFilter(
+        @RequestParam("filter") String keyfilter ,
+        @RequestParam("sortField") String field ,
+        @RequestParam("sortOrder") String order ,
+        @RequestParam("page") int page, 
+        @RequestParam("size") int size) {
+        return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findByFilter(keyfilter,field,order, page, size));
+    }
 
 }
