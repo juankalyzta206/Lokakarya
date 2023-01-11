@@ -3,9 +3,10 @@ package com.ogya.lokakarya.usermanagement.wrapper;
 import java.util.Date;
 
 
-public class UsersWrapper {
+public class UsersRegisterWrapper {
 	private Long userId;
 	private String username;
+	private String password;
 	private String nama;
 	private String alamat;
 	private String email;
@@ -31,7 +32,14 @@ public class UsersWrapper {
 	public void setUsername(String username) {
 		this.username = username;
 	}	
+	//--------------------------------------------------------------------------------------------------------
 
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}	
 	//--------------------------------------------------------------------------------------------------------
 
 	public String getNama() {
@@ -104,16 +112,15 @@ public class UsersWrapper {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+	
+	
 	@Override
 	public String toString() {
-		return "UsersWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamat
-				+ ", email=" + email + ", telp=" + telp + ", programName=" + programName + ", createdDate="
-				+ createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate + ", updatedBy=" + updatedBy
-				+ "]";
+		return "UsersWrapper [userId=" + userId + ", username=" + username + ", password=" + password + ", nama=" + nama
+				+ ", alamat=" + alamat + ", email=" + email + ", telp=" + telp + ", programName=" + programName
+				+ ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate
+				+ ", updatedBy=" + updatedBy + ", sameUsername=" + "]";
 	}
-	
-	
-
 	
 	
 	

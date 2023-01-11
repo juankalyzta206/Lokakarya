@@ -3,9 +3,10 @@ package com.ogya.lokakarya.usermanagement.wrapper;
 import java.util.Date;
 
 
-public class UsersWrapper {
+public class UsersUpdateWrapper {
 	private Long userId;
 	private String username;
+	private String password;
 	private String nama;
 	private String alamat;
 	private String email;
@@ -15,6 +16,8 @@ public class UsersWrapper {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
+	private Integer sameUsername;
+	private Integer sameEmail;
 	
 	
 	public Long getUserId() {
@@ -31,7 +34,14 @@ public class UsersWrapper {
 	public void setUsername(String username) {
 		this.username = username;
 	}	
+	//--------------------------------------------------------------------------------------------------------
 
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}	
 	//--------------------------------------------------------------------------------------------------------
 
 	public String getNama() {
@@ -104,16 +114,27 @@ public class UsersWrapper {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
+	
+	
+	public Integer getSameUsername() {
+		return sameUsername;
+	}
+	public void setSameUsername(Integer sameUsername) {
+		this.sameUsername = sameUsername;
+	}
+	public Integer getSameEmail() {
+		return sameEmail;
+	}
+	public void setSameEmail(Integer sameEmail) {
+		this.sameEmail = sameEmail;
+	}
 	@Override
 	public String toString() {
-		return "UsersWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamat
-				+ ", email=" + email + ", telp=" + telp + ", programName=" + programName + ", createdDate="
-				+ createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate + ", updatedBy=" + updatedBy
-				+ "]";
+		return "UsersWrapper [userId=" + userId + ", username=" + username + ", password=" + password + ", nama=" + nama
+				+ ", alamat=" + alamat + ", email=" + email + ", telp=" + telp + ", programName=" + programName
+				+ ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate
+				+ ", updatedBy=" + updatedBy + ", sameUsername=" + sameUsername + ", sameEmail=" + sameEmail + "]";
 	}
-	
-	
-
 	
 	
 	

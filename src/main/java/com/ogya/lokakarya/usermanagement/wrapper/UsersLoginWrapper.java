@@ -5,19 +5,11 @@ import java.util.Set;
 import com.ogya.lokakarya.usermanagement.entity.HakAkses;
 
 public class UsersLoginWrapper {
-	private Long userId;
 	private String username;
-	private String password;
 	private String nama;
 	private Set<HakAkses> hakAkses;
 	
-	
-	public Long getUserId() {
-		return userId;
-	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}	
+
 	//--------------------------------------------------------------------------------------------------------
 
 	public String getUsername() {
@@ -25,14 +17,6 @@ public class UsersLoginWrapper {
 	}
 	public void setUsername(String username) {
 		this.username = username;
-	}	
-	//--------------------------------------------------------------------------------------------------------
-
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
 	}	
 	//--------------------------------------------------------------------------------------------------------
 
@@ -51,12 +35,12 @@ public class UsersLoginWrapper {
 		this.hakAkses = hakAkses;
 	}
 	//--------------------------------------------------------------------------------------------------------
-	
 	@Override
 	public String toString() {
-		return "UsersLoginWrapper [userId=" + userId + ", username=" + username + ", password=" + password + ", nama="
-				+ nama + ", hakAkses=" + hakAkses + "]";
+		return "UsersLoginWrapper [username=" + username + ", nama=" + nama + ", hakAkses=" + hakAkses + "]";
 	}
+	
+	
 	
 	
 	
