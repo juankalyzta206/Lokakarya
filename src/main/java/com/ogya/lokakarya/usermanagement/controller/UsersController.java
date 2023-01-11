@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
-import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
@@ -53,13 +55,13 @@ public class UsersController {
 	}
 	
 	@PostMapping(path = "/")
-	public DataResponse<UsersWrapper> save(@RequestBody UsersWrapper wrapper){
-		return new DataResponse<UsersWrapper>(userService.save(wrapper));
+	public DataResponse<UsersAddWrapper> save(@RequestBody UsersAddWrapper wrapper){
+		return new DataResponse<UsersAddWrapper>(userService.save(wrapper));
 	}
 	
 
 	@PutMapping(path = "/")
-	public DataResponse<UsersWrapper> update(@RequestBody UpdateUsersWrapper wrapper){
+	public DataResponse<UsersWrapper> update(@RequestBody UsersUpdateWrapper wrapper){
 		return new DataResponse<UsersWrapper>(userService.update(wrapper));
 	}
 	
@@ -70,8 +72,8 @@ public class UsersController {
 	}
 	
 	@PostMapping(path = "/register")
-	public DataResponse<UsersWrapper> register(@RequestBody UsersWrapper wrapper){
-		return new DataResponse<UsersWrapper>(userService.save(wrapper));
+	public DataResponse<UsersRegisterWrapper> register(@RequestBody UsersRegisterWrapper wrapper){
+		return new DataResponse<UsersRegisterWrapper>(userService.register(wrapper));
 	}
 	
 	

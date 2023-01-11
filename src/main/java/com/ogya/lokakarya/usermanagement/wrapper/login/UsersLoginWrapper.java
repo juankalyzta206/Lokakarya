@@ -1,23 +1,15 @@
-package com.ogya.lokakarya.usermanagement.wrapper;
+package com.ogya.lokakarya.usermanagement.wrapper.login;
 
 import java.util.Set;
 
-import com.ogya.lokakarya.usermanagement.entity.HakAkses;
+import com.ogya.lokakarya.usermanagement.entity.login.HakAksesLogin;
 
 public class UsersLoginWrapper {
-	private Long userId;
 	private String username;
-	private String password;
 	private String nama;
-	private Set<HakAkses> hakAkses;
+	private Set<HakAksesLogin> hakAkses;
 	
-	
-	public Long getUserId() {
-		return userId;
-	}
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}	
+
 	//--------------------------------------------------------------------------------------------------------
 
 	public String getUsername() {
@@ -25,14 +17,6 @@ public class UsersLoginWrapper {
 	}
 	public void setUsername(String username) {
 		this.username = username;
-	}	
-	//--------------------------------------------------------------------------------------------------------
-
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
 	}	
 	//--------------------------------------------------------------------------------------------------------
 
@@ -44,19 +28,19 @@ public class UsersLoginWrapper {
 	}	
 	//--------------------------------------------------------------------------------------------------------
 
-	public Set<HakAkses> getHakAkses() {
+	public Set<HakAksesLogin> getHakAkses() {
 		return hakAkses;
 	}
-	public void setHakAkses(Set<HakAkses> hakAkses) {
+	public void setHakAkses(Set<HakAksesLogin> hakAkses) {
 		this.hakAkses = hakAkses;
 	}
 	//--------------------------------------------------------------------------------------------------------
-	
 	@Override
 	public String toString() {
-		return "UsersLoginWrapper [userId=" + userId + ", username=" + username + ", password=" + password + ", nama="
-				+ nama + ", hakAkses=" + hakAkses + "]";
+		return "UsersLoginWrapper [username=" + username + ", nama=" + nama + ", hakAkses=" + hakAkses + "]";
 	}
+	
+	
 	
 	
 	

@@ -1,9 +1,8 @@
-package com.ogya.lokakarya.usermanagement.wrapper;
+package com.ogya.lokakarya.usermanagement.wrapper.login;
 
-import java.util.Date;
 import java.util.Set;
 
-import com.ogya.lokakarya.usermanagement.entity.SubMenu;
+import com.ogya.lokakarya.usermanagement.entity.login.SubMenuLogin;
 
 
 public class MenuLoginWrapper {
@@ -11,7 +10,7 @@ public class MenuLoginWrapper {
 	private String nama;
 	private String icon;
 	private String url;
-	private Set<SubMenu> subMenu;
+	private Set<SubMenuLogin> subMenu;
 	
 
 	public Long getMenuId() {
@@ -54,10 +53,10 @@ public class MenuLoginWrapper {
 
 	
 
-	public Set<SubMenu> getSubMenu() {
+	public Set<SubMenuLogin> getSubMenu() {
 		return subMenu;
 	}
-	public void setSubMenu(Set<SubMenu> subMenu) {
+	public void setSubMenu(Set<SubMenuLogin> subMenu) {
 		this.subMenu = subMenu;
 	}
 	

@@ -1,15 +1,14 @@
-package com.ogya.lokakarya.usermanagement.wrapper;
+package com.ogya.lokakarya.usermanagement.wrapper.login;
 
-import java.util.Date;
 import java.util.Set;
 
-import com.ogya.lokakarya.usermanagement.entity.RoleMenu;
+import com.ogya.lokakarya.usermanagement.entity.login.RoleMenuLogin;
 
 
 public class RolesLoginWrapper {
 	private Long roleId;
 	private String nama;
-	private Set<RoleMenu> roleMenu;
+	private Set<RoleMenuLogin> roleMenu;
 	
 
 	public Long getRoleId() {
@@ -29,10 +28,10 @@ public class RolesLoginWrapper {
 	}//--------------------------------------------------------------------------------------------------------
 	
 	
-	public Set<RoleMenu> getRoleMenu() {
+	public Set<RoleMenuLogin> getRoleMenu() {
 		return roleMenu;
 	}
-	public void setRoleMenu(Set<RoleMenu> roleMenu) {
+	public void setRoleMenu(Set<RoleMenuLogin> roleMenu) {
 		this.roleMenu = roleMenu;
 	}
 	//--------------------------------------------------------------------------------------------------------

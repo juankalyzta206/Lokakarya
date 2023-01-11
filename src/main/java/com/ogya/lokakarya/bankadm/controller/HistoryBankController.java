@@ -1,6 +1,10 @@
 package com.ogya.lokakarya.bankadm.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,9 +14,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.service.HistoryBankService;
@@ -103,5 +116,35 @@ public class HistoryBankController {
 		historyBankService.delete(norek);
 		return "History "+norek+" Berhasil di delete";
 	}
+	
+	
+    @RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
+    public void exportToPdf(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdf(response);
+       }
+
+	
+    @RequestMapping(value = "/exportToPdfALLSetor", method = RequestMethod.GET)
+    public void exportToPdfsetor(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfSetor(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLTarik", method = RequestMethod.GET)
+    public void exportToPdftarik(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfTarik(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLTransfer", method = RequestMethod.GET)
+    public void exportToPdftransfer(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfTransfer(response);
+       }
+    
+	
+    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
+    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
+        historyBankService.ExportToPdfBayarTelepon(response);
+       }
 
 }

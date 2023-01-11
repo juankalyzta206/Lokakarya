@@ -19,9 +19,11 @@ import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
-import com.ogya.lokakarya.usermanagement.wrapper.UpdateUsersWrapper;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersLoginWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 
 @Service
@@ -86,6 +88,22 @@ public class UsersService {
 		UsersWrapper wrapper = new UsersWrapper();
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
+		wrapper.setNama(entity.getNama());
+		wrapper.setAlamat(entity.getAlamat());
+		wrapper.setEmail(entity.getEmail());
+		wrapper.setTelp(entity.getTelp());
+		wrapper.setProgramName(entity.getProgramName());
+		wrapper.setCreatedDate(entity.getCreatedDate());
+		wrapper.setCreatedBy(entity.getCreatedBy());
+		wrapper.setUpdatedDate(entity.getUpdatedDate());
+		wrapper.setUpdatedBy(entity.getUpdatedBy());
+		return wrapper;
+	}
+	
+	private UsersRegisterWrapper toWrapperRegister(Users entity) {
+		UsersRegisterWrapper wrapper = new UsersRegisterWrapper();
+		wrapper.setUserId(entity.getUserId());
+		wrapper.setUsername(entity.getUsername());
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setNama(entity.getNama());
 		wrapper.setAlamat(entity.getAlamat());
@@ -99,11 +117,27 @@ public class UsersService {
 		return wrapper;
 	}
 	
-	private UsersLoginWrapper toWrapperLogin(Users entity) {
-		UsersLoginWrapper wrapper = new UsersLoginWrapper();
+	private UsersAddWrapper toWrapperAdd(Users entity) {
+		UsersAddWrapper wrapper = new UsersAddWrapper();
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setPassword(entity.getPassword());
+		wrapper.setNama(entity.getNama());
+		wrapper.setAlamat(entity.getAlamat());
+		wrapper.setEmail(entity.getEmail());
+		wrapper.setTelp(entity.getTelp());
+		wrapper.setProgramName(entity.getProgramName());
+		wrapper.setCreatedDate(entity.getCreatedDate());
+		wrapper.setCreatedBy(entity.getCreatedBy());
+		wrapper.setUpdatedDate(entity.getUpdatedDate());
+		wrapper.setUpdatedBy(entity.getUpdatedBy());
+		return wrapper;
+	}
+	
+	
+	private UsersLoginWrapper toWrapperLogin(Users entity) {
+		UsersLoginWrapper wrapper = new UsersLoginWrapper();
+		wrapper.setUsername(entity.getUsername());
 		wrapper.setHakAkses(entity.getHakAkses());		
 		wrapper.setNama(entity.getNama());
 		return wrapper;
@@ -138,7 +172,25 @@ public class UsersService {
 		return toWrapperList(userList);
 	}
 
-	private Users toEntity(UsersWrapper wrapper) {
+//	private Users toEntity(UsersWrapper wrapper) {
+//		Users entity = new Users();
+//		if (wrapper.getUserId() != null) {
+//			entity = usersRepository.getReferenceById(wrapper.getUserId());
+//		}
+//		entity.setUsername(wrapper.getUsername());
+//		entity.setNama(wrapper.getNama());
+//		entity.setAlamat(wrapper.getAlamat());
+//		entity.setEmail(wrapper.getEmail());
+//		entity.setTelp(wrapper.getTelp());
+//		entity.setProgramName(wrapper.getProgramName());
+//		entity.setCreatedDate(wrapper.getCreatedDate());
+//		entity.setCreatedBy(wrapper.getCreatedBy());
+//		entity.setUpdatedDate(wrapper.getUpdatedDate());
+//		entity.setUpdatedBy(wrapper.getUpdatedBy());
+//		return entity;
+//	}
+	
+	private Users toEntityUpdate(UsersUpdateWrapper wrapper) {
 		Users entity = new Users();
 		if (wrapper.getUserId() != null) {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
@@ -157,7 +209,26 @@ public class UsersService {
 		return entity;
 	}
 	
-	private Users toEntityUpdate(UpdateUsersWrapper wrapper) {
+	private Users toEntityRegister(UsersRegisterWrapper wrapper) {
+		Users entity = new Users();
+		if (wrapper.getUserId() != null) {
+			entity = usersRepository.getReferenceById(wrapper.getUserId());
+		}
+		entity.setUsername(wrapper.getUsername());
+		entity.setPassword(wrapper.getPassword());
+		entity.setNama(wrapper.getNama());
+		entity.setAlamat(wrapper.getAlamat());
+		entity.setEmail(wrapper.getEmail());
+		entity.setTelp(wrapper.getTelp());
+		entity.setProgramName(wrapper.getProgramName());
+		entity.setCreatedDate(wrapper.getCreatedDate());
+		entity.setCreatedBy(wrapper.getCreatedBy());
+		entity.setUpdatedDate(wrapper.getUpdatedDate());
+		entity.setUpdatedBy(wrapper.getUpdatedBy());
+		return entity;
+	}
+	
+	private Users toEntityAdd(UsersAddWrapper wrapper) {
 		Users entity = new Users();
 		if (wrapper.getUserId() != null) {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
@@ -176,12 +247,12 @@ public class UsersService {
 		return entity;
 	}
 
-	public UsersWrapper save(UsersWrapper wrapper) {
+	public UsersRegisterWrapper register(UsersRegisterWrapper wrapper) {
 		if (usersRepository.checkUsername(wrapper.getUsername())==0) {
 			if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
 				wrapper.setPassword(hashPassword(wrapper.getPassword()));
-				Users user = usersRepository.save(toEntity(wrapper));
-				return toWrapper(user);
+				Users user = usersRepository.save(toEntityRegister(wrapper));
+				return toWrapperRegister(user);
 			} else {
 				throw new BusinessException("Email already taken");
 			}
@@ -190,7 +261,22 @@ public class UsersService {
 		}
 	}
 	
-	public UsersWrapper update(UpdateUsersWrapper wrapper) {
+	
+	public UsersAddWrapper save(UsersAddWrapper wrapper) {
+		if (usersRepository.checkUsername(wrapper.getUsername())==0) {
+			if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
+				wrapper.setPassword(hashPassword(wrapper.getPassword()));
+				Users user = usersRepository.save(toEntityAdd(wrapper));
+				return toWrapperAdd(user);
+			} else {
+				throw new BusinessException("Email already taken");
+			}
+		} else {
+			throw new BusinessException("Username already taken");
+		}
+	}
+	
+	public UsersWrapper update(UsersUpdateWrapper wrapper) {
 		if (wrapper.getSameUsername() == 0) {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkUsername(wrapper.getUsername())==0) {

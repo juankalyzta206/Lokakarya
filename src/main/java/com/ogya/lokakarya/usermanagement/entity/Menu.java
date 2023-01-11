@@ -1,15 +1,13 @@
 package com.ogya.lokakarya.usermanagement.entity;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
@@ -27,7 +25,7 @@ public class Menu {
 	private String createdBy;
 	private Date updatedDate;
 	private String updatedBy;
-	private Set<SubMenu> subMenu = new HashSet<SubMenu>(0);
+
 	
 	@Id
 	@GeneratedValue(generator = "MENU_GEN", strategy = GenerationType.SEQUENCE)
@@ -112,14 +110,6 @@ public class Menu {
 		this.updatedBy = updatedBy;
 	}
 	
-	
-	@OneToMany(mappedBy = "menu")
-	public Set<SubMenu> getSubMenu() {
-		return subMenu;
-	}
-	public void setSubMenu(Set<SubMenu> subMenu) {
-		this.subMenu = subMenu;
-	}
 	
 	
 	

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> {
@@ -39,4 +40,17 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	@Query(value = "SELECT count(*) FROM HISTORY_BANK e WHERE e.STATUS_KET = 4 AND e.TANGGAL  between trunc(sysdate)\n"
 			+ "      And trunc(sysdate) + interval '1' day - interval '1' second", nativeQuery = true)
 	Long sumStatus4();
+	
+	
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 1", nativeQuery = true)
+	    List<HistoryBank> laporanSetor();
+	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 2", nativeQuery = true)
+	    List<HistoryBank> laporanTarik();
+	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 3", nativeQuery = true)
+	    List<HistoryBank> laporanTransfer();
+	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4", nativeQuery = true)
+	    List<HistoryBank> laporanBayarTelepon();
 }
