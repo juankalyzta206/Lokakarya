@@ -35,6 +35,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
+import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -89,12 +90,13 @@ public class UsersService {
 	}
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-		Pageable paging = PageRequest.of(0, 5);
-//		FilterWrapper filterWrapper = new FilterWrapper();
-		Page<Users> usersPage = usersRepository.findAll(paging);
-		List<Users> usersList = usersPage.getContent();
-		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
-		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
+		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
+		List<FilterWrapper> filterWrapper = wrapper.getFilters();
+//		throw new BusinessException(filterWrapper.getName());
+//		Page<Users> usersPage = usersRepository.findAll(paging);
+//		List<Users> usersList = usersPage.getContent();
+//		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
+//		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
 	
 	
