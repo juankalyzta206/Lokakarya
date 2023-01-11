@@ -157,7 +157,7 @@ public void ExportToPdf(HttpServletResponse response) throws Exception{
     pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
     // Create a table
-    PdfPTable pdfTable = new PdfPTable(9); 
+    PdfPTable pdfTable = new PdfPTable(8); 
     
 
     pdfTable.setWidthPercentage(100);
@@ -165,7 +165,6 @@ public void ExportToPdf(HttpServletResponse response) throws Exception{
     pdfTable.setSpacingAfter(10f);
          
   
-        pdfTable.addCell("ID History");
         pdfTable.addCell("Nomor Rekening");
         pdfTable.addCell("Nama");
         pdfTable.addCell("Tanggal Transaksi");
@@ -174,13 +173,12 @@ public void ExportToPdf(HttpServletResponse response) throws Exception{
         pdfTable.addCell("Rekening Tujuan");
         pdfTable.addCell("Tujuan Nama");
         pdfTable.addCell("No. TLP");        	
-    	for(int i=0;i<9;i++) {
+    	for(int i=0;i<8;i++) {
     		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
     	}
     
     // Iterate through the data and add it to the table
     for (HistoryBank entity : data) {
-    	pdfTable.addCell(String.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-"));
     	pdfTable.addCell(String.valueOf(entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-"));
     	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
     	
@@ -242,7 +240,7 @@ public void ExportToPdfSetor(HttpServletResponse response) throws Exception{
    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
    // Create a table
-   PdfPTable pdfTable = new PdfPTable(9); 
+   PdfPTable pdfTable = new PdfPTable(8); 
    
 
    pdfTable.setWidthPercentage(100);
@@ -250,7 +248,6 @@ public void ExportToPdfSetor(HttpServletResponse response) throws Exception{
    pdfTable.setSpacingAfter(10f);
         
  
-       pdfTable.addCell("ID History");
        pdfTable.addCell("Nomor Rekening");
        pdfTable.addCell("Nama");
        pdfTable.addCell("Tanggal Transaksi");
@@ -259,13 +256,12 @@ public void ExportToPdfSetor(HttpServletResponse response) throws Exception{
        pdfTable.addCell("Rekening Tujuan");
        pdfTable.addCell("Tujuan Nama");
        pdfTable.addCell("No. TLP");        	
-   	for(int i=0;i<9;i++) {
+   	for(int i=0;i<8;i++) {
    		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
    	}
    
    // Iterate through the data and add it to the table
    for (HistoryBank entity : data) {
-   	pdfTable.addCell(String.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-"));
    	pdfTable.addCell(String.valueOf(entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-"));
    	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
    	
@@ -328,7 +324,7 @@ public void ExportToPdfTarik(HttpServletResponse response) throws Exception{
    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
    // Create a table
-   PdfPTable pdfTable = new PdfPTable(9); 
+   PdfPTable pdfTable = new PdfPTable(8); 
    
 
    pdfTable.setWidthPercentage(100);
@@ -336,7 +332,6 @@ public void ExportToPdfTarik(HttpServletResponse response) throws Exception{
    pdfTable.setSpacingAfter(10f);
         
  
-       pdfTable.addCell("ID History");
        pdfTable.addCell("Nomor Rekening");
        pdfTable.addCell("Nama");
        pdfTable.addCell("Tanggal Transaksi");
@@ -345,13 +340,12 @@ public void ExportToPdfTarik(HttpServletResponse response) throws Exception{
        pdfTable.addCell("Rekening Tujuan");
        pdfTable.addCell("Tujuan Nama");
        pdfTable.addCell("No. TLP");        	
-   	for(int i=0;i<9;i++) {
+   	for(int i=0;i<8;i++) {
    		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
    	}
    
    // Iterate through the data and add it to the table
    for (HistoryBank entity : data) {
-   	pdfTable.addCell(String.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-"));
    	pdfTable.addCell(String.valueOf(entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-"));
    	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
    	
@@ -413,15 +407,13 @@ public void ExportToPdfTransfer(HttpServletResponse response) throws Exception{
   pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
   // Create a table
-  PdfPTable pdfTable = new PdfPTable(9); 
+  PdfPTable pdfTable = new PdfPTable(8); 
   
 
   pdfTable.setWidthPercentage(100);
   pdfTable.setSpacingBefore(10f);
   pdfTable.setSpacingAfter(10f);
        
-
-      pdfTable.addCell("ID History");
       pdfTable.addCell("Nomor Rekening");
       pdfTable.addCell("Nama");
       pdfTable.addCell("Tanggal Transaksi");
@@ -430,7 +422,7 @@ public void ExportToPdfTransfer(HttpServletResponse response) throws Exception{
       pdfTable.addCell("Rekening Tujuan");
       pdfTable.addCell("Tujuan Nama");
       pdfTable.addCell("No. TLP");        	
-  	for(int i=0;i<9;i++) {
+  	for(int i=0;i<8;i++) {
   		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
   	}
   
@@ -497,7 +489,7 @@ public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Excepti
   pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
   // Create a table
-  PdfPTable pdfTable = new PdfPTable(9); 
+  PdfPTable pdfTable = new PdfPTable(8); 
   
 
   pdfTable.setWidthPercentage(100);
@@ -505,7 +497,6 @@ public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Excepti
   pdfTable.setSpacingAfter(10f);
        
 
-      pdfTable.addCell("ID History");
       pdfTable.addCell("Nomor Rekening");
       pdfTable.addCell("Nama");
       pdfTable.addCell("Tanggal Transaksi");
@@ -514,7 +505,7 @@ public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Excepti
       pdfTable.addCell("Rekening Tujuan");
       pdfTable.addCell("Tujuan Nama");
       pdfTable.addCell("No. TLP");        	
-  	for(int i=0;i<9;i++) {
+  	for(int i=0;i<8;i++) {
   		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
   	}
   
