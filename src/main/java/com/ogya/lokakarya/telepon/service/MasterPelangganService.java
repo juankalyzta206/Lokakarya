@@ -107,7 +107,7 @@ public class MasterPelangganService {
 		    ByteArrayInputStream in = ExcelHelperMasterPelanggan.tutorialsToExcel(masterPelanggan);
 		    return in;
 		  }
-	    public List<MasterPelanggan> listAll() {
+	 public List<MasterPelanggan> listAll() {
 	        return masterPelangganRepository.findAll();
 	    }
 	
