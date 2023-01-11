@@ -190,7 +190,7 @@ public class HistoryBankController {
         	pdfTable.addCell(String.valueOf(entity.getNoRekTujuan() != null ? String.valueOf(entity.getNoRekTujuan()) : "-"));
         	pdfTable.addCell(String.valueOf(entity.getNamaTujuan() != null ? String.valueOf(entity.getNamaTujuan()) : "-"));
         	pdfTable.addCell(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-"));
-
+//
 
         }
         
