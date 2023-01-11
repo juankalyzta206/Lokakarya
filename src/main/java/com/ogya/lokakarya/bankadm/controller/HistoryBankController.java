@@ -23,9 +23,12 @@ import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.service.HistoryBankService;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/historybank")
@@ -142,15 +145,10 @@ public class HistoryBankController {
     
     
 
-    @GetMapping(path = "/PageFilter")
-    public DataResponsePagination<HistoryBankWrapper, HistoryBank> pageFilter(
-        @RequestParam("filter") String keyfilter ,
-        @RequestParam("sortField") String field ,
-        @RequestParam("sortOrder") String order ,
-        @RequestParam("page") int page, 
-        @RequestParam("size") int size) {
-    	
-        return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findByFilter(keyfilter,field,order, page, size));
-    }
+ // findAllPagination
+ 	@PostMapping(path = "/findAllWithPaginationAndFilter")
+ 	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
+ 		return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findAllWithPaginationAndFilter(wrapper));
+ 	}
 
 }

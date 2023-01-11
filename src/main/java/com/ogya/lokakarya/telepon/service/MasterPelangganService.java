@@ -25,6 +25,7 @@ import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 
@@ -102,47 +103,59 @@ public class MasterPelangganService {
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
-	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,Long idPelanggan){
-		Pageable paging = PageRequest.of(page, size);
-		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,idPelanggan);
+//	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,Long idPelanggan){
+//		Pageable paging = PageRequest.of(page, size);
+//		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,idPelanggan);
+//		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//	}
+//	public <T>PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,String filter,T value ){
+//		Pageable paging = PageRequest.of(page, size);
+//		if(filter.equals("idPelanggan")) {
+//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllIdPelanggan(paging,value);
+//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//		}
+//		else if(filter.equals("nama")) {
+//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllName(paging,value);
+//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//		}
+//		else if(filter.equals("alamat")) {
+//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllAlamat(paging,value);
+//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//		}
+//		else if(filter.equals("noTelp")) {
+//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllNotelp(paging,value);
+//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//		}
+//		else {
+//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllUserId(paging,value);
+//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
+//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
+//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
+//		}
+//		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
+//	}
+	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(PagingRequestWrapper wrapper){
+		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
+		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging);
 		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
-	public <T>PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,String filter,T value ){
-		Pageable paging = PageRequest.of(page, size);
-		if(filter.equals("idPelanggan")) {
-			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllIdPelanggan(paging,value);
-			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-		}
-		else if(filter.equals("nama")) {
-			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllName(paging,value);
-			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-		}
-		else if(filter.equals("alamat")) {
-			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllAlamat(paging,value);
-			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-		}
-		else if(filter.equals("noTelp")) {
-			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllNotelp(paging,value);
-			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-		}
-		else {
-			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllUserId(paging,value);
-			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-		}
-		//Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
-	}
+	
+	
+	
+	
+	
 	 public ByteArrayInputStream load() {
 		    List<MasterPelanggan> masterPelanggan = masterPelangganRepository.findAll();
 		    ByteArrayInputStream in = ExcelHelperMasterPelanggan.tutorialsToExcel(masterPelanggan);
