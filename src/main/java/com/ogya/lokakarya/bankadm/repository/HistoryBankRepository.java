@@ -53,4 +53,13 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4", nativeQuery = true)
 	    List<HistoryBank> laporanBayarTelepon();
+	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE :sortField LIKE '%' || :keyFilter || '%' ORDER BY :sortField :sortOrder",
+	            countQuery = "SELECT count(*) FROM HISTORY_BANK",
+	            nativeQuery = true)
+	    Page<HistoryBank> findAllFilter(@Param("keyFilter") String keyfilter,  @Param("sortOrder") String sortOrder,@Param("sortField") String sortField, @Param("paging") Pageable paging);
+
+	 
 }
+
+
