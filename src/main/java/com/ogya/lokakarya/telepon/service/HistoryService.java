@@ -179,8 +179,6 @@ public class HistoryService {
 		pdfTable.addCell("Bulan Tagihan");
 		pdfTable.addCell("Tahun Tagihan");
 		pdfTable.addCell("Nominal");
-		pdfTable.addCell("Nominal");
-		pdfTable.addCell("Nominal");
 		
 		BaseColor color = new BaseColor(135, 206, 235);
 
