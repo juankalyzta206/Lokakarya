@@ -327,7 +327,7 @@ public class HistoryBankService {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		PdfPTable pdfTable = new PdfPTable(8);
+		PdfPTable pdfTable = new PdfPTable(5);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
