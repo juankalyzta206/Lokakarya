@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -96,6 +97,10 @@ public class MasterPelangganController {
          
         excelExporter.export(response);    
     }
+    @RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
+	public void exportToPdf(HttpServletResponse response) throws Exception {
+		masterPelangganService.ExportToPdf(response);
+	}
     
 //	@GetMapping(path = "/findByname")
 //	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
