@@ -146,20 +146,51 @@ public class MasterPelangganService {
 //		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
 //	}
 	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(PagingRequestWrapper wrapper){
-		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
-		for(FilterWrapper filter : wrapper.getFilters()) {
-			
+		Pageable paging;
+		if (wrapper.getSortOrder() == "ASC") {
+			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).ascending());
+		} else {
+			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).descending());
 		}
-		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging);
+		List<FilterWrapper> filterWrapper = wrapper.getFilters();
+		String jIdPelanggan = "";
+		String nama = "";
+		String jNoTelp = "";
+		String alamat = "";
+		String jUserId = "";
+		for (FilterWrapper entity : filterWrapper) {
+			switch(entity.getName().toLowerCase()) {
+			  case "idpelanggan":
+				  jIdPelanggan = entity.getValue();
+			  case "nama":
+				 nama = entity.getValue();
+			  case "notelp":
+				  jNoTelp = entity.getValue();
+			  case "alamat":
+				  alamat = entity.getValue();
+			  case "userid":
+				  jUserId = entity.getValue();
+			  default:
+			    // code block
+			}
+		}
+		Long idPelanggan = Long.parseLong(jIdPelanggan);
+		Long noTelp = Long.parseLong(jNoTelp);
+		Long userId = Long.parseLong(jUserId);
+		Optional<Users> optionalUser = usersRepository.findById(userId);
+		Users users = optionalUser.isPresent() ? optionalUser.get() : null;
+		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(paging,idPelanggan,nama,alamat,noTelp,users);
 		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
 	
-	public List<MasterPelangganWrapper> findByNama(String nama,Long idPelanggan,String alamat,Long noTelp){
-		List<MasterPelanggan> masterPelangganList = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelp(idPelanggan,nama,alamat,noTelp);
-		return toWrapperList(masterPelangganList);
-	}
+//	public List<MasterPelangganWrapper> findByNama(String nama,Long idPelanggan,String alamat,Long noTelp,Long userId){
+//		Optional<Users> optionalUser = usersRepository.findById(userId);
+//		Users users = optionalUser.isPresent() ? optionalUser.get() : null;
+//		List<MasterPelanggan> masterPelangganList = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(idPelanggan,nama,alamat,noTelp,users);
+//		return toWrapperList(masterPelangganList);
+//	}
 	
 	
 	

@@ -99,11 +99,11 @@ public class MasterPelangganController {
         excelExporter.export(response);    
     }
     
-	@GetMapping(path = "/findByname")
-	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
-			@RequestParam("alamat") String alamat,@RequestParam("noTelp") Long noTelp) {
-		return masterPelangganService.findByNama(nama,idPelanggan,alamat,noTelp);
-	}
+//	@GetMapping(path = "/findByname")
+//	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
+//			@RequestParam("alamat") String alamat,@RequestParam("noTelp") Long noTelp,@RequestParam("userId") Long userId) {
+//		return masterPelangganService.findByNama(nama,idPelanggan,alamat,noTelp,userId);
+//	}
     
     
 }
