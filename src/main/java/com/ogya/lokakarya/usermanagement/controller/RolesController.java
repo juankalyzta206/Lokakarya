@@ -22,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @RestController
@@ -70,5 +71,11 @@ public class RolesController {
     public void exportToPdf(HttpServletResponse response) throws Exception {
 		rolesService.ExportToPdf(response);
 	}
+
+	@PostMapping(value = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<RolesWrapper, Roles> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<RolesWrapper, Roles>(rolesService.ListWithPaging(request));
+	}
+	
 	
 }

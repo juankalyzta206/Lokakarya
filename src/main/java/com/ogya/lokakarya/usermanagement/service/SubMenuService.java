@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -30,8 +31,10 @@ import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.SubMenuRepository;
+import com.ogya.lokakarya.usermanagement.repository.criteria.SubMenuCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -41,6 +44,21 @@ public class SubMenuService {
 	
 	@Autowired
 	MenuRepository menuRepository;
+	
+	@Autowired
+	SubMenuCriteriaRepository subMenuCriteriaRepository;
+
+	public PaginationList<SubMenuWrapper, SubMenu> ListWithPaging(PagingRequestWrapper request) { 
+		List<SubMenu> subMenuList = subMenuCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), subMenuList.size());
+		Page<SubMenu> subMenuPage = new PageImpl<>(subMenuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),subMenuList.size());
+		List<SubMenuWrapper> subMenuWrapperList = new ArrayList<>();
+		for(SubMenu entity : subMenuPage) {
+		    subMenuWrapperList.add(toWrapper(entity));
+		}
+		return new PaginationList<SubMenuWrapper, SubMenu>(subMenuWrapperList, subMenuPage);	
+	}
 	
 	public PaginationList<SubMenuWrapper, SubMenu> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
