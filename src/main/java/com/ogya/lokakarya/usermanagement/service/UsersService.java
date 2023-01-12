@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
+import com.ogya.lokakarya.usermanagement.repository.UsersCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
@@ -46,6 +48,24 @@ public class UsersService {
 	
 	@Autowired
 	HakAksesRepository hakAksesRepository;
+	
+	@Autowired
+	private UsersCriteriaRepository usersCriteriaRepository;
+
+	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
+		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
+		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), usersList.size());
+		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
+		for(Users users : usersList) {
+			UsersWrapper wrapper = new UsersWrapper();
+			wrapper.setNama(users.getNama());
+			wrapper.setEmail(users.getEmail());
+			usersWrapperList.add(wrapper);
+		}
+		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);	
+	}
 	
 	private String hashPassword(String plainPassword) {
         return new BCryptPasswordEncoder().encode(plainPassword);
@@ -88,91 +108,11 @@ public class UsersService {
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
 	
-	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-		if (wrapper.getSortOrder().toLowerCase() == "asc") {
-			return findAllWithPaginationAndFilterAscending(wrapper);
-		} else {
-			return findAllWithPaginationAndFilterAscending(wrapper);
-		}
-	}
-	
-	public String CaseSortField(String sortField) {	
-		switch(sortField.toLowerCase()) {	
-			case "userid" : return "USER_ID";
-			case "username" : return "USERNAME";
-			case "password" : return "PASSWORD";
-			case "nama" : return "NAMA";
-			case "alamat" : return "ALAMAT";
-			case "email" : return "EMAIL";
-			case "telp" : return "TELP";
-			case "programname" : return "PROGRAM_NAME";
-			case "createddate" : return "CREATED_DATE";
-			case "createdby" : return "CREATED_BY";
-			case "updateddate" : return "UPDATED_DATE";
-			case "updatedby" : return "UPDATED_BY";
-			default:return sortField;
-			}
-		}	
-
-	
-	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilterAscending(PagingRequestWrapper wrapper) {	
-		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(CaseSortField(wrapper.getSortField())).ascending());	
-		String userId = "";	
-		String username = "";		
-		String nama = "";	
-		String alamat = "";	
-		String email = "";	
-		String telp = "";	
-		String programName = "";	
-		String createdDate = "";	
-		String createdBy = "";	
-		String updatedDate = "";	
-		String updatedBy = "";	
-		String value = "";	
-		for (int i=0; i<wrapper.getFilters().size(); i++) {	
-			value = (String) wrapper.getFilters().get(i).getValue().toString();
-			String key = wrapper.getFilters().get(i).getName();
-			switch(key) {
-			case "userId": userId = value; break;
-			case "username": username = value; break;
-			case "nama": nama = value; break;
-			case "alamat": alamat = value; break;
-			case "email": email = value; break;
-			case "telp": telp = value; break;
-			case "programName": programName = value; break;
-			case "createdDate": createdDate = value; break;
-			case "createdBy": createdBy = value; break;
-			case "updatedDate": updatedDate = value; break;
-			case "updatedBy": updatedBy = value; break;
-			default:
-			}
-		}	
-		Page<Users> usersPage = usersRepository.filterQuery(	
-		userId,	
-		username,	
-		nama,	
-		alamat,	
-		email,	
-		telp,	
-		programName,	
-		createdDate,	
-		createdBy,	
-		updatedDate,	
-		updatedBy,	
-		paging	
-		);	
-		List<Users> usersList = usersPage.getContent();	
-		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);	
-		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);	
-		}	
-	
-	
 	
 	public List<UsersWrapper> findByEmailAndPassword(String email, String password) {
 		List<Users> loginList = usersRepository.findByEmailAndPassword(email, password);
 		return toWrapperList(loginList);
 	}
-	
 	
 
 	private UsersWrapper toWrapper(Users entity) {
