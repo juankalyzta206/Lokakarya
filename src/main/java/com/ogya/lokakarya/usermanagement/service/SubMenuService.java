@@ -28,7 +28,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.SubMenu;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.SubMenuRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;

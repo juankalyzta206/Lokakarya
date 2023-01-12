@@ -26,7 +26,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
