@@ -23,13 +23,7 @@ import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
-<<<<<<< HEAD
-=======
 
-import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
-import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
->>>>>>> 83cba28e0aed0210e944836abc1c874f7a81ca27
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
 
