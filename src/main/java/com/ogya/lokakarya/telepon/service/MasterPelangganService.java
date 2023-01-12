@@ -155,30 +155,32 @@ public class MasterPelangganService {
 			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).descending());
 		}
 		List<TeleponFilterWrapper> filterWrapper = wrapper.getFilters();
-		String jIdPelanggan = "";
-		String nama = "";
-		String jNoTelp = "";
-		String alamat = "";
-		String jUserId = "";
-		for (TeleponFilterWrapper<String> entity : filterWrapper) {
-			switch(entity.getName().toLowerCase()) {
+		Long idPelanggan = 0L;
+		String nama = null;
+		Long noTelp = null;
+		String alamat = null;
+		Long userId = 0L;
+		for (int i=0; i<filterWrapper.size(); i++) {
+			switch(wrapper.getFilters().get(i).getName().toLowerCase()) {
 			  case "idpelanggan":
-				  jIdPelanggan = entity.getValue();
+				  idPelanggan = Long.valueOf(wrapper.getFilters().get(i).getValue()) ;
+				  break;
 			  case "nama":
-				 nama = entity.getValue();
+				 nama = wrapper.getFilters().get(i).getValue() ;
+				 break;
 			  case "notelp":
-				  jNoTelp = entity.getValue();
-			  case "alamat":
-				  alamat = entity.getValue();
+				  noTelp = Long.valueOf(wrapper.getFilters().get(i).getValue()) ; 
+				  break;
+			  case "alamat": 
+				  alamat = wrapper.getFilters().get(i).getValue() ;
+				  break;
 			  case "userid":
-				  jUserId = entity.getValue();
+				  userId =   Long.valueOf(wrapper.getFilters().get(i).getValue()) ; 
+				  break;
 			  default:
 			    // code block
 			}
 		}
-		Long idPelanggan = Long.parseLong(jIdPelanggan);
-		Long noTelp = Long.parseLong(jNoTelp);
-		Long userId = Long.parseLong(jUserId);
 		Optional<Users> optionalUser = usersRepository.findById(userId);
 		Users users = optionalUser.isPresent() ? optionalUser.get() : null;
 		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(paging,idPelanggan,nama,alamat,noTelp,users);

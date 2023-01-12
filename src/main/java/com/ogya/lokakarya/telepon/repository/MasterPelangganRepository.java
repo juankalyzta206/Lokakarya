@@ -14,7 +14,7 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 
 public interface MasterPelangganRepository extends JpaRepository<MasterPelanggan, Long> {
 	MasterPelanggan findByNoTelp (Long noTelpon);
-	
+	MasterPelanggan findByIdPelanggan (Long idPelanggan);
 	Page<MasterPelanggan> findAll(Pageable page);
 	
 	@Query(value = "SELECT e FROM MasterPelanggan e WHERE e.idPelanggan = :pidPelanggan ")

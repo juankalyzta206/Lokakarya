@@ -20,6 +20,7 @@ import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.service.HistoryService;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 
 @RestController
@@ -64,5 +65,10 @@ public class HistoryTelkomController {
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
 	public void exportToPdf(HttpServletResponse response) throws Exception {
 		historyService.ExportToPdf(response);
+	}
+	
+	@GetMapping(path = "/testData")
+	public DataResponseList<HistoryWrapper> testData() {
+		return new DataResponseList<HistoryWrapper>(historyService.testData());
 	}
 }
