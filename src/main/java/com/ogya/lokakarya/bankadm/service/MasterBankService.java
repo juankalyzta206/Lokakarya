@@ -125,7 +125,7 @@ public class MasterBankService {
 	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(6); 
+	    PdfPTable pdfTable = new PdfPTable(5); 
 	    
 
 	    pdfTable.setWidthPercentage(100);
@@ -138,8 +138,7 @@ public class MasterBankService {
 	        pdfTable.addCell("Alamat");
 	        pdfTable.addCell("Saldo");
 	        pdfTable.addCell("No. TLP");  
-	        pdfTable.addCell("Saldo");
-	    	for(int i=0;i<6;i++) {
+	    	for(int i=0;i<5;i++) {
 	    		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
 	    	}
 	    
