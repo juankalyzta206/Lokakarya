@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -38,8 +41,8 @@ public class HistoryBankCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-		}
+	    	 Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+	    	 predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));		}
 	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
@@ -61,7 +64,8 @@ public class HistoryBankCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	  Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+	    	 predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
 		}
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
