@@ -35,7 +35,6 @@ import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
-import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -82,7 +81,7 @@ public class UsersService {
 	}
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPagination(int page, int size) {
-		Pageable paging = PageRequest.of(page, size);
+		Pageable paging = PageRequest.of(page, size, Sort.by("userId").ascending());
 		Page<Users> usersPage = usersRepository.findAll(paging);
 		List<Users> usersList = usersPage.getContent();
 		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
@@ -90,33 +89,82 @@ public class UsersService {
 	}
 	
 	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-		Pageable paging;
-		if (wrapper.getSortOrder() == "ASC") {
-			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).ascending());
+		if (wrapper.getSortOrder().toLowerCase() == "asc") {
+			return findAllWithPaginationAndFilterAscending(wrapper);
 		} else {
-			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).descending());
+			return findAllWithPaginationAndFilterAscending(wrapper);
 		}
-		List<FilterWrapper> filterWrapper = wrapper.getFilters();
-		String username = "";
-		String nama = "";
-		String email = "";
-		for (int i=0; i<filterWrapper.size(); i++) {
-			switch(filterWrapper.get(i).getName().toLowerCase()) {
-			  case "username":
-			     username = filterWrapper.get(i).getValue();
-			  case "nama":
-				 nama = filterWrapper.get(i).getValue();
-			  case "email":
-				 email = filterWrapper.get(i).getValue();
-			  default:
-			    // code block
-			}
-		}
-		Page<Users> usersPage = usersRepository.findAllWithPaginationAndFilter(username,nama,email,paging);
-		List<Users> usersList = usersPage.getContent();
-		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
-		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
+	
+	public String CaseSortField(String sortField) {	
+		switch(sortField.toLowerCase()) {	
+			case "userid" : return "USER_ID";
+			case "username" : return "USERNAME";
+			case "password" : return "PASSWORD";
+			case "nama" : return "NAMA";
+			case "alamat" : return "ALAMAT";
+			case "email" : return "EMAIL";
+			case "telp" : return "TELP";
+			case "programname" : return "PROGRAM_NAME";
+			case "createddate" : return "CREATED_DATE";
+			case "createdby" : return "CREATED_BY";
+			case "updateddate" : return "UPDATED_DATE";
+			case "updatedby" : return "UPDATED_BY";
+			default:return sortField;
+			}
+		}	
+
+	
+	public PaginationList<UsersWrapper, Users> findAllWithPaginationAndFilterAscending(PagingRequestWrapper wrapper) {	
+		Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(CaseSortField(wrapper.getSortField())).ascending());	
+		String userId = "";	
+		String username = "";		
+		String nama = "";	
+		String alamat = "";	
+		String email = "";	
+		String telp = "";	
+		String programName = "";	
+		String createdDate = "";	
+		String createdBy = "";	
+		String updatedDate = "";	
+		String updatedBy = "";	
+		String value = "";	
+		for (int i=0; i<wrapper.getFilters().size(); i++) {	
+			value = (String) wrapper.getFilters().get(i).getValue().toString();
+			String key = wrapper.getFilters().get(i).getName();
+			switch(key) {
+			case "userId": userId = value; break;
+			case "username": username = value; break;
+			case "nama": nama = value; break;
+			case "alamat": alamat = value; break;
+			case "email": email = value; break;
+			case "telp": telp = value; break;
+			case "programName": programName = value; break;
+			case "createdDate": createdDate = value; break;
+			case "createdBy": createdBy = value; break;
+			case "updatedDate": updatedDate = value; break;
+			case "updatedBy": updatedBy = value; break;
+			default:
+			}
+		}	
+		Page<Users> usersPage = usersRepository.filterQuery(	
+		userId,	
+		username,	
+		nama,	
+		alamat,	
+		email,	
+		telp,	
+		programName,	
+		createdDate,	
+		createdBy,	
+		updatedDate,	
+		updatedBy,	
+		paging	
+		);	
+		List<Users> usersList = usersPage.getContent();	
+		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);	
+		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);	
+		}	
 	
 	
 	
@@ -209,6 +257,7 @@ public class UsersService {
 		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
 		return toWrapperList(userList);
 	}
+	
 	
 	public List<UsersWrapper> findByUserId(Long userId) {
 		List<Users> userList = usersRepository.findByUserId(userId);

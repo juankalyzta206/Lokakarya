@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 
 
 public interface MasterPelangganRepository extends JpaRepository<MasterPelanggan, Long> {
@@ -33,5 +34,6 @@ public interface MasterPelangganRepository extends JpaRepository<MasterPelanggan
 	@Query(value = "SELECT * FROM MASTER_PELANGGAN e WHERE USER_ID = :userId" , nativeQuery=true)
 	<T>Page<MasterPelanggan> findAllUserId(Pageable page,@Param("userId") T userId);
 	
-	List<MasterPelanggan> findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelp(Long idPelanggan,String nama,String alamat,Long noTelp);
+	//List<MasterPelanggan> findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(Long idPelanggan,String nama,String alamat,Long noTelp,Users user);
+	Page<MasterPelanggan> findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(Pageable page,Long idPelanggan,String nama,String alamat,Long noTelp,Users user);
 }

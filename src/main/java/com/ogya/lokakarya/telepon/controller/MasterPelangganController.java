@@ -19,16 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
-import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
+
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
-import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/masterpelanggan")
@@ -78,10 +75,10 @@ public class MasterPelangganController {
 //		}
 //	}
 	
-	@PostMapping(path = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
-	}
+//	@PostMapping(path = "/findAllWithPaginationAndFilter")
+//	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody TeleponPagingRequestWrapper wrapper) {
+//		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
+//	}
 	
     @GetMapping("/download")
     public void exportToExcel(HttpServletResponse response) throws IOException {
@@ -99,11 +96,11 @@ public class MasterPelangganController {
         excelExporter.export(response);    
     }
     
-	@GetMapping(path = "/findByname")
-	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
-			@RequestParam("alamat") String alamat,@RequestParam("noTelp") Long noTelp) {
-		return masterPelangganService.findByNama(nama,idPelanggan,alamat,noTelp);
-	}
+//	@GetMapping(path = "/findByname")
+//	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
+//			@RequestParam("alamat") String alamat,@RequestParam("noTelp") Long noTelp,@RequestParam("userId") Long userId) {
+//		return masterPelangganService.findByNama(nama,idPelanggan,alamat,noTelp,userId);
+//	}
     
     
 }

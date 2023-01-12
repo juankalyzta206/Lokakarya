@@ -1,6 +1,5 @@
 package com.ogya.lokakarya.usermanagement.repository;
 
-
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.util.FilterWrapper;
 
 
 public interface UsersRepository extends JpaRepository<Users, Long>{
@@ -56,23 +54,46 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 	Long isExistHakAkses(@Param("userId") Long userId);
 	
 	
-	@Query(value = "SELECT * FROM USERS u "
-			+ "WHERE LOWER(u.USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:username),'%')) "
-			+ "AND LOWER(u.NAMA) LIKE LOWER(CONCAT(CONCAT('%',:nama),'%')) "
-			+ "AND LOWER(u.EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:email),'%')) "
-			,
-	           countQuery = "SELECT COUNT(*) FROM USERS u "
-	           		+ "WHERE LOWER(u.USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:username),'%')) "
-	           		+ "AND LOWER(u.NAMA) LIKE LOWER(CONCAT(CONCAT('%',:nama),'%')) "
-	    			+ "AND LOWER(u.EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:email),'%')) "
-	    			,
-	           nativeQuery = true)
-	Page<Users> findAllWithPaginationAndFilter(@Param("username") String username,  
-			@Param("nama") String nama,
-			@Param("email") String email,
-//			@Param("sortField") String sortField,
-			Pageable paging);
 	
+	
+	@Query(value="SELECT * FROM USERS WHERE "
+			+ "(LOWER(USER_ID) LIKE LOWER(CONCAT(CONCAT('%',:pUserId),'%'))) AND "
+			+ "(LOWER(USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:pUsername),'%'))) AND "
+			+ "(LOWER(EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:pEmail),'%'))) AND "
+			+ "(LOWER(NAMA) LIKE LOWER(CONCAT(CONCAT('%',:pNama),'%')) OR NAMA IS NULL) AND "
+			+ "(LOWER(TELP) LIKE LOWER(CONCAT(CONCAT('%',:pTelp),'%')) OR TELP IS NULL) AND "
+			+ "(LOWER(PROGRAM_NAME) LIKE LOWER(CONCAT(CONCAT('%',:pProgramName),'%')) OR PROGRAM_NAME IS NULL) AND "
+			+ "(LOWER(ALAMAT) LIKE LOWER(CONCAT(CONCAT('%',:pAlamat),'%')) OR ALAMAT IS NULL) AND "
+			+ "(LOWER(CREATED_DATE) LIKE LOWER(CONCAT(CONCAT('%',:pCreatedDate),'%')) OR CREATED_DATE IS NULL) AND "
+			+ "(LOWER(CREATED_BY) LIKE LOWER(CONCAT(CONCAT('%',:pCreatedBy),'%')) OR CREATED_BY IS NULL) AND "
+			+ "(LOWER(UPDATED_DATE) LIKE LOWER(CONCAT(CONCAT('%',:pUpdatedDate),'%')) OR UPDATED_DATE IS NULL) AND "
+			+ "(LOWER(UPDATED_BY) LIKE LOWER(CONCAT(CONCAT('%',:pUpdatedBy),'%')) OR UPDATED_BY IS NULL)",
+			countQuery = "SELECT COUNT(*) FROM USERS WHERE "
+					+ "(LOWER(USER_ID) LIKE LOWER(CONCAT(CONCAT('%',:pUserId),'%'))) AND "
+					+ "(LOWER(USERNAME) LIKE LOWER(CONCAT(CONCAT('%',:pUsername),'%'))) AND "
+					+ "(LOWER(EMAIL) LIKE LOWER(CONCAT(CONCAT('%',:pEmail),'%'))) AND "
+					+ "(LOWER(NAMA) LIKE LOWER(CONCAT(CONCAT('%',:pNama),'%')) OR NAMA IS NULL) AND "
+					+ "(LOWER(TELP) LIKE LOWER(CONCAT(CONCAT('%',:pTelp),'%')) OR TELP IS NULL) AND "
+					+ "(LOWER(PROGRAM_NAME) LIKE LOWER(CONCAT(CONCAT('%',:pProgramName),'%')) OR PROGRAM_NAME IS NULL) AND "
+					+ "(LOWER(ALAMAT) LIKE LOWER(CONCAT(CONCAT('%',:pAlamat),'%')) OR ALAMAT IS NULL) AND "
+					+ "(LOWER(CREATED_DATE) LIKE LOWER(CONCAT(CONCAT('%',:pCreatedDate),'%')) OR CREATED_DATE IS NULL) AND "
+					+ "(LOWER(CREATED_BY) LIKE LOWER(CONCAT(CONCAT('%',:pCreatedBy),'%')) OR CREATED_BY IS NULL) AND "
+					+ "(LOWER(UPDATED_DATE) LIKE LOWER(CONCAT(CONCAT('%',:pUpdatedDate),'%')) OR UPDATED_DATE IS NULL) AND "
+					+ "(LOWER(UPDATED_BY) LIKE LOWER(CONCAT(CONCAT('%',:pUpdatedBy),'%')) OR UPDATED_BY IS NULL)",	
+			nativeQuery = true)
+	Page<Users> filterQuery(
+			@Param("pUserId") String userId, 
+			@Param("pUsername") String username, 
+			@Param("pNama") String nama, 
+			@Param("pAlamat") String alamat, 
+			@Param("pEmail") String email, 
+			@Param("pTelp") String telp, 
+			@Param("pProgramName") String programName, 
+			@Param("pCreatedDate") String createdDate, 
+			@Param("pCreatedBy") String createdBy,
+			@Param("pUpdatedDate") String updatedDate,
+			@Param("pUpdatedBy") String updatedBy,
+			Pageable paging);
 
 	
 }

@@ -1,9 +1,9 @@
 package com.ogya.lokakarya.util;
 
-public class FilterWrapper {
+public class FilterWrapper<T> {
 
 private String name;
-private String value;
+private T value;
 
 public String getName() {
 return name;
@@ -13,11 +13,11 @@ public void setName(String name) {
 this.name = name;
 }
 
-public String getValue() {
+public T getValue() {
 return value;
 }
 
-public void setValue(String value) {
+public void setValue(T value) {
 this.value = value;
 }
 

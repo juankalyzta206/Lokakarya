@@ -9,6 +9,7 @@ private Integer page;
 private Integer size;
 private String sortField;
 private String sortOrder;
+@SuppressWarnings("rawtypes")
 private List<FilterWrapper> filters = null;
 
 public Integer getOffSet() {
@@ -50,10 +51,12 @@ public void setSortOrder(String sortOrder) {
 this.sortOrder = sortOrder;
 }
 
+@SuppressWarnings("rawtypes")
 public List<FilterWrapper> getFilters() {
 return filters;
 }
 
+@SuppressWarnings("rawtypes")
 public void setFilters(List<FilterWrapper> filters) {
 this.filters = filters;
 }
