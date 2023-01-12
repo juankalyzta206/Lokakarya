@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,8 +33,10 @@ import com.ogya.lokakarya.usermanagement.entity.Roles;
 import com.ogya.lokakarya.usermanagement.repository.MenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.RoleMenuRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
+import com.ogya.lokakarya.usermanagement.repository.criteria.RoleMenuCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RoleMenuWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -46,6 +49,21 @@ public class RoleMenuService {
 	
 	@Autowired
 	MenuRepository menuRepository;
+	
+	@Autowired
+	RoleMenuCriteriaRepository roleMenuCriteriaRepository;
+
+	public PaginationList<RoleMenuWrapper, RoleMenu> ListWithPaging(PagingRequestWrapper request) { 
+		List<RoleMenu> roleMenuList = roleMenuCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), roleMenuList.size());
+		Page<RoleMenu> roleMenuPage = new PageImpl<>(roleMenuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),roleMenuList.size());
+		List<RoleMenuWrapper> roleMenuWrapperList = new ArrayList<>();
+		for(RoleMenu entity : roleMenuPage) {
+		    roleMenuWrapperList.add(toWrapper(entity));
+		}
+		return new PaginationList<RoleMenuWrapper, RoleMenu>(roleMenuWrapperList, roleMenuPage);	
+	}
 
 	public PaginationList<RoleMenuWrapper, RoleMenu> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);

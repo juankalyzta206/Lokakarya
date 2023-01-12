@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,14 +28,31 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
+import com.ogya.lokakarya.usermanagement.repository.criteria.RolesCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
 public class RolesService {
 	@Autowired
 	RolesRepository rolesRepository;
+	
+	@Autowired
+	RolesCriteriaRepository rolesCriteriaRepository;
+
+	public PaginationList<RolesWrapper, Roles> ListWithPaging(PagingRequestWrapper request) { 
+		List<Roles> rolesList = rolesCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), rolesList.size());
+		Page<Roles> rolesPage = new PageImpl<>(rolesList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),rolesList.size());
+		List<RolesWrapper> rolesWrapperList = new ArrayList<>();
+		for(Roles entity : rolesPage) {
+		    rolesWrapperList.add(toWrapper(entity));
+		}
+		return new PaginationList<RolesWrapper, Roles>(rolesWrapperList, rolesPage);	
+	}
 	
 	public PaginationList<RolesWrapper, Roles> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);

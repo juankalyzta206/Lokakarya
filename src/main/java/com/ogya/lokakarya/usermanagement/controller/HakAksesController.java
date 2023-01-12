@@ -22,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.HakAksesWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @RestController
@@ -69,6 +70,12 @@ public class HakAksesController {
     public void exportToPdf(HttpServletResponse response) throws Exception {
 		hakAksesService.ExportToPdf(response);
 	}
+	
+	@PostMapping(value = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<HakAksesWrapper, HakAkses> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<HakAksesWrapper, HakAkses>(hakAksesService.ListWithPaging(request));
+	}
+	
 	
 	
 }

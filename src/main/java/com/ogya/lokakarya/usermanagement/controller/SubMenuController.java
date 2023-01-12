@@ -22,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.SubMenuWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @RestController
@@ -68,5 +69,11 @@ public class SubMenuController {
     public void exportToPdf(HttpServletResponse response) throws Exception {
 		subMenuService.ExportToPdf(response);
 	}
+	
+	@PostMapping(value = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<SubMenuWrapper, SubMenu>(subMenuService.ListWithPaging(request));
+	}
+	
 	
 }
