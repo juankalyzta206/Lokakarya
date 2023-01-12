@@ -50,7 +50,7 @@ public class HistoryBank {
 	}
 	
 	@ManyToOne
-	@JoinColumn(name = "norek")
+	@JoinColumn(name = "norek" ,referencedColumnName = "norek")
 	public MasterBank getRekening() {
 		return rekening;
 	}
