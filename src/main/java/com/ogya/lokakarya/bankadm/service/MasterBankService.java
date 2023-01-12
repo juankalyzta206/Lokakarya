@@ -22,6 +22,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
@@ -121,6 +123,12 @@ public class MasterBankService {
 		List<MasterBankWrapper> bookWrapperList = toWrapperList(bankList);
 		return new PaginationList<MasterBankWrapper, MasterBank>(bookWrapperList, bankPage);
 	}
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
 	
 	
 	public void ExportToPdf(HttpServletResponse response) throws Exception{
@@ -149,22 +157,24 @@ public class MasterBankService {
 	    pdfTable.setSpacingAfter(10f);
 	         
 	  
-	        pdfTable.addCell("Nomor Rekening");
-	        pdfTable.addCell("Nama");
-	        pdfTable.addCell("Alamat");
-	        pdfTable.addCell("Saldo");
-	        pdfTable.addCell("No. TLP");  
+	        pdfTable.addCell(Align("Nomor Rekening"));
+	        pdfTable.addCell(Align("Nama"));
+	        pdfTable.addCell(Align("Alamat"));
+	        pdfTable.addCell(Align("No Telepon"));
+	        pdfTable.addCell(Align("Saldo"));
+	          
 	    	for(int i=0;i<5;i++) {
 	    		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
 	    	}
 	    
 	    // Iterate through the data and add it to the table
 	    for (MasterBank entity : data) {
-	    	pdfTable.addCell(String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-"));
+	    	pdfTable.addCell(Align(String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-")));
+	    	pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
+	    	pdfTable.addCell(Align(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-")));
+	    	pdfTable.addCell(Align(String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-")));  
+	    	pdfTable.addCell(Align(String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-")));
+	    	  	
 	//
 
 	    }

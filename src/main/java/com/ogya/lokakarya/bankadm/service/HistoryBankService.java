@@ -296,7 +296,7 @@ public class HistoryBankService {
 			}
 			pdfTable.addCell(Align(formattedDate));
 			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-			pdfTable.addCell(Align("Setor"));
+			pdfTable.addCell(Align("Setor Tunai"));
 		}
 
 		// Add the table to the pdf document
@@ -355,7 +355,7 @@ public class HistoryBankService {
 			}
 			pdfTable.addCell(Align(formattedDate));
 			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-			pdfTable.addCell(Align("Tarik"));
+			pdfTable.addCell(Align("Tarik Tunai"));
 		}
 
 		// Add the table to the pdf document
