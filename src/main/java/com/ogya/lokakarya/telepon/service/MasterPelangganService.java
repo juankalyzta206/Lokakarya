@@ -28,20 +28,17 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.ExcelHelperMasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.repository.criteria.MasterPelangganCriteriaRepository;
-import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponFilterWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
-import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -241,11 +238,12 @@ public class MasterPelangganService {
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 		}
+	 
 	 public PaginationList<MasterPelangganWrapper, MasterPelanggan> ListWithPaging(PagingRequestWrapper request) { 
 			List<MasterPelanggan> masterPelangganList = masterPelangganCriteriaRepository.findByFilter(request);
-			int fromIndex = (request.getPage()-1)* request.getSize();
+			int fromIndex = (request.getPage())* (request.getSize());
 			int toIndex = Math.min(fromIndex + request.getSize(), masterPelangganList.size());
-			Page<MasterPelanggan> masterPelangganPage = new PageImpl<>(masterPelangganList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),masterPelangganList.size());
+			Page<MasterPelanggan> masterPelangganPage = new PageImpl<>(masterPelangganList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), masterPelangganList.size());
 			List<MasterPelangganWrapper> masterPelangganWrapperList = new ArrayList<>();
 			for(MasterPelanggan entity : masterPelangganPage) {
 			    masterPelangganWrapperList.add(toWrapper(entity));
