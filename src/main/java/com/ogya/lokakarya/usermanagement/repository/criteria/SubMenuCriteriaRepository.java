@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.usermanagement.repository;
+package com.ogya.lokakarya.usermanagement.repository.criteria;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,21 +12,21 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @Repository
-public class UsersCriteriaRepository {
+public class SubMenuCriteriaRepository {
 	@Autowired
 	private EntityManager entityManager;
 
-	public List<Users> findByFilter(PagingRequestWrapper request) {
+	public List<SubMenu> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Users> criteriaQuery = cb.createQuery(Users.class);
+		CriteriaQuery<SubMenu> criteriaQuery = cb.createQuery(SubMenu.class);
 
-		Root<Users> root = criteriaQuery.from(Users.class);
+		Root<SubMenu> root = criteriaQuery.from(SubMenu.class);
 
 		if(request.getSortOrder().equalsIgnoreCase("asc"))
 			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
@@ -45,7 +45,7 @@ public class UsersCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<Users> result = entityManager.createQuery(criteriaQuery)
+		List<SubMenu> result = entityManager.createQuery(criteriaQuery)
 				.setMaxResults(request.getSize())
 				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
 
@@ -55,7 +55,7 @@ public class UsersCriteriaRepository {
 	public Long countAll(PagingRequestWrapper request){ 	
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
-	    Root<Users> root = criteriaQuery.from(Users.class);
+	    Root<SubMenu> root = criteriaQuery.from(SubMenu.class);
 	    
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    

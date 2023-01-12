@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,8 +33,10 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.usermanagement.repository.criteria.HakAksesCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.HakAksesWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -46,7 +49,22 @@ public class HakAksesService {
 	
 	@Autowired
 	RolesRepository rolesRepository;
+	
+	@Autowired
+	HakAksesCriteriaRepository hakAksesCriteriaRepository;
 
+	public PaginationList<HakAksesWrapper, HakAkses> ListWithPaging(PagingRequestWrapper request) { 
+		List<HakAkses> hakAksesList = hakAksesCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), hakAksesList.size());
+		Page<HakAkses> hakAksesPage = new PageImpl<>(hakAksesList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),hakAksesList.size());
+		List<HakAksesWrapper> hakAksesWrapperList = new ArrayList<>();
+		for(HakAkses entity : hakAksesPage) {
+		    hakAksesWrapperList.add(toWrapper(entity));
+		}
+		return new PaginationList<HakAksesWrapper, HakAkses>(hakAksesWrapperList, hakAksesPage);	
+	}
+	
 	public PaginationList<HakAksesWrapper, HakAkses> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
 		Page<HakAkses> hakAksesPage = hakAksesRepository.findAll(paging);
