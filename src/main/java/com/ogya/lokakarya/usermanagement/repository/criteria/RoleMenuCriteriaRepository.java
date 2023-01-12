@@ -45,9 +45,7 @@ public class RoleMenuCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<RoleMenu> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<RoleMenu> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}

@@ -45,9 +45,7 @@ public class UsersCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<Users> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<Users> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
