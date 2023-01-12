@@ -6,12 +6,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.Tuple;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,12 +27,10 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.repository.HistoryBankCriteriaRepository;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
-import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
-import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -43,7 +41,20 @@ public class HistoryBankService {
 HistoryBankRepository historyBankRepository;
 @Autowired
 MasterBankRepository masterBankRepository;
+@Autowired
+HistoryBankCriteriaRepository historyBankCriteriaRepository;
 
+public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequestWrapper request) { 
+	List<HistoryBank> historyBankList = historyBankCriteriaRepository.findByFilter(request);
+	int fromIndex = (request.getPage()-1)* request.getSize();
+	int toIndex = Math.min(fromIndex + request.getSize(), historyBankList.size());
+	Page<HistoryBank> historyBankPage = new PageImpl<>(historyBankList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), historyBankList.size());
+	List<HistoryBankWrapper> historyBankWrapperList = new ArrayList<>();
+	for(HistoryBank entity : historyBankPage) {
+	    historyBankWrapperList.add(toWrapper(entity));
+	}
+	return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);	
+}
 public HistoryBankWrapper getByidHistoryBank(Long idHistoryBank) {
 	HistoryBank historybank = historyBankRepository.getReferenceById(idHistoryBank);
 	return toWrapper(historybank);
@@ -557,22 +568,6 @@ public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Excepti
 
   response.setContentType("application/pdf");
   response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
-}
-
-
-
-
-public PaginationList<HistoryBankWrapper, HistoryBank> findAllWithPaginationAndFilter(PagingRequestWrapper wrapper) {
-	Pageable paging = PageRequest.of(wrapper.getPage(), wrapper.getSize());
-	List<FilterWrapper> filterWrapper = wrapper.getFilters();
-	for (int i=0; i<filterWrapper.size(); i++) {
-		
-	}
-//	throw new BusinessException(filterWrapper.getName());
-	Page<HistoryBank> historyPage = historyBankRepository.findAll(paging);
-	List<HistoryBank> historyList = historyPage.getContent();
-	List<HistoryBankWrapper> historyWrapperList = toWrapperList(historyList);
-	return new PaginationList<HistoryBankWrapper, HistoryBank>(historyWrapperList, historyPage);
 }
 
 }
