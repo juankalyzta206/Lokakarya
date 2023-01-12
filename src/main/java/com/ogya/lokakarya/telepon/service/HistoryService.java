@@ -1,9 +1,12 @@
 package com.ogya.lokakarya.telepon.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +17,20 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.PaginationList;
 
 @Service
@@ -93,5 +105,70 @@ public class HistoryService {
 		List<HistoryTelkom> historyList =  historyPage.getContent();
 		List<HistoryWrapper> historyWrapperList = toWrapperList(historyList);
 		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyWrapperList, historyPage);
+	}
+	
+//	Export To PDF
+	public void ExportToPdf(HttpServletResponse response) throws Exception{
+		 // Call the findAll method to retrieve the data
+	    List<HistoryTelkom> data = historyRepository.findAll();
+	    
+	    // Now create a new iText PDF document
+	    Document pdfDoc = new Document(PageSize.A4.rotate());
+	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+	    pdfDoc.open();
+	    
+	    Paragraph title = new Paragraph("List Laporan Pelunasan",
+	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+	    title.setAlignment(Element.ALIGN_CENTER);
+	    pdfDoc.add(title);
+	    
+	    // Add the generation date
+	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+	    // Create a table
+	    PdfPTable pdfTable = new PdfPTable(6); 
+	    
+
+	    pdfTable.setWidthPercentage(100);
+	    pdfTable.setSpacingBefore(10f);
+	    pdfTable.setSpacingAfter(10f);
+	         
+	  
+	        pdfTable.addCell("ID History");
+	        pdfTable.addCell("ID Pelanggan");
+	        pdfTable.addCell("Tanggal bayar");
+	        pdfTable.addCell("Bulan Tagihan");
+	        pdfTable.addCell("Tahun Tagihan");
+	        pdfTable.addCell("Total Tagihan");
+	        BaseColor color = new BaseColor(135,206,235);
+	    	for(int i=0;i<6;i++) {
+	    		pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+	    	}
+	    
+	    // Iterate through the data and add it to the table
+	    for (HistoryTelkom entity : data) {
+	    	pdfTable.addCell(String.valueOf(entity.getIdHistory() != null ? String.valueOf(entity.getIdHistory()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getIdPelanggan() != null ? String.valueOf(entity.getIdPelanggan()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
+	    	
+	    	SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	    	String tanggalBayar = "-";
+	    	if (entity.getTanggalBayar() != null) {
+	    		tanggalBayar = formatter.format(entity.getTanggalBayar());
+	    	}
+	    	pdfTable.addCell(tanggalBayar);
+	    	pdfTable.addCell(String.valueOf(entity.getTanggalBayar() != null ? String.valueOf(entity.getTanggalBayar()) : "-"));
+	    }
+	    
+	    // Add the table to the pdf document
+	    pdfDoc.add(pdfTable);
+
+	    pdfDoc.close();
+	    pdfWriter.close();
+
+	    response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 }
