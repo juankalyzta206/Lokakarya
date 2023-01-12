@@ -196,60 +196,76 @@ public class TransaksiTelkomService {
 	}
 
 //	Export To PDF
-	public void ExportToPdf(HttpServletResponse response) throws Exception{
-		 // Call the findAll method to retrieve the data
-	    List<TransaksiTelkom> data = transaksiTelkomRepository.findAll();
-	    
-	    // Now create a new iText PDF document
-	    Document pdfDoc = new Document(PageSize.A4.rotate());
-	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-	    pdfDoc.open();
-	    
-	    Paragraph title = new Paragraph("List Laporan Penunggakan Telepon",
-	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-	    
-	    // Add the generation date
-	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+	public void ExportToPdf(HttpServletResponse response) throws Exception {
+		// Call the findAll method to retrieve the data
+		List<TransaksiTelkom> dataTransaksi = transaksiTelkomRepository.findStatus1();
+		List<TransaksiTelkomWrapper> wrapperList = new ArrayList<TransaksiTelkomWrapper>();
 
-	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(6); 
-	    
+		for (int i = 0; i < dataTransaksi.size(); i++) {
+			TransaksiTelkomWrapper wrapper = new TransaksiTelkomWrapper();
+			wrapper.setIdPelanggan(dataTransaksi.get(i).getIdPelanggan().getIdPelanggan());
+			MasterPelanggan masterPelanggan = masterPelangganRepository
+					.findByIdPelanggan(wrapper.getIdPelanggan());
+			
+			wrapper.setNama(masterPelanggan.getNama());
+			wrapper.setBulanTagihan(dataTransaksi.get(i).getBulanTagihan());
+			wrapper.setTahunTagihan(dataTransaksi.get(i).getTahunTagihan());
+			wrapper.setUang(dataTransaksi.get(i).getUang());
+			wrapper.setStatus(dataTransaksi.get(i).getStatus());
+			wrapper.setIdTransaksi(dataTransaksi.get(i).getIdTransaksi());
+			wrapperList.add(wrapper);
+		}
 
-	    pdfTable.setWidthPercentage(100);
-	    pdfTable.setSpacingBefore(10f);
-	    pdfTable.setSpacingAfter(10f);
-	         
-	  
-	        pdfTable.addCell("ID Transaksi");
-	        pdfTable.addCell("ID Pelanggan");
-	        pdfTable.addCell("Bulan Tagihan");
-	        pdfTable.addCell("Tahun Tagihan");
-	        pdfTable.addCell("Total Tagihan");
-	        pdfTable.addCell("Status");
-	        BaseColor color = new BaseColor(135,206,235);
-	    	for(int i=0;i<6;i++) {
-	    		pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-	    	}
-	    
-	    // Iterate through the data and add it to the table
-	    for (TransaksiTelkom entity : data) {
-	    	pdfTable.addCell(String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getIdPelanggan() != null ? String.valueOf(entity.getIdPelanggan()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getStatus() == 1 ? "Belum Lunas" : "Lunas"));
-	    }
-	    
-	    // Add the table to the pdf document
-	    pdfDoc.add(pdfTable);
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		pdfDoc.open();
 
-	    pdfDoc.close();
-	    pdfWriter.close();
+		Paragraph title = new Paragraph("Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
 
-	    response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(6);
+
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+
+		pdfTable.addCell("ID Transaksi");
+		pdfTable.addCell("Nama Pelanggan");
+		pdfTable.addCell("Bulan Tagihan");
+		pdfTable.addCell("Tahun Tagihan");
+		pdfTable.addCell("Nominal");
+		pdfTable.addCell("Status");
+		
+		BaseColor color = new BaseColor(135, 206, 235);
+
+		for (int i = 0; i < 6; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (TransaksiTelkomWrapper entity : wrapperList) {
+			pdfTable.addCell(String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getStatus() != null ? "Belum Lunas" : "-"));
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+		pdfWriter.close();
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 }
