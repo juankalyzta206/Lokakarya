@@ -238,22 +238,22 @@ public class TransaksiTelkomService {
 		pdfTable.setSpacingAfter(10f);
 
 		PdfPCell cell1 = new PdfPCell(new Phrase("ID Transaksi"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell1);
 		PdfPCell cell2 = new PdfPCell(new Phrase("Nama Pelanggan"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell2);
 		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell3);
 		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell4);
 		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell5);
 		PdfPCell cell6 = new PdfPCell(new Phrase("Status"));
-		cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell6);
 //		pdfTable.addCell("Nama Pelanggan");
 //		pdfTable.addCell("Bulan Tagihan");
