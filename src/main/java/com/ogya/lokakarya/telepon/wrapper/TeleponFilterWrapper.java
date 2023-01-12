@@ -1,8 +1,8 @@
 package com.ogya.lokakarya.telepon.wrapper;
 
-public class TeleponFilterWrapper<T> {
+public class TeleponFilterWrapper {
 	private String name;
-	private T value;
+	private String value;
 
 	public String getName() {
 	return name;
@@ -12,11 +12,11 @@ public class TeleponFilterWrapper<T> {
 	this.name = name;
 	}
 
-	public T getValue() {
+	public String getValue() {
 	return value;
 	}
 
-	public void setValue(T value) {
+	public void setValue(String value) {
 	this.value = value;
 	}
 }
