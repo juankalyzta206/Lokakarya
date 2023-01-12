@@ -159,8 +159,8 @@ public class HistoryBankService {
 		List<HistoryBankWrapper> historyWrapperList = toWrapperList(historyList);
 		return new PaginationList<HistoryBankWrapper, HistoryBank>(historyWrapperList, historyPage);
 	}
-	
-	public PdfPCell Head(String title) {
+
+	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
@@ -433,59 +433,42 @@ public class HistoryBankService {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		PdfPTable pdfTable = new PdfPTable(8);
+		PdfPTable pdfTable = new PdfPTable(7);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		pdfTable.addCell("Nomor Rekening");
-		pdfTable.addCell("Nama");
-		pdfTable.addCell("Tanggal Transaksi");
-		pdfTable.addCell("Nominal");
-		pdfTable.addCell("Keterangan");
-		pdfTable.addCell("Rekening Tujuan");
-		pdfTable.addCell("Tujuan Nama");
-		pdfTable.addCell("No. TLP");
-		for (int i = 0; i < 8; i++) {
+		pdfTable.addCell(Align("Nomor Rekening Pengirim"));
+		pdfTable.addCell(Align("Nama Nasabah Pengirim"));
+		pdfTable.addCell(Align("Tanggal Transaksi"));
+		pdfTable.addCell(Align("Nominal"));
+		pdfTable.addCell(Align("Nomor Rekening Tujuan"));
+		pdfTable.addCell(Align("Nama Nasabah Tujuan"));
+		pdfTable.addCell(Align("Keterangan"));
+		for (int i = 0; i < 7; i++) {
 			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
 		}
 
 		// Iterate through the data and add it to the table
 		for (HistoryBank entity : data) {
-			pdfTable.addCell(String
-					.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-"));
-			pdfTable.addCell(String.valueOf(
-					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+			pdfTable.addCell(Align(String.valueOf(
+					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
 
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			String formattedDate = "-";
 			if (entity.getTanggal() != null) {
 				formattedDate = formatter.format(entity.getTanggal());
 			}
-			pdfTable.addCell(formattedDate);
-			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
-
-			String status = "-";
-			if (entity.getStatusKet() != null) {
-				if (entity.getStatusKet() == 1) {
-					status = "Setor";
-				} else if (entity.getStatusKet() == 2) {
-					status = "Tarik";
-				} else if (entity.getStatusKet() == 3) {
-					status = "Transfer";
-				} else if (entity.getStatusKet() == 4) {
-					status = "Bayar Telepon";
-				}
-			}
-			pdfTable.addCell(status);
-
-			pdfTable.addCell(
-					String.valueOf(entity.getNoRekTujuan() != null ? String.valueOf(entity.getNoRekTujuan()) : "-"));
-			pdfTable.addCell(
-					String.valueOf(entity.getNamaTujuan() != null ? String.valueOf(entity.getNamaTujuan()) : "-"));
+			pdfTable.addCell(Align(formattedDate));
+			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getNoRekTujuan() != null ? String.valueOf(entity.getNoRekTujuan()) : "-")));
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getNamaTujuan() != null ? String.valueOf(entity.getNamaTujuan()) : "-")));
 			pdfTable.addCell(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-"));
+			pdfTable.addCell(Align("Transfer"));
 //
 
 		}
@@ -524,12 +507,12 @@ public class HistoryBankService {
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		pdfTable.addCell(Head("Nomor Rekening"));
-		pdfTable.addCell(Head("Nama Nasabah"));
-		pdfTable.addCell(Head("Tanggal Transaksi"));
-		pdfTable.addCell(Head("Nominal"));
-		pdfTable.addCell(Head("No Telepon"));
-		pdfTable.addCell(Head("Keterangan"));
+		pdfTable.addCell(Align("Nomor Rekening"));
+		pdfTable.addCell(Align("Nama Nasabah"));
+		pdfTable.addCell(Align("Tanggal Transaksi"));
+		pdfTable.addCell(Align("Nominal"));
+		pdfTable.addCell(Align("No Telepon"));
+		pdfTable.addCell(Align("Keterangan"));
 		for (int i = 0; i < 6; i++) {
 			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
 		}
@@ -537,7 +520,7 @@ public class HistoryBankService {
 		// Iterate through the data and add it to the table
 		for (HistoryBank entity : data) {
 			pdfTable.addCell(String.valueOf(
-					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()): "-"));
+					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-"));
 			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
 
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -547,24 +530,8 @@ public class HistoryBankService {
 			}
 			pdfTable.addCell(formattedDate);
 			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
-
-//			String status = "-";
-//			if (entity.getStatusKet() != null) {
-//				if (entity.getStatusKet() == 1) {
-//					status = "Setor";
-//				} else if (entity.getStatusKet() == 2) {
-//					status = "Tarik";
-//				} else if (entity.getStatusKet() == 3) {
-//					status = "Transfer";
-//				} else if (entity.getStatusKet() == 4) {
-//					status = "Bayar Telepon";
-//				}
-//			}
-			
 			pdfTable.addCell(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-"));
 			pdfTable.addCell("BayarTelepon");
-//
-
 		}
 
 		// Add the table to the pdf document
