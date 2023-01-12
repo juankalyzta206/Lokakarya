@@ -30,8 +30,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
-import com.ogya.lokakarya.usermanagement.repository.UsersCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.usermanagement.repository.criteria.UsersCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
@@ -50,7 +50,7 @@ public class UsersService {
 	HakAksesRepository hakAksesRepository;
 	
 	@Autowired
-	private UsersCriteriaRepository usersCriteriaRepository;
+	UsersCriteriaRepository usersCriteriaRepository;
 
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
@@ -59,19 +59,7 @@ public class UsersService {
 		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),usersList.size());
 		List<UsersWrapper> usersWrapperList = new ArrayList<>();
 		for(Users entity : usersPage) {
-		    UsersWrapper wrapper = new UsersWrapper();
-		    wrapper.setUserId(entity.getUserId());
-			wrapper.setUsername(entity.getUsername());
-			wrapper.setNama(entity.getNama());
-			wrapper.setAlamat(entity.getAlamat());
-			wrapper.setEmail(entity.getEmail());
-			wrapper.setTelp(entity.getTelp());
-			wrapper.setProgramName(entity.getProgramName());
-			wrapper.setCreatedDate(entity.getCreatedDate());
-			wrapper.setCreatedBy(entity.getCreatedBy());
-			wrapper.setUpdatedDate(entity.getUpdatedDate());
-			wrapper.setUpdatedBy(entity.getUpdatedBy());
-		    usersWrapperList.add(wrapper);
+		    usersWrapperList.add(toWrapper(entity));
 		}
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);	
 	}
