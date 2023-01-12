@@ -56,13 +56,22 @@ public class UsersService {
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
 		int fromIndex = (request.getPage()-1)* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
-		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), usersList.size());
-		List<UsersWrapper> usersWrapperList = toWrapperList(usersList);
-		for(Users users : usersList) {
-			UsersWrapper wrapper = new UsersWrapper();
-			wrapper.setNama(users.getNama());
-			wrapper.setEmail(users.getEmail());
-			usersWrapperList.add(wrapper);
+		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),usersList.size());
+		List<UsersWrapper> usersWrapperList = new ArrayList<>();
+		for(Users entity : usersPage) {
+		    UsersWrapper wrapper = new UsersWrapper();
+		    wrapper.setUserId(entity.getUserId());
+			wrapper.setUsername(entity.getUsername());
+			wrapper.setNama(entity.getNama());
+			wrapper.setAlamat(entity.getAlamat());
+			wrapper.setEmail(entity.getEmail());
+			wrapper.setTelp(entity.getTelp());
+			wrapper.setProgramName(entity.getProgramName());
+			wrapper.setCreatedDate(entity.getCreatedDate());
+			wrapper.setCreatedBy(entity.getCreatedBy());
+			wrapper.setUpdatedDate(entity.getUpdatedDate());
+			wrapper.setUpdatedBy(entity.getUpdatedBy());
+		    usersWrapperList.add(wrapper);
 		}
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);	
 	}
