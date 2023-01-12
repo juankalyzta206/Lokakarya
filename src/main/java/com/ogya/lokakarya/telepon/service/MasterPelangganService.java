@@ -156,9 +156,9 @@ public class MasterPelangganService {
 		}
 		List<TeleponFilterWrapper> filterWrapper = wrapper.getFilters();
 		Long idPelanggan = 0L;
-		String nama = "";
-		Long noTelp = 0L;
-		String alamat = "";
+		String nama = null;
+		Long noTelp = null;
+		String alamat = null;
 		Long userId = 0L;
 		for (int i=0; i<filterWrapper.size(); i++) {
 			switch(wrapper.getFilters().get(i).getName().toLowerCase()) {
@@ -183,7 +183,7 @@ public class MasterPelangganService {
 		}
 		Optional<Users> optionalUser = usersRepository.findById(userId);
 		Users users = optionalUser.isPresent() ? optionalUser.get() : null;
-		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(paging,84L,"hilman","serigala",0L,users);
+		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(paging,idPelanggan,nama,alamat,noTelp,users);
 		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
