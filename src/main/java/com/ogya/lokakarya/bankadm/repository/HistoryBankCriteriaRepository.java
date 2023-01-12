@@ -29,11 +29,11 @@ public class HistoryBankCriteriaRepository {
 		CriteriaQuery<HistoryBank> criteriaQuery = cb.createQuery(HistoryBank.class);
 
 		Root<HistoryBank> root = criteriaQuery.from(HistoryBank.class);
-
+		Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
 		if(request.getSortOrder().equalsIgnoreCase("asc"))
-			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
+			criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));
 		else
-			criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+			criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));
 				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
@@ -41,8 +41,8 @@ public class HistoryBankCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
-	    	 predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));		}
+	 		Join<HistoryBank, MasterBank> join2 = root.join("rekening", JoinType.INNER);
+	    	 predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));		}
 	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
