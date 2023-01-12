@@ -54,7 +54,7 @@ public class UsersService {
 
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
 		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), usersList.size());
 		List<UsersWrapper> usersWrapperList = new ArrayList<>();

@@ -45,9 +45,7 @@ public class HakAksesCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<HakAkses> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<HakAkses> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}

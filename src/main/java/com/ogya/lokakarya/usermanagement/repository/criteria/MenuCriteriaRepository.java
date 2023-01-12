@@ -45,9 +45,7 @@ public class MenuCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<Menu> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<Menu> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}

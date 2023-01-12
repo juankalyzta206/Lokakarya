@@ -45,9 +45,7 @@ public class RolesCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<Roles> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<Roles> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
