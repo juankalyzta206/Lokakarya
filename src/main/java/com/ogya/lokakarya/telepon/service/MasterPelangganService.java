@@ -106,47 +106,6 @@ public class MasterPelangganService {
 		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
-//	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,Long idPelanggan){
-//		Pageable paging = PageRequest.of(page, size);
-//		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,idPelanggan);
-//		List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//		List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//	}
-//	public <T>PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(int page, int size,String filter,T value ){
-//		Pageable paging = PageRequest.of(page, size);
-//		if(filter.equals("idPelanggan")) {
-//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllIdPelanggan(paging,value);
-//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//		}
-//		else if(filter.equals("nama")) {
-//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllName(paging,value);
-//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//		}
-//		else if(filter.equals("alamat")) {
-//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllAlamat(paging,value);
-//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//		}
-//		else if(filter.equals("noTelp")) {
-//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllNotelp(paging,value);
-//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//		}
-//		else {
-//			Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAllUserId(paging,value);
-//			List<MasterPelanggan> masterPelangganList =  masterPelangganPage.getContent();
-//			List<MasterPelangganWrapper> masterPelangganWrapperList = toWrapperList(masterPelangganList);
-//			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
-//		}
-//		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
-//	}
 	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(TeleponPagingRequestWrapper wrapper){
 		Pageable paging;
 		if (wrapper.getSortOrder() == "ASC") {
@@ -189,12 +148,6 @@ public class MasterPelangganService {
 		return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);
 	}
 	
-//	public List<MasterPelangganWrapper> findByNama(String nama,Long idPelanggan,String alamat,Long noTelp,Long userId){
-//		Optional<Users> optionalUser = usersRepository.findById(userId);
-//		Users users = optionalUser.isPresent() ? optionalUser.get() : null;
-//		List<MasterPelanggan> masterPelangganList = masterPelangganRepository.findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(idPelanggan,nama,alamat,noTelp,users);
-//		return toWrapperList(masterPelangganList);
-//	}
 	
 	
 	
