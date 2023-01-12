@@ -42,16 +42,17 @@ public class MasterBankService {
 	MasterBankCriteriaRepository masterBankCriteriaRepository;
 
 	public PaginationList<MasterBankWrapper, MasterBank> ListWithPaging(PagingRequestWrapper request) { 
-		List<MasterBank> usersList = masterBankCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
-		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
-		Page<MasterBank> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),usersList.size());
-		List<MasterBankWrapper> usersWrapperList = new ArrayList<>();
-		for(MasterBank entity : usersPage) {
-		    usersWrapperList.add(toWrapper(entity));
+		List<MasterBank> masterBankList = masterBankCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage())* (request.getSize());
+		int toIndex = Math.min(fromIndex + request.getSize(), masterBankList.size());
+		Page<MasterBank> masterBankPage = new PageImpl<>(masterBankList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), masterBankList.size());
+		List<MasterBankWrapper> masterBankWrapperList = new ArrayList<>();
+		for(MasterBank entity : masterBankPage) {
+		    masterBankWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<MasterBankWrapper, MasterBank>(usersWrapperList, usersPage);	
+		return new PaginationList<MasterBankWrapper, MasterBank>(masterBankWrapperList, masterBankPage);	
 	}
+	
 	public MasterBankWrapper getByNoRek(Long norek) {
 		MasterBank masterbank = masterBankRepository.getReferenceById(norek);
 		return toWrapper(masterbank);
