@@ -43,9 +43,7 @@ public class MasterBankCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<MasterBank> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<MasterBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}

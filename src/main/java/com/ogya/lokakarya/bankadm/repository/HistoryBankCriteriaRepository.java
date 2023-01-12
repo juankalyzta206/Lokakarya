@@ -44,9 +44,7 @@ public class HistoryBankCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<HistoryBank> result = entityManager.createQuery(criteriaQuery)
-				.setMaxResults(request.getSize())
-				.setFirstResult(request.getSize() * (request.getPage()-1)).getResultList();
+		List<HistoryBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}

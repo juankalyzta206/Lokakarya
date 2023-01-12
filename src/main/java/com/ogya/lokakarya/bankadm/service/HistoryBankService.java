@@ -55,6 +55,7 @@ public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequ
 	}
 	return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);	
 }
+
 public HistoryBankWrapper getByidHistoryBank(Long idHistoryBank) {
 	HistoryBank historybank = historyBankRepository.getReferenceById(idHistoryBank);
 	return toWrapper(historybank);
