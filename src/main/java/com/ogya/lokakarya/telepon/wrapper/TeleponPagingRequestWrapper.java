@@ -1,13 +1,13 @@
 package com.ogya.lokakarya.telepon.wrapper;
 
 import java.util.List;
-public class TeleponPagingRequestWrapper {
+public class TeleponPagingRequestWrapper<T> {
 	private Integer offSet;
 	private Integer page;
 	private Integer size;
 	private String sortField;
 	private String sortOrder;
-	private List<TeleponFilterWrapper> filters = null;
+	private List<TeleponFilterWrapper<T>> filters = null;
 
 	public Integer getOffSet() {
 	return offSet;
@@ -48,11 +48,11 @@ public class TeleponPagingRequestWrapper {
 	this.sortOrder = sortOrder;
 	}
 
-	public List<TeleponFilterWrapper> getFilters() {
+	public List<TeleponFilterWrapper<T>> getFilters() {
 	return filters;
 	}
 
-	public void setFilters(List<TeleponFilterWrapper> filters) {
+	public void setFilters(List<TeleponFilterWrapper<T>> filters) {
 	this.filters = filters;
 	}
 }

@@ -24,6 +24,7 @@ import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
+import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
@@ -78,10 +79,10 @@ public class MasterPelangganController {
 //		}
 //	}
 	
-	@PostMapping(path = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
-	}
+//	@PostMapping(path = "/findAllWithPaginationAndFilter")
+//	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody TeleponPagingRequestWrapper wrapper) {
+//		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
+//	}
 	
     @GetMapping("/download")
     public void exportToExcel(HttpServletResponse response) throws IOException {

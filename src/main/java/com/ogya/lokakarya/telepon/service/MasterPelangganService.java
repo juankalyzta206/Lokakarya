@@ -22,6 +22,8 @@ import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
+import com.ogya.lokakarya.telepon.wrapper.TeleponFilterWrapper;
+import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.util.FilterWrapper;
@@ -145,20 +147,20 @@ public class MasterPelangganService {
 //		}
 //		Page<MasterPelanggan> masterPelangganPage = masterPelangganRepository.findAll(paging,value);
 //	}
-	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(PagingRequestWrapper wrapper){
+	public PaginationList<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationFilter(TeleponPagingRequestWrapper wrapper){
 		Pageable paging;
 		if (wrapper.getSortOrder() == "ASC") {
 			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).ascending());
 		} else {
 			paging = PageRequest.of(wrapper.getPage(), wrapper.getSize(),Sort.by(Order.by(wrapper.getSortField())).descending());
 		}
-		List<FilterWrapper> filterWrapper = wrapper.getFilters();
+		List<TeleponFilterWrapper> filterWrapper = wrapper.getFilters();
 		String jIdPelanggan = "";
 		String nama = "";
 		String jNoTelp = "";
 		String alamat = "";
 		String jUserId = "";
-		for (FilterWrapper entity : filterWrapper) {
+		for (TeleponFilterWrapper<String> entity : filterWrapper) {
 			switch(entity.getName().toLowerCase()) {
 			  case "idpelanggan":
 				  jIdPelanggan = entity.getValue();
