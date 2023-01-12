@@ -20,9 +20,12 @@ import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.service.MasterBankService;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/masterbank")
@@ -52,6 +55,11 @@ public class MasterBankController {
 	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPagination(@RequestParam("page") 
 	int page, @RequestParam("size") int size) {
 		return new DataResponsePagination<MasterBankWrapper, MasterBank>(masterBankService.findAllWithPagination(page, size));
+	}
+	
+	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
+	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<MasterBankWrapper, MasterBank>(masterBankService.ListWithPaging(request));
 	}
 	
 	@GetMapping(path = "/findAll")

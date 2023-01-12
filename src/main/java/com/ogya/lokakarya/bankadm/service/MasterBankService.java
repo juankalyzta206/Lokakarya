@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,12 +24,13 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.repository.MasterBankCriteriaRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @Service
@@ -36,7 +38,20 @@ import com.ogya.lokakarya.util.PaginationList;
 public class MasterBankService {
 	@Autowired
 	MasterBankRepository masterBankRepository;
-	
+	@Autowired
+	MasterBankCriteriaRepository masterBankCriteriaRepository;
+
+	public PaginationList<MasterBankWrapper, MasterBank> ListWithPaging(PagingRequestWrapper request) { 
+		List<MasterBank> usersList = masterBankCriteriaRepository.findByFilter(request);
+		int fromIndex = (request.getPage()-1)* request.getSize();
+		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
+		Page<MasterBank> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),usersList.size());
+		List<MasterBankWrapper> usersWrapperList = new ArrayList<>();
+		for(MasterBank entity : usersPage) {
+		    usersWrapperList.add(toWrapper(entity));
+		}
+		return new PaginationList<MasterBankWrapper, MasterBank>(usersWrapperList, usersPage);	
+	}
 	public MasterBankWrapper getByNoRek(Long norek) {
 		MasterBank masterbank = masterBankRepository.getReferenceById(norek);
 		return toWrapper(masterbank);

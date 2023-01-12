@@ -43,7 +43,10 @@ public class HistoryBankController {
 	public DataResponse<HistoryBankWrapper> getByidTransaksiNasabah(@RequestParam("id") Long idHistoryBank) {
 		return new DataResponse<HistoryBankWrapper>(historyBankService.getByidHistoryBank(idHistoryBank));
 	}
-	
+	@PostMapping(value = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.ListWithPaging(request));
+	}
 	@GetMapping(path = "/findAllWithPagination")
 	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findAllWithPagination(@RequestParam("page") 
 	int page, @RequestParam("size") int size) {
@@ -140,10 +143,5 @@ public class HistoryBankController {
     
     
 
- // findAllPagination
- 	@PostMapping(path = "/findAllWithPaginationAndFilter")
- 	public DataResponsePagination<HistoryBankWrapper, HistoryBank> findAllWithPaginationAndFilter(@RequestBody PagingRequestWrapper wrapper) {
- 		return new DataResponsePagination<HistoryBankWrapper, HistoryBank>(historyBankService.findAllWithPaginationAndFilter(wrapper));
- 	}
 
 }

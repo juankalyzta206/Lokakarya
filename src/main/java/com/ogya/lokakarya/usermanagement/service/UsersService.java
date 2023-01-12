@@ -56,7 +56,7 @@ public class UsersService {
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
 		int fromIndex = (request.getPage()-1)* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
-		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),usersList.size());
+		Page<Users> usersPage = new PageImpl<>(usersList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), usersList.size());
 		List<UsersWrapper> usersWrapperList = new ArrayList<>();
 		for(Users entity : usersPage) {
 		    usersWrapperList.add(toWrapper(entity));
