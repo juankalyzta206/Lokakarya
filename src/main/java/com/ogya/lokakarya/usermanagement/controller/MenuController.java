@@ -22,6 +22,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.MenuWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 
 @RestController
@@ -68,5 +69,11 @@ public class MenuController {
     public void exportToPdf(HttpServletResponse response) throws Exception {
 		menuService.ExportToPdf(response);
 	}
+	
+	@PostMapping(value = "/findAllWithPaginationAndFilter")
+	public DataResponsePagination<MenuWrapper, Menu> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<MenuWrapper, Menu>(menuService.ListWithPaging(request));
+	}
+	
 	
 }

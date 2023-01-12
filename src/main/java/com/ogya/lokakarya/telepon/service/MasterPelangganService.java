@@ -1,10 +1,13 @@
 package com.ogya.lokakarya.telepon.service;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.ExcelHelperMasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
+import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponFilterWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
@@ -159,5 +172,70 @@ public class MasterPelangganService {
 	 public List<MasterPelanggan> listAll() {
 	        return masterPelangganRepository.findAll();
 	    }
+	 public void ExportToPdf(HttpServletResponse response) throws Exception {
+			// Call the findAll method to retrieve the data
+			List<MasterPelanggan> dataHistory = masterPelangganRepository.findAll();
+			List<MasterPelangganWrapper> masterPelangganList = new ArrayList<MasterPelangganWrapper>();
+
+			for (int i = 0; i < dataHistory.size(); i++) {
+				MasterPelangganWrapper wrapper = new MasterPelangganWrapper();
+				wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan());
+				
+				wrapper.setNama(dataHistory.get(i).getNama());
+				wrapper.setAlamat(dataHistory.get(i).getAlamat());
+				wrapper.setNoTelp(dataHistory.get(i).getNoTelp());
+				wrapper.setUserId(dataHistory.get(i).getUsers() != null ? dataHistory.get(i).getUsers().getUserId() : null);
+				masterPelangganList.add(wrapper);
+			}
+
+			// Now create a new iText PDF document
+			Document pdfDoc = new Document(PageSize.A4.rotate());
+			PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+			pdfDoc.open();
+
+			Paragraph title = new Paragraph("Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+			title.setAlignment(Element.ALIGN_CENTER);
+			pdfDoc.add(title);
+
+			// Add the generation date
+			pdfDoc.add(new Paragraph(
+					"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+			// Create a table
+			PdfPTable pdfTable = new PdfPTable(5);
+
+			pdfTable.setWidthPercentage(100);
+			pdfTable.setSpacingBefore(10f);
+			pdfTable.setSpacingAfter(10f);
+
+			pdfTable.addCell("ID Pelanggan");
+			pdfTable.addCell("Nama Pelanggan");
+			pdfTable.addCell("Alamat");
+			pdfTable.addCell("No Telp");
+			pdfTable.addCell("ID Pengguna");
+			
+			BaseColor color = new BaseColor(135, 206, 235);
+
+			for (int i = 0; i < 5; i++) {
+				pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+			}
+
+			// Iterate through the data and add it to the table
+			for (MasterPelangganWrapper entity : masterPelangganList) {
+				pdfTable.addCell(String.valueOf(entity.getIdPelanggan() != null ? String.valueOf(entity.getIdPelanggan()) : "-"));
+				pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+				pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
+				pdfTable.addCell(String.valueOf(entity.getNoTelp() != null ? String.valueOf(entity.getNoTelp()) : "-"));
+				pdfTable.addCell(String.valueOf(entity.getUserId() != null ? String.valueOf(entity.getUserId()) : "-"));
+			}
+			// Add the table to the pdf document
+			pdfDoc.add(pdfTable);
+
+			pdfDoc.close();
+			pdfWriter.close();
+
+			response.setContentType("application/pdf");
+			response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		}
 	
 }
