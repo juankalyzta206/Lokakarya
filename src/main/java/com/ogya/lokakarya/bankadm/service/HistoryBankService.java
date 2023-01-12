@@ -46,17 +46,16 @@ public class HistoryBankService {
 	@Autowired
 	HistoryBankCriteriaRepository historyBankCriteriaRepository;
 
-	public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequestWrapper request) {
+	public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequestWrapper request) { 
 		List<HistoryBank> historyBankList = historyBankCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage() - 1) * request.getSize();
+		int fromIndex = (request.getPage())* (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), historyBankList.size());
-		Page<HistoryBank> historyBankPage = new PageImpl<>(historyBankList.subList(fromIndex, toIndex),
-				PageRequest.of(request.getPage(), request.getSize()), historyBankList.size());
+		Page<HistoryBank> historyBankPage = new PageImpl<>(historyBankList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), historyBankList.size());
 		List<HistoryBankWrapper> historyBankWrapperList = new ArrayList<>();
-		for (HistoryBank entity : historyBankPage) {
-			historyBankWrapperList.add(toWrapper(entity));
+		for(HistoryBank entity : historyBankPage) {
+		    historyBankWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);
+		return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);	
 	}
 
 	public HistoryBankWrapper getByidHistoryBank(Long idHistoryBank) {
