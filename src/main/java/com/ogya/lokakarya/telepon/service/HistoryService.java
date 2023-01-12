@@ -159,7 +159,7 @@ public class HistoryService {
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("List Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -189,20 +189,17 @@ public class HistoryService {
 		// Iterate through the data and add it to the table
 		for (HistoryWrapper entity : historyList) {
 			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
-//			pdfTable.addCell(String.valueOf(entity.getIdHistory() != null ? String.valueOf(entity.getIdHistory()) : "-"));
-//			pdfTable.addCell(String.valueOf(entity.getIdPelanggan() != null ? String.valueOf(entity.getIdPelanggan()) : "-"));
-
+			
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			String tanggalBayar = "-";
 			if (entity.getTanggalBayar() != null) {
 				tanggalBayar = formatter.format(entity.getTanggalBayar());
 			}
 			pdfTable.addCell(tanggalBayar);
-			pdfTable.addCell(
-					String.valueOf(entity.getTanggalBayar() != null ? String.valueOf(entity.getTanggalBayar()) : "-"));
+			
+			pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
 		}
 
 		// Add the table to the pdf document
