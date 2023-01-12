@@ -25,6 +25,8 @@ import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
@@ -77,11 +79,14 @@ public class MasterPelangganController {
 //		}
 //	}
 	
-	@PostMapping(path = "/findAllWithPaginationAndFilter")
+	@PostMapping(path = "/findAllWithPaginationFilter")
 	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody TeleponPagingRequestWrapper wrapper) {
 		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
 	}
-	
+	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.ListWithPaging(request));
+	}
     @GetMapping("/download")
     public void exportToExcel(HttpServletResponse response) throws IOException {
         response.setContentType("application/octet-stream");

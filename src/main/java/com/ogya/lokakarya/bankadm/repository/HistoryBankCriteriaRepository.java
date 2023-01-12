@@ -12,19 +12,20 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.ogya.lokakarya.bankadm.entity.MasterBank;
+import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+
 @Repository
-public class MasterBankCriteriaRepository {
+public class HistoryBankCriteriaRepository {
 	@Autowired
 	private EntityManager entityManager;
 
-	public List<MasterBank> findByFilter(PagingRequestWrapper request) {
+	public List<HistoryBank> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<MasterBank> criteriaQuery = cb.createQuery(MasterBank.class);
+		CriteriaQuery<HistoryBank> criteriaQuery = cb.createQuery(HistoryBank.class);
 
-		Root<MasterBank> root = criteriaQuery.from(MasterBank.class);
+		Root<HistoryBank> root = criteriaQuery.from(HistoryBank.class);
 
 		if(request.getSortOrder().equalsIgnoreCase("asc"))
 			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
@@ -43,7 +44,7 @@ public class MasterBankCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<MasterBank> result = entityManager.createQuery(criteriaQuery).getResultList();
+		List<HistoryBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
@@ -51,7 +52,7 @@ public class MasterBankCriteriaRepository {
 	public Long countAll(PagingRequestWrapper request){ 	
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
-	    Root<MasterBank> root = criteriaQuery.from(MasterBank.class);
+	    Root<HistoryBank> root = criteriaQuery.from(HistoryBank.class);
 	    
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    

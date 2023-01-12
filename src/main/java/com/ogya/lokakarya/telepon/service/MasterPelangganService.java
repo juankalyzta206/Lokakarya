@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,7 @@ import com.ogya.lokakarya.telepon.helper.ExcelHelperMasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
+import com.ogya.lokakarya.telepon.repository.criteria.MasterPelangganCriteriaRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TeleponFilterWrapper;
@@ -56,6 +58,8 @@ public class MasterPelangganService {
 	HistoryRepository historyRepository;
 	@Autowired
 	UsersRepository usersRepository;
+	@Autowired
+	MasterPelangganCriteriaRepository masterPelangganCriteriaRepository;
 	
 	//service untuk menampilkan semua list
 	public List<MasterPelangganWrapper> findAll(){
@@ -212,7 +216,7 @@ public class MasterPelangganService {
 			pdfTable.addCell("Nama Pelanggan");
 			pdfTable.addCell("Alamat");
 			pdfTable.addCell("No Telp");
-			pdfTable.addCell("ID Pengguna");
+			
 			
 			BaseColor color = new BaseColor(135, 206, 235);
 
@@ -226,7 +230,7 @@ public class MasterPelangganService {
 				pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
 				pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
 				pdfTable.addCell(String.valueOf(entity.getNoTelp() != null ? String.valueOf(entity.getNoTelp()) : "-"));
-				pdfTable.addCell(String.valueOf(entity.getUserId() != null ? String.valueOf(entity.getUserId()) : "-"));
+				
 			}
 			// Add the table to the pdf document
 			pdfDoc.add(pdfTable);
@@ -236,6 +240,17 @@ public class MasterPelangganService {
 
 			response.setContentType("application/pdf");
 			response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		}
+	 public PaginationList<MasterPelangganWrapper, MasterPelanggan> ListWithPaging(PagingRequestWrapper request) { 
+			List<MasterPelanggan> masterPelangganList = masterPelangganCriteriaRepository.findByFilter(request);
+			int fromIndex = (request.getPage()-1)* request.getSize();
+			int toIndex = Math.min(fromIndex + request.getSize(), masterPelangganList.size());
+			Page<MasterPelanggan> masterPelangganPage = new PageImpl<>(masterPelangganList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),masterPelangganList.size());
+			List<MasterPelangganWrapper> masterPelangganWrapperList = new ArrayList<>();
+			for(MasterPelanggan entity : masterPelangganPage) {
+			    masterPelangganWrapperList.add(toWrapper(entity));
+			}
+			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);	
 		}
 	
 }
