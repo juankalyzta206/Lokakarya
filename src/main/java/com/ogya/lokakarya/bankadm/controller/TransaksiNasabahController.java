@@ -72,24 +72,6 @@ public class TransaksiNasabahController {
 			@RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findTotalTagihan(rekAsal, noTelp));
 	}
-
-	@GetMapping(path = "/exportToPdfSetor")
-	public void exportToPdfSetor(HttpServletResponse response) throws Exception {
-		transaksiNasabahService.ExportToPdfSetor(response);
-	}
-	
-	@GetMapping(path = "/exportToPdfTarik")
-	public void exportToPdfTarik(HttpServletResponse response) throws Exception {
-		transaksiNasabahService.ExportToPdfTarik(response);
-	}
-	@GetMapping(path = "/exportToPdfTransfer")
-	public void exportToPdfTransfer(HttpServletResponse response) throws Exception {
-		transaksiNasabahService.ExportToPdfTransfer(response);
-	}
-	@GetMapping(path = "/exportToPdfBayarTelepon")
-	public void exportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
-		transaksiNasabahService.ExportToPdfBayarTelepon(response);
-	}
 	
 	@GetMapping(path = "/exportToPdfSetorParam")
 	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
@@ -104,5 +86,11 @@ public class TransaksiNasabahController {
 	@GetMapping(path = "/exportToPdfTransferParam")
 	public void exportToPdfTransferParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
 		transaksiNasabahService.ExportToPdfTransferParam(response, idHistory);
+	}
+	
+	@GetMapping(path = "/exportToPdfBayarTeleponParam")
+	public void exportToPdfBayarTeleponParam(HttpServletResponse response, @RequestParam("ID History Bank") Long idHistoryBank,
+			@RequestParam("ID History Telepon") Long idHistoryTelp) throws Exception {
+		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
 	}
 }

@@ -2,15 +2,11 @@ package com.ogya.lokakarya.bankadm.service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -338,11 +334,13 @@ public class TransaksiNasabahService {
 							transaksiNasabahRepo.save(transaksiNasabah);
 
 							transaksiTelkom.get(i).setStatus((byte) 2);
-							transaksiTelkomRepo.save(transaksiTelkom.get(i));
+							transaksiTelkomRepo.save(transaksiTelkom.get(i));						
 						}
 					}
+					List<HistoryTelkom> dataHistory = historyTelkomRepo.dataTeleponById(masterPelanggan);
 					BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
-					wrapper.setIdTransaksiTelp(historyBank.getIdHistoryBank());
+					wrapper.setIdTransaksiBank(historyBank.getIdHistoryBank());
+					wrapper.setIdTransaksiTelp(dataHistory.get(0).getIdHistory());
 					wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
 					wrapper.setNamaPelanggan(masterPelanggan.getNama());
 					wrapper.setNoTelepon(masterPelanggan.getNoTelp());
@@ -352,6 +350,7 @@ public class TransaksiNasabahService {
 					wrapper.setSaldo(masterBank.getSaldo());
 					wrapper.setTanggal(historyBank.getTanggal());
 					wrapperList.add(wrapper);
+					
 
 				} else {
 					throw new BusinessException("Saldo Anda tidak cukup");
@@ -467,246 +466,7 @@ public class TransaksiNasabahService {
 	}
 
 
-//	---------------------------------Bukti Transaksi Setor--------------------------------------
-	public void ExportToPdfSetor(HttpServletResponse response) throws Exception {
-		List<HistoryBank> data = historyBankRepo.findLastHistory();
-		// Now create a new iText PDF document
-		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-		pdfDoc.open();
-		
-		BaseColor color = new BaseColor(245, 128, 11);
-	    Paragraph title = new Paragraph("BANK XYZ",
-	            new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
-		notif.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(notif);
-		// Add the generation date
-		pdfDoc.add(new Paragraph(""));
-
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(2);
-		pdfTable.getDefaultCell().setBorderWidth(1);
-		pdfTable.setPaddingTop(100);
-
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("");
-		pdfTable.addCell("");
-		pdfTable.addCell(Left("Tanggal"));
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = "-";
-		if (data.get(0).getTanggal() != null) {
-			formattedDate = formatter.format(data.get(0).getTanggal());
-		}
-		pdfTable.addCell(Right(formattedDate));
-		
-		pdfTable.addCell(Left("Nomor Rekening"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getRekening().getNorek()) != null ? String.valueOf(data.get(0).getRekening().getNorek()) : "-"));
-		pdfTable.addCell(Left("Nama Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getNama() != null ? String.valueOf(data.get(0).getNama()) : "-")));
-		pdfTable.addCell(Left("Jenis Transaksi"));
-		pdfTable.addCell(Right("Setor Tunai"));
-		pdfTable.addCell(Left("Nominal"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getUang() != null ? String.valueOf(data.get(0).getUang()) : "-")));
-
-		// Add the table to the pdf document
-		pdfDoc.add(pdfTable);
-
-		pdfDoc.close();
-		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
-	}
-	
-//	---------------------------------Bukti Transaksi Tarik--------------------------------------
-	public void ExportToPdfTarik(HttpServletResponse response) throws Exception {
-		List<HistoryBank> data = historyBankRepo.findLastHistory();
-		// Now create a new iText PDF document
-		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-		pdfDoc.open();
-		
-		BaseColor color = new BaseColor(245, 128, 11);
-	    Paragraph title = new Paragraph("BANK XYZ",
-	            new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
-		notif.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(notif);
-		// Add the generation date
-		pdfDoc.add(new Paragraph(""));
-
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(2);
-		pdfTable.getDefaultCell().setBorderWidth(1);
-		pdfTable.setPaddingTop(100);
-
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("");
-		pdfTable.addCell("");
-		pdfTable.addCell(Left("Tanggal"));
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = "-";
-		if (data.get(0).getTanggal() != null) {
-			formattedDate = formatter.format(data.get(0).getTanggal());
-		}
-		pdfTable.addCell(Right(formattedDate));
-		
-		pdfTable.addCell(Left("Nomor Rekening"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getRekening().getNorek()) != null ? String.valueOf(data.get(0).getRekening().getNorek()) : "-"));
-		pdfTable.addCell(Left("Nama Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getNama() != null ? String.valueOf(data.get(0).getNama()) : "-")));
-		pdfTable.addCell(Left("Jenis Transaksi"));
-		pdfTable.addCell(Right("Tarik Tunai"));
-		pdfTable.addCell(Left("Nominal"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getUang() != null ? String.valueOf(data.get(0).getUang()) : "-")));
-
-		// Add the table to the pdf document
-		pdfDoc.add(pdfTable);
-
-		pdfDoc.close();
-		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
-	}
-	
-//	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public void ExportToPdfTransfer(HttpServletResponse response) throws Exception {
-		List<HistoryBank> data = historyBankRepo.findLastHistory();
-		// Now create a new iText PDF document
-		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-		pdfDoc.open();
-		
-		BaseColor color = new BaseColor(245, 128, 11);
-	    Paragraph title = new Paragraph("BANK XYZ",
-	            new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
-		notif.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(notif);
-		// Add the generation date
-		pdfDoc.add(new Paragraph(""));
-
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(2);
-		pdfTable.getDefaultCell().setBorderWidth(1);
-		pdfTable.setPaddingTop(100);
-
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("");
-		pdfTable.addCell("");
-		pdfTable.addCell(Left("Tanggal"));
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = "-";
-		if (data.get(0).getTanggal() != null) {
-			formattedDate = formatter.format(data.get(0).getTanggal());
-		}
-		pdfTable.addCell(Right(formattedDate));
-		
-		pdfTable.addCell(Left("Nomor Rekening Pengirim"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getRekening().getNorek()) != null ? String.valueOf(data.get(0).getRekening().getNorek()) : "-"));
-		pdfTable.addCell(Left("Nama Nasabah Pengirim"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getNama() != null ? String.valueOf(data.get(0).getNama()) : "-")));
-		pdfTable.addCell(Left("Jenis Transaksi"));
-		pdfTable.addCell(Right("Transfer"));
-		pdfTable.addCell(Left("Nomor Rekening Tujuan"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getNoRekTujuan() != null ? String.valueOf(data.get(0).getNoRekTujuan()) : "-")));
-		pdfTable.addCell(Left("Nama Nasabah Tujuan"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getNamaTujuan() != null ? String.valueOf(data.get(0).getNamaTujuan()) : "-")));
-		pdfTable.addCell(Left("Nominal"));
-		pdfTable.addCell(Right(String.valueOf(data.get(0).getUang() != null ? String.valueOf(data.get(0).getUang()) : "-")));
-
-		// Add the table to the pdf document
-		pdfDoc.add(pdfTable);
-
-		pdfDoc.close();
-		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
-	}
-	
-//	---------------------------------Bukti Transaksi Bayar Telepon--------------------------------------
-	public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
-		List<HistoryTelkom> dataTelepon = historyTelkomRepo.findLastHistoryTelkom();
-		List<HistoryBank> dataNasabah = historyBankRepo.findLastHistory();
-		// Now create a new iText PDF document
-		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-		pdfDoc.open();
-		
-		BaseColor color = new BaseColor(245, 128, 11);
-	    Paragraph title = new Paragraph("BANK XYZ",
-	            new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
-		notif.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(notif);
-		// Add the generation date
-		pdfDoc.add(new Paragraph(""));
-
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(2);
-		pdfTable.getDefaultCell().setBorderWidth(1);
-		pdfTable.setPaddingTop(100);
-
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("");
-		pdfTable.addCell("");
-		pdfTable.addCell(Left("Tanggal"));
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = "-";
-		if (dataNasabah.get(0).getTanggal() != null) {
-			formattedDate = formatter.format(dataNasabah.get(0).getTanggal());
-		}
-		pdfTable.addCell(Right(formattedDate));
-		
-		pdfTable.addCell(Left("Nomor Rekening"));
-		pdfTable.addCell(Right(String.valueOf(dataNasabah.get(0).getRekening().getNorek()) != null ? String.valueOf(dataNasabah.get(0).getRekening().getNorek()) : "-"));
-		pdfTable.addCell(Left("Nama Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(dataNasabah.get(0).getNama() != null ? String.valueOf(dataNasabah.get(0).getNama()) : "-")));
-		pdfTable.addCell(Left("Jenis Transaksi"));
-		pdfTable.addCell(Right("Bayar Telepon"));
-		pdfTable.addCell(Left("Nomor Telepon"));
-		pdfTable.addCell(Right(String.valueOf(dataTelepon.get(0).getIdPelanggan().getNoTelp()) != null ? String.valueOf(dataTelepon.get(0).getIdPelanggan().getNoTelp()) : "-"));
-		pdfTable.addCell(Left("Nama Pelanggan Telepon"));
-		pdfTable.addCell(Right(String.valueOf(dataTelepon.get(0).getIdPelanggan().getNama() != null ? String.valueOf(dataTelepon.get(0).getIdPelanggan().getNama()) : "-")));
-		pdfTable.addCell(Left("Nominal"));
-		pdfTable.addCell(Right(String.valueOf(dataNasabah.get(0).getUang() != null ? String.valueOf(dataNasabah.get(0).getUang()) : "-")));
-
-		// Add the table to the pdf document
-		pdfDoc.add(pdfTable);
-
-		pdfDoc.close();
-		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
-	}
 	
 //	---------------------------------Bukti Transaksi Setor--------------------------------------
 	public void ExportToPdfSetorParam(HttpServletResponse response, Long idHistory) throws Exception {
@@ -886,9 +646,10 @@ public class TransaksiNasabahService {
 	}
 	
 //	---------------------------------Bukti Transaksi Bayar Telepon--------------------------------------
-	public void ExportToPdfBayarTeleponParam(HttpServletResponse response, Long idHistoryBank) throws Exception {
-		List<HistoryTelkom> dataTelepon = historyTelkomRepo.findLastHistoryTelkom();
+	public void ExportToPdfBayarTeleponParam(HttpServletResponse response, Long idHistoryBank, Long idHistoryTelp) throws Exception {
+		List<HistoryTelkom> dataTelepon = historyTelkomRepo.findByIdHistory(idHistoryTelp);
 		HistoryBank dataNasabah = historyBankRepo.getReferenceById(idHistoryBank);
+//		HistoryTelkom dataTelepon = historyTelkomRepo.dataTeleponById(data.get(0).getIdPelanggan().getIdPelanggan());
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
