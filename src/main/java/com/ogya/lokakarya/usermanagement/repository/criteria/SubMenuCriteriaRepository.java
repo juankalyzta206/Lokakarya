@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.SubMenu;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -37,9 +38,9 @@ public class SubMenuCriteriaRepository {
 		    if(request.getSortOrder().equalsIgnoreCase("asc"))
 		        criteriaQuery.orderBy(cb.asc(join.get("menuId")));
 		    else
-		        criteriaQuery.orderBy(cb.desc(join.get("menuId")));
-		} else {
-		    // sort by other field without join
+		        criteriaQuery.orderBy(cb.desc(join.get("userId")));
+		} 
+		else {
 		    if(request.getSortOrder().equalsIgnoreCase("asc"))
 		        criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
 		    else
@@ -49,14 +50,20 @@ public class SubMenuCriteriaRepository {
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 if (filter.getName().equalsIgnoreCase("menuId")) {
-	    		    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    		} else {
-	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    		}
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+	    		if ((filter.getName().equalsIgnoreCase("menuId"))) {
+	    			predicatesValue[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("menuName")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join.get("nama").as(String.class)), "%"+value+"%");
+		    	}  else {
+		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
+	    	}
+	    	predicatesList.add(cb.or(predicatesValue));
 	    }
 	    
 
@@ -74,19 +81,26 @@ public class SubMenuCriteriaRepository {
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
 	    Root<SubMenu> root = criteriaQuery.from(SubMenu.class);
 	    List<Predicate> predicatesList = new ArrayList<>();
-	    Join<SubMenu, Menu> join = root.join("menu", JoinType.INNER);
+	    Join<SubMenu, Users> join = root.join("users", JoinType.INNER);
 	    
-	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+	    
+		@SuppressWarnings("rawtypes")
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	if (filter.getName().equalsIgnoreCase("menuId")) {
-	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	} else {
-	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+	    		if ((filter.getName().equalsIgnoreCase("menuId"))) {
+	    			predicatesValue[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("menuName")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join.get("nama").as(String.class)), "%"+value+"%");
+		    	} else {
+		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
 	    	}
+	    	predicatesList.add(cb.or(predicatesValue));
 	    }
-	    
+  
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.select(cb.count(root));
