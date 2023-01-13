@@ -33,6 +33,12 @@ public class TransaksiTelkomCriteriaRepository {
 			else {
 				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
 		}
+		else if(request.getSortField().toLowerCase().equals("nama")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get("nama")));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get("nama")));}
+    	}
 		else {
 			if(request.getSortOrder().equalsIgnoreCase("asc")) {
 				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
@@ -50,6 +56,9 @@ public class TransaksiTelkomCriteriaRepository {
 	    	Join<TransaksiTelkom,MasterPelanggan > join2 = root.join("idPelanggan", JoinType.INNER);
 	    	if(filter.getName().toLowerCase().equals("idpelanggan") ) {
 	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	else if(filter.getName().toLowerCase().equals("nama")) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
 	    	}
 	    	else {
 	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
