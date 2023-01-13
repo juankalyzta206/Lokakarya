@@ -1,5 +1,4 @@
 package com.ogya.lokakarya.telepon.repository.criteria;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,26 +13,32 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 @Repository
-public class MasterPelangganCriteriaRepository {
+public class HistoryTelkomCriteriaRepository {
 	@Autowired
 	private EntityManager entityManager;
 
-	public List<MasterPelanggan> findByFilter(PagingRequestWrapper request) {
+	public List<HistoryTelkom> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<MasterPelanggan> criteriaQuery = cb.createQuery(MasterPelanggan.class);
-		Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
-		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
-		if(request.getSortField().toLowerCase().equals("userid")) {
+		CriteriaQuery<HistoryTelkom> criteriaQuery = cb.createQuery(HistoryTelkom.class);
+		Root<HistoryTelkom> root = criteriaQuery.from(HistoryTelkom.class);
+		Join<HistoryTelkom, MasterPelanggan> join = root.join("idPelanggan", JoinType.INNER);
+		if(request.getSortField().toLowerCase().equals("idpelanggan")) {
 			if(request.getSortOrder().equalsIgnoreCase("asc")) {
 				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
 			else {
 				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
 		}
+		else if(request.getSortField().toLowerCase().equals("nama")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get("nama")));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get("nama")));}
+    	}
 		else {
 			if(request.getSortOrder().equalsIgnoreCase("asc")) {
 				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
@@ -48,9 +53,12 @@ public class MasterPelangganCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
-	    	if(filter.getName().toLowerCase().equals("userid") ) {
+	    	Join<HistoryTelkom,MasterPelanggan > join2 = root.join("idPelanggan", JoinType.INNER);
+	    	if(filter.getName().toLowerCase().equals("idpelanggan") ) {
 	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	else if(filter.getName().toLowerCase().equals("nama")) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
 	    	}
 	    	else {
 	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
@@ -61,7 +69,7 @@ public class MasterPelangganCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<MasterPelanggan> result = entityManager.createQuery(criteriaQuery).getResultList();
+		List<HistoryTelkom> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
@@ -69,7 +77,7 @@ public class MasterPelangganCriteriaRepository {
 	public Long countAll(PagingRequestWrapper request){ 	
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
-	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
+	    Root<HistoryTelkom> root = criteriaQuery.from(HistoryTelkom.class);
 	    
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    

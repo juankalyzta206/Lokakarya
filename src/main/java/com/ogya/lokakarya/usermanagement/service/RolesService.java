@@ -44,7 +44,7 @@ public class RolesService {
 
 	public PaginationList<RolesWrapper, Roles> ListWithPaging(PagingRequestWrapper request) { 
 		List<Roles> rolesList = rolesCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), rolesList.size());
 		Page<Roles> rolesPage = new PageImpl<>(rolesList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),rolesList.size());
 		List<RolesWrapper> rolesWrapperList = new ArrayList<>();

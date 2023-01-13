@@ -44,7 +44,7 @@ public class MenuService {
 
 	public PaginationList<MenuWrapper, Menu> ListWithPaging(PagingRequestWrapper request) { 
 		List<Menu> menuList = menuCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), menuList.size());
 		Page<Menu> menuPage = new PageImpl<>(menuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),menuList.size());
 		List<MenuWrapper> menuWrapperList = new ArrayList<>();
