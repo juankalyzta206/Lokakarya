@@ -78,18 +78,61 @@ public class HistoryTelkomCriteriaRepository {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
 	    Root<HistoryTelkom> root = criteriaQuery.from(HistoryTelkom.class);
-	    
+		Join<HistoryTelkom, MasterPelanggan> join = root.join("idPelanggan", JoinType.INNER);
+		if(request.getSortField().toLowerCase().equals("idpelanggan")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
+		}
+		else if(request.getSortField().toLowerCase().equals("nama")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get("nama")));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get("nama")));}
+    	}
+		else {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
+		}
+		
+				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+	    	String value = (String) filter.getValue().toString().toLowerCase();
+	    	Join<HistoryTelkom,MasterPelanggan > join2 = root.join("idPelanggan", JoinType.INNER);
+	    	if(filter.getName().toLowerCase().equals("idpelanggan") ) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	else if(filter.getName().toLowerCase().equals("nama")) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
+	    	}
+	    	else {
+	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
 		}
+	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.select(cb.count(root));
 	    criteriaQuery.where(finalPredicates);
+//	    Root<HistoryTelkom> root = criteriaQuery.from(HistoryTelkom.class);
+//	    
+//	    List<Predicate> predicatesList = new ArrayList<>();
+//	    
+//	    @SuppressWarnings("rawtypes")
+//		List<FilterWrapper> filterList = request.getFilters();
+//	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
+//	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+//		}
+//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+//	    predicatesList.toArray(finalPredicates);
+//	    criteriaQuery.select(cb.count(root));
+//	    criteriaQuery.where(finalPredicates);
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;

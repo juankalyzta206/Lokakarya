@@ -207,7 +207,6 @@ public class UsersService {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
 		}
 		entity.setUsername(wrapper.getUsername());
-		entity.setPassword(wrapper.getPassword());
 		entity.setNama(wrapper.getNama());
 		entity.setAlamat(wrapper.getAlamat());
 		entity.setEmail(wrapper.getEmail());
@@ -292,7 +291,6 @@ public class UsersService {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkUsername(wrapper.getUsername())==0) {
 					if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
-						wrapper.setPassword(hashPassword(wrapper.getPassword()));
 						Users user = usersRepository.save(toEntityUpdate(wrapper));
 						return toWrapper(user);
 					} else {
@@ -309,7 +307,6 @@ public class UsersService {
 			}
 			if (wrapper.getSameEmail() == 1) {
 				if (usersRepository.checkUsername(wrapper.getUsername()) == 0) {
-					wrapper.setPassword(hashPassword(wrapper.getPassword()));
 					Users user = usersRepository.save(toEntityUpdate(wrapper));
 					return toWrapper(user);
 				} else {
@@ -319,7 +316,6 @@ public class UsersService {
 		} else {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
-					wrapper.setPassword(hashPassword(wrapper.getPassword()));
 					Users user = usersRepository.save(toEntityUpdate(wrapper));
 					return toWrapper(user);
 				} else {
@@ -327,7 +323,6 @@ public class UsersService {
 				}
 			}
 			if (wrapper.getSameEmail() == 1) {
-				wrapper.setPassword(hashPassword(wrapper.getPassword()));
 				Users user = usersRepository.save(toEntityUpdate(wrapper));
 				return toWrapper(user);
 			}
