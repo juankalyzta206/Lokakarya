@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,8 +30,10 @@ import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
+import com.ogya.lokakarya.telepon.repository.criteria.HistoryTelkomCriteriaRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -39,6 +42,8 @@ public class HistoryService {
 	HistoryRepository historyRepository;
 	@Autowired
 	MasterPelangganRepository masterPelangganRepository;
+	@Autowired
+	HistoryTelkomCriteriaRepository historyTelkomCriteriaRepository;
 
 	public Long sumAll() {
 		Long sumAll = historyRepository.sumAll();
@@ -210,5 +215,19 @@ public class HistoryService {
 
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+	}
+	
+	public PaginationList<HistoryWrapper, HistoryTelkom> ListWithPaging(PagingRequestWrapper request) { 
+		List<HistoryTelkom> historyTelkomList = historyTelkomCriteriaRepository.findByFilter(request);
+		
+		int fromIndex = (request.getPage())* (request.getSize());
+		int toIndex = Math.min(fromIndex + request.getSize(), historyTelkomList.size());
+		Page<HistoryTelkom> historyTelkomPage = new PageImpl<>(historyTelkomList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), historyTelkomList.size());
+		List<HistoryWrapper> historyTelkomWrapperList = new ArrayList<HistoryWrapper>();
+		for(HistoryTelkom entity : historyTelkomPage) {
+			HistoryWrapper wrapper = toWrapper(entity);
+		    historyTelkomWrapperList.add(wrapper);
+		}
+		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyTelkomWrapperList, historyTelkomPage);	
 	}
 }

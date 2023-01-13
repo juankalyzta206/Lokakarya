@@ -36,7 +36,8 @@ public class MasterBankCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+(filter.getValue().toString()).toLowerCase()+"%"));
+	    	 String value = (String) filter.getValue().toString().toLowerCase();
+	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
 		}
 	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
@@ -58,7 +59,8 @@ public class MasterBankCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+	    	String value = (String) filter.getValue().toString().toLowerCase();
+	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
 		}
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);

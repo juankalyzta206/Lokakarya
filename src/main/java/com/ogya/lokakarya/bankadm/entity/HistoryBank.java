@@ -47,10 +47,10 @@ public class HistoryBank {
 	}
 	public void setTanggal(Date tanggel) {
 		this.tanggal = tanggel;
-	}
+	}	@JoinColumn(name = "norek" ,referencedColumnName = "norek")
+
 	
 	@ManyToOne
-	@JoinColumn(name = "norek")
 	public MasterBank getRekening() {
 		return rekening;
 	}

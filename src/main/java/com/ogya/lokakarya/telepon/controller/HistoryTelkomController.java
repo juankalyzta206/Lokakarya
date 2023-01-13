@@ -22,6 +22,7 @@ import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/historytelkom")
@@ -70,5 +71,9 @@ public class HistoryTelkomController {
 	@GetMapping(path = "/testData")
 	public DataResponseList<HistoryWrapper> testData() {
 		return new DataResponseList<HistoryWrapper>(historyService.testData());
+	}
+	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
+	public DataResponsePagination<HistoryWrapper, HistoryTelkom> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<HistoryWrapper, HistoryTelkom>(historyService.ListWithPaging(request));
 	}
 }

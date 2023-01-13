@@ -9,7 +9,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "master_bank")
+@Table(name = "MASTER_BANK")
 public class MasterBank {
 private Long norek;
 private String nama;
@@ -21,7 +21,6 @@ private Long userId;
 @Id
 @GeneratedValue(generator = "MASTERBANK_GEN", strategy = GenerationType.SEQUENCE)
 @SequenceGenerator(name = "MASTERBANK_GEN", sequenceName = "MASTERBANK_SEQ", initialValue = 1, allocationSize = 1)
-
 public Long getNorek() {
 	return norek;
 }

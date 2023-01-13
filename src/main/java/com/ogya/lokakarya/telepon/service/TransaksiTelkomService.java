@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,9 +35,11 @@ import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
+import com.ogya.lokakarya.telepon.repository.criteria.TransaksiTelkomCriteriaRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.PaginationList;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @Service
 @Transactional
@@ -48,6 +51,8 @@ public class TransaksiTelkomService {
 	MasterPelangganRepository masterPelangganRepository;
 	@Autowired
 	HistoryRepository historyRepository;
+	@Autowired
+	TransaksiTelkomCriteriaRepository transaksiTelkomCriteriaRepository;
 
 	public Long sumAll() {
 		Long sumAll = transaksiTelkomRepository.sumAll();
@@ -285,5 +290,19 @@ public class TransaksiTelkomService {
 
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+	}
+	
+	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> ListWithPaging(PagingRequestWrapper request) { 
+		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomCriteriaRepository.findByFilter(request);
+		
+		int fromIndex = (request.getPage())* (request.getSize());
+		int toIndex = Math.min(fromIndex + request.getSize(), transaksiTelkomList.size());
+		Page<TransaksiTelkom> transaksiTelkomPage = new PageImpl<>(transaksiTelkomList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), transaksiTelkomList.size());
+		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = new ArrayList<TransaksiTelkomWrapper>();
+		for(TransaksiTelkom entity : transaksiTelkomPage) {
+			TransaksiTelkomWrapper wrapper = toWrapper(entity);
+		    transaksiTelkomWrapperList.add(wrapper);
+		}
+		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList, transaksiTelkomPage);	
 	}
 }

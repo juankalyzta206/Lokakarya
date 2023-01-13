@@ -241,14 +241,24 @@ public class MasterPelangganService {
 	 
 	 public PaginationList<MasterPelangganWrapper, MasterPelanggan> ListWithPaging(PagingRequestWrapper request) { 
 			List<MasterPelanggan> masterPelangganList = masterPelangganCriteriaRepository.findByFilter(request);
+			
 			int fromIndex = (request.getPage())* (request.getSize());
 			int toIndex = Math.min(fromIndex + request.getSize(), masterPelangganList.size());
 			Page<MasterPelanggan> masterPelangganPage = new PageImpl<>(masterPelangganList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), masterPelangganList.size());
-			List<MasterPelangganWrapper> masterPelangganWrapperList = new ArrayList<>();
+			List<MasterPelangganWrapper> masterPelangganWrapperList = new ArrayList<MasterPelangganWrapper>();
 			for(MasterPelanggan entity : masterPelangganPage) {
-			    masterPelangganWrapperList.add(toWrapper(entity));
+				MasterPelangganWrapper wrapper = toWrapper(entity);
+			    masterPelangganWrapperList.add(wrapper);
 			}
 			return new PaginationList<MasterPelangganWrapper, MasterPelanggan>(masterPelangganWrapperList, masterPelangganPage);	
 		}
+//	 private List<MasterPelangganWrapper> toWrapperList(List<MasterPelanggan> entityList) {
+//			List<MasterPelangganWrapper> wrapperList = new ArrayList<MasterPelangganWrapper>();
+//			for (MasterPelanggan entity : entityList) {
+//				MasterPelangganWrapper wrapper = toWrapper(entity);
+//				wrapperList.add(wrapper);
+//			}
+//			return wrapperList;
+//		}
 	
 }

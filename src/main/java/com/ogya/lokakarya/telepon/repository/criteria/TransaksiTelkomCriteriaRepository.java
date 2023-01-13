@@ -1,5 +1,4 @@
 package com.ogya.lokakarya.telepon.repository.criteria;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,20 +14,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
-import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 @Repository
-public class MasterPelangganCriteriaRepository {
+public class TransaksiTelkomCriteriaRepository {
 	@Autowired
 	private EntityManager entityManager;
-
-	public List<MasterPelanggan> findByFilter(PagingRequestWrapper request) {
+	
+	public List<TransaksiTelkom> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<MasterPelanggan> criteriaQuery = cb.createQuery(MasterPelanggan.class);
-		Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
-		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
-		if(request.getSortField().toLowerCase().equals("userid")) {
+		CriteriaQuery<TransaksiTelkom> criteriaQuery = cb.createQuery(TransaksiTelkom.class);
+		Root<TransaksiTelkom> root = criteriaQuery.from(TransaksiTelkom.class);
+		Join<TransaksiTelkom, MasterPelanggan> join = root.join("idPelanggan", JoinType.INNER);
+		if(request.getSortField().toLowerCase().equals("idpelanggan")) {
 			if(request.getSortOrder().equalsIgnoreCase("asc")) {
 				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
 			else {
@@ -48,8 +47,8 @@ public class MasterPelangganCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
-	    	if(filter.getName().toLowerCase().equals("userid") ) {
+	    	Join<TransaksiTelkom,MasterPelanggan > join2 = root.join("idPelanggan", JoinType.INNER);
+	    	if(filter.getName().toLowerCase().equals("idpelanggan") ) {
 	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
 	    	}
 	    	else {
@@ -61,7 +60,7 @@ public class MasterPelangganCriteriaRepository {
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
 	
-		List<MasterPelanggan> result = entityManager.createQuery(criteriaQuery).getResultList();
+		List<TransaksiTelkom> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
@@ -69,7 +68,7 @@ public class MasterPelangganCriteriaRepository {
 	public Long countAll(PagingRequestWrapper request){ 	
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
-	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
+	    Root<TransaksiTelkom> root = criteriaQuery.from(TransaksiTelkom.class);
 	    
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    

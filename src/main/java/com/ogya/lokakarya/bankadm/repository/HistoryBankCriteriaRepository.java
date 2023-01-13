@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
+import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -26,19 +29,34 @@ public class HistoryBankCriteriaRepository {
 		CriteriaQuery<HistoryBank> criteriaQuery = cb.createQuery(HistoryBank.class);
 
 		Root<HistoryBank> root = criteriaQuery.from(HistoryBank.class);
+		if (request.getSortField().equalsIgnoreCase("norek")) {
+		    Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+		    if(request.getSortOrder().equalsIgnoreCase("asc"))
+		        criteriaQuery.orderBy(cb.asc(join.get("norek")));
+		    else
+		        criteriaQuery.orderBy(cb.desc(join.get("norek")));
+		} else {
+		    // sort by other field without join
+		    if(request.getSortOrder().equalsIgnoreCase("asc"))
+		        criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
+		    else
+		        criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+		}
 
-		if(request.getSortOrder().equalsIgnoreCase("asc"))
-			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
-		else
-			criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
-				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+(filter.getValue().toString()).toLowerCase()+"%"));
-		}
+	    	 String value2 = (String) filter.getValue().toString().toLowerCase();
+	    	 if (filter.getName().equalsIgnoreCase("norek")) {
+	    		    Join<HistoryBank, MasterBank> join2 = root.join("rekening", JoinType.INNER);
+	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value2+"%"));
+	    		} else {
+	    		    // add other predicates without join
+	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value2+"%"));
+	    		}
+	    }
 	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
@@ -59,7 +77,17 @@ public class HistoryBankCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+	    	String value = (String) filter.getValue().toString().toLowerCase();
+	    	  
+	    	if (filter.getName().equalsIgnoreCase("norek")) {
+	    	    Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	} else {
+	    	    // add other predicates without join
+	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	
+	    	
 		}
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
