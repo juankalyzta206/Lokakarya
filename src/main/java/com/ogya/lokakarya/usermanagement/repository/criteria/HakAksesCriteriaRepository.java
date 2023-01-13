@@ -14,7 +14,6 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.HakAkses;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
 import com.ogya.lokakarya.usermanagement.entity.Users;
@@ -48,7 +47,6 @@ public class HakAksesCriteriaRepository {
 		        criteriaQuery.orderBy(cb.desc(join2.get("roleId")));
 		}
 		else {
-		    // sort by other field without join
 		    if(request.getSortOrder().equalsIgnoreCase("asc"))
 		        criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
 		    else

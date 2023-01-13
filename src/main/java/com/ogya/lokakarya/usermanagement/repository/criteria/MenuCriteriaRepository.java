@@ -25,23 +25,28 @@ public class MenuCriteriaRepository {
 	public List<Menu> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<Menu> criteriaQuery = cb.createQuery(Menu.class);
-
 		Root<Menu> root = criteriaQuery.from(Menu.class);
-
+		criteriaQuery.select(root);
+		
 		if(request.getSortOrder().equalsIgnoreCase("asc"))
-			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
+		    criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
 		else
-			criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+		    criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
 				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-		}
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		    	predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	predicatesList.add(cb.or(predicatesValue));
+	    }
 	    
+
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.where(finalPredicates);
@@ -55,15 +60,20 @@ public class MenuCriteriaRepository {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
 	    Root<Menu> root = criteriaQuery.from(Menu.class);
-	    
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
-	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+	    
+		@SuppressWarnings("rawtypes")
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-		}
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	predicatesList.add(cb.or(predicatesValue));
+	    }
+  
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.select(cb.count(root));
