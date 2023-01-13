@@ -3,6 +3,7 @@ package com.ogya.lokakarya.bankadm.wrapper;
 import java.util.Date;
 
 public class TransferWrapper {
+	private Long idTransaksi;
 	private Long rekAsal;
 	private Long rekTujuan;
 	private String namaPengirim;
@@ -13,6 +14,12 @@ public class TransferWrapper {
 	private Long saldoPenerima;
 	
 	
+	public Long getIdTransaksi() {
+		return idTransaksi;
+	}
+	public void setIdTransaksi(Long idTransaksi) {
+		this.idTransaksi = idTransaksi;
+	}
 	public Long getSaldoPengirim() {
 		return saldoPengirim;
 	}

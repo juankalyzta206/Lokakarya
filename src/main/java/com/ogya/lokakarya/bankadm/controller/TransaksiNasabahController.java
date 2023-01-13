@@ -95,4 +95,14 @@ public class TransaksiNasabahController {
 	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
 		transaksiNasabahService.ExportToPdfSetorParam(response, idHistory);
 	}
+	
+	@GetMapping(path = "/exportToPdfTarikParam")
+	public void exportToPdfTarikParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfTarikParam(response, idHistory);
+	}
+	
+	@GetMapping(path = "/exportToPdfTransferParam")
+	public void exportToPdfTransferParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfTransferParam(response, idHistory);
+	}
 }

@@ -8,7 +8,8 @@ public class BayarTeleponWrapper {
 	private Long noTelepon;
 	private Long tagihan;
 	private Long noRekening;
-	private Long idTransaksi;
+	private Long idTransaksiTelp;
+	private Long idTransaksiBank;
 	private Byte bulanTagihan;
 	private Integer tahunTagihan;
 	private Byte status;
@@ -16,6 +17,18 @@ public class BayarTeleponWrapper {
 	private Date tanggal;
 	
 	
+	public Long getIdTransaksiTelp() {
+		return idTransaksiTelp;
+	}
+	public void setIdTransaksiTelp(Long idTransaksiTelp) {
+		this.idTransaksiTelp = idTransaksiTelp;
+	}
+	public Long getIdTransaksiBank() {
+		return idTransaksiBank;
+	}
+	public void setIdTransaksiBank(Long idTransaksiBank) {
+		this.idTransaksiBank = idTransaksiBank;
+	}
 	public Date getTanggal() {
 		return tanggal;
 	}
@@ -27,12 +40,6 @@ public class BayarTeleponWrapper {
 	}
 	public void setSaldo(Long saldo) {
 		this.saldo = saldo;
-	}
-	public Long getIdTransaksi() {
-		return idTransaksi;
-	}
-	public void setIdTransaksi(Long idTransaksi) {
-		this.idTransaksi = idTransaksi;
 	}
 	public Byte getBulanTagihan() {
 		return bulanTagihan;
