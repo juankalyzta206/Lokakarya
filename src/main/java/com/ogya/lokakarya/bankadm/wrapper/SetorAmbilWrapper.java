@@ -3,6 +3,7 @@ package com.ogya.lokakarya.bankadm.wrapper;
 import java.util.Date;
 
 public class SetorAmbilWrapper {
+	private Long idTransaksi;
 	private Long nomorRekening;
 	private String namaNasabah;
 	private Long nominal;
@@ -10,6 +11,12 @@ public class SetorAmbilWrapper {
 	private Date tanggal;
 	
 	
+	public Long getIdTransaksi() {
+		return idTransaksi;
+	}
+	public void setIdTransaksi(Long idTransaksi) {
+		this.idTransaksi = idTransaksi;
+	}
 	public Long getNomorRekening() {
 		return nomorRekening;
 	}

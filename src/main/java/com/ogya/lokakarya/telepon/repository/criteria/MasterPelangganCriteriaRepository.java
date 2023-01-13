@@ -70,18 +70,52 @@ public class MasterPelangganCriteriaRepository {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
 	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
-	    
+		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
+		if(request.getSortField().toLowerCase().equals("userid")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
+		}
+		else {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
+		}
+		
+				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+	    	String value = (String) filter.getValue().toString().toLowerCase();
+	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
+	    	if(filter.getName().toLowerCase().equals("userid") ) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	else {
+	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
 		}
+	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.select(cb.count(root));
 	    criteriaQuery.where(finalPredicates);
+//	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
+//	    
+//	    List<Predicate> predicatesList = new ArrayList<>();
+//	    
+//	    @SuppressWarnings("rawtypes")
+//		List<FilterWrapper> filterList = request.getFilters();
+//	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
+//	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName())), "%"+ (filter.getValue().toString()).toLowerCase()+"%"));
+//		}
+//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+//	    predicatesList.toArray(finalPredicates);
+//	    criteriaQuery.select(cb.count(root));
+//	    criteriaQuery.where(finalPredicates);
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;

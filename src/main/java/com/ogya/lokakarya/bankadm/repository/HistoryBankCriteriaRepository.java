@@ -58,10 +58,14 @@ public class HistoryBankCriteriaRepository {
 	    		}
 	    }
 	    
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.where(finalPredicates);
-	
+	    Predicate[] predicates = new Predicate[filterList.size()];
+	    int i = 0;
+	    for (FilterWrapper filter : filterList) {
+	        String value = (String) filter.getValue().toString().toLowerCase();
+	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	        i++;
+	    }
+	    criteriaQuery.where(cb.or(predicates));
 		List<HistoryBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
@@ -89,11 +93,14 @@ public class HistoryBankCriteriaRepository {
 	    	
 	    	
 		}
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.select(cb.count(root));
-	    criteriaQuery.where(finalPredicates);
-	    
+	    Predicate[] predicates = new Predicate[filterList.size()];
+	    int i = 0;
+	    for (FilterWrapper filter : filterList) {
+	        String value = (String) filter.getValue().toString().toLowerCase();
+	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	        i++;
+	    }
+	    criteriaQuery.where(cb.or(predicates));
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;
 	}
