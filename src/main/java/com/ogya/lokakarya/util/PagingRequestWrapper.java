@@ -51,6 +51,7 @@ public void setSortOrder(String sortOrder) {
 this.sortOrder = sortOrder;
 }
 
+
 @SuppressWarnings("rawtypes")
 public List<FilterWrapper> getFilters() {
 return filters;

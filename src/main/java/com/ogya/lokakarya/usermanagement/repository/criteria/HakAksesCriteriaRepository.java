@@ -14,10 +14,9 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.HakAkses;
-import com.ogya.lokakarya.usermanagement.entity.Menu;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
-import com.ogya.lokakarya.usermanagement.entity.SubMenu;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
@@ -59,26 +58,38 @@ public class HakAksesCriteriaRepository {
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 if (filter.getName().equalsIgnoreCase("userId")) {
-	    		    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    		} else if (filter.getName().equalsIgnoreCase("username")) {
-	    		    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
-	    		} else if (filter.getName().equalsIgnoreCase("roleName")) {
-	    		    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
-	    		} else if (filter.getName().equalsIgnoreCase("roleId")) {
-	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    		} else {
-	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    		}
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	criteriaQuery.where(cb.or(predicates));
 	    }
+	   
+	    
+//		List<FilterWrapper> filterList = request.getFilters();
+//	    for (FilterWrapper filter : filterList) {
+//	    	
+//	    	 String value = (String) filter.getValue().toString().toLowerCase();
+//	    	 if (filter.getName().equalsIgnoreCase("userId")) {
+//	    		    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    		} else if (filter.getName().equalsIgnoreCase("username")) {
+//	    		    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
+//	    		} else if (filter.getName().equalsIgnoreCase("roleName")) {
+//	    		    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
+//	    		} else if (filter.getName().equalsIgnoreCase("roleId")) {
+//	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    		} else {
+//	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    		}
+//	    }
 	    
 
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.where(finalPredicates);
+//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+//	    predicatesList.toArray(finalPredicates);
+//	    criteriaQuery.where(finalPredicates);
 	
 		List<HakAkses> result = entityManager.createQuery(criteriaQuery).getResultList();
 
@@ -93,27 +104,37 @@ public class HakAksesCriteriaRepository {
 	    Join<HakAkses, Users> join = root.join("users", JoinType.INNER);
 		Join<HakAkses, Roles> join2 = root.join("roles", JoinType.INNER);
 	    
-	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
-	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	if ((filter.getName().equalsIgnoreCase("userId"))) {
-	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	} else if (filter.getName().equalsIgnoreCase("username")) {
-	    	    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
-	    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
-	    	    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
-	    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
-	    	    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	} else {
-	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
-	    }
 	    
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
+		@SuppressWarnings("rawtypes")
+    	List<FilterWrapper> filterList = request.getFilters();
+	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	criteriaQuery.where(cb.or(predicates));
+	    }
+//		List<FilterWrapper> filterList = request.getFilters();
+//	    for (FilterWrapper filter : filterList) {
+//	    	String value = (String) filter.getValue().toString().toLowerCase();
+//	    	if ((filter.getName().equalsIgnoreCase("userId"))) {
+//	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    	} else if (filter.getName().equalsIgnoreCase("username")) {
+//	    	    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
+//	    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
+//	    	    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
+//	    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
+//	    	    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    	} else {
+//	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    	}
+//	    }
+	    
+//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+//	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.select(cb.count(root));
-	    criteriaQuery.where(finalPredicates);
+//	    criteriaQuery.where(finalPredicates);
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;

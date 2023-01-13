@@ -1,9 +1,11 @@
 package com.ogya.lokakarya.util;
 
+import java.util.List;
+
 public class FilterWrapper<T> {
 
 private String name;
-private T value;
+private List<T> value;
 
 public String getName() {
 return name;
@@ -13,11 +15,11 @@ public void setName(String name) {
 this.name = name;
 }
 
-public T getValue() {
+public List<T> getValue() {
 return value;
 }
 
-public void setValue(T value) {
+public void setValue(List<T> value) {
 this.value = value;
 }
 
