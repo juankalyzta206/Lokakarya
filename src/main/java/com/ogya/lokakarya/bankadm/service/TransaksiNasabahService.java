@@ -204,6 +204,7 @@ public class TransaksiNasabahService {
 					historyBankRepo.save(historyBank);
 
 					SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+					wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
 					wrapper.setNamaNasabah(nasabah.getNama());
 					wrapper.setNominal(nominal);
 					wrapper.setNomorRekening(rekening);
