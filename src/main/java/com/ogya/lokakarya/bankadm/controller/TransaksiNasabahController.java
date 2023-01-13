@@ -1,5 +1,7 @@
 package com.ogya.lokakarya.bankadm.controller;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,19 +27,21 @@ public class TransaksiNasabahController {
 
 	@PostMapping(path = "/transfer")
 	public DataResponse<TransferWrapper> transfer(@RequestParam("Nomor Rekening Asal") Long rekAsal,
-												  @RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) {
+			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) {
 		return new DataResponse<TransferWrapper>(transaksiNasabahService.transfer(rekTujuan, rekAsal, nominal));
 	}
 
 	@PostMapping(path = "/bayarTelpon")
-	public DataResponseList<BayarTeleponWrapper> bayarTelpon(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelpon) {
+	public DataResponseList<BayarTeleponWrapper> bayarTelpon(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelpon) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelpon(rekAsal, noTelpon));
 	}
-	
+
 	@PostMapping(path = "/bayarTelponPerbulan")
-	public DataResponseList<BayarTeleponWrapper> bayarTelponPerbulan(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelpon,
-			@RequestParam("Bulan Tagihan") Byte bulanTagihan) {
-		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan));
+	public DataResponseList<BayarTeleponWrapper> bayarTelponPerbulan(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelpon, @RequestParam("Bulan Tagihan") Byte bulanTagihan) {
+		return new DataResponseList<BayarTeleponWrapper>(
+				transaksiNasabahService.bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan));
 	}
 
 	@GetMapping(path = "/cekSaldo")
@@ -46,22 +50,31 @@ public class TransaksiNasabahController {
 	}
 
 	@PostMapping(path = "/setor")
-	public DataResponse<SetorAmbilWrapper> setor(@RequestParam("Nomor Rekening") Long norek, @RequestParam("Nominal") Long nominal) {
+	public DataResponse<SetorAmbilWrapper> setor(@RequestParam("Nomor Rekening") Long norek,
+			@RequestParam("Nominal") Long nominal) {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.setor(norek, nominal));
 	}
 
 	@PostMapping(path = "/tarik")
-	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek, @RequestParam("Nominal") Long nominal) {
+	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
+			@RequestParam("Nominal") Long nominal) {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.tarik(norek, nominal));
 	}
 
 	@GetMapping(path = "/findByNoRekAndNoTelp")
-	public DataResponseList<BayarTeleponWrapper> findByNoTelp(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelp) {
+	public DataResponseList<BayarTeleponWrapper> findByNoTelp(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findByNoTelpon(rekAsal, noTelp));
 	}
-	
+
 	@GetMapping(path = "/findTotalTagihan")
-	public DataResponseList<BayarTeleponWrapper> findTotalTagihan(@RequestParam("Nomor Rekening") Long rekAsal, @RequestParam("No Telepon") Long noTelp) {
+	public DataResponseList<BayarTeleponWrapper> findTotalTagihan(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findTotalTagihan(rekAsal, noTelp));
+	}
+
+	@GetMapping(path = "/exportToPdfSetor")
+	public void exportToPdf(HttpServletResponse response) throws Exception {
+		transaksiNasabahService.ExportToPdfSetor(response);
 	}
 }
