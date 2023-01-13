@@ -90,4 +90,9 @@ public class TransaksiNasabahController {
 	public void exportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
 		transaksiNasabahService.ExportToPdfBayarTelepon(response);
 	}
+	
+	@GetMapping(path = "/exportToPdfSetorParam")
+	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfSetorParam(response, idHistory);
+	}
 }
