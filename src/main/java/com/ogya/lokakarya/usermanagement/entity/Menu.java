@@ -109,8 +109,7 @@ public class Menu {
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-	
-	
+
 	
 	
 }

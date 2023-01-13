@@ -50,7 +50,7 @@ public class SubMenuService {
 
 	public PaginationList<SubMenuWrapper, SubMenu> ListWithPaging(PagingRequestWrapper request) { 
 		List<SubMenu> subMenuList = subMenuCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), subMenuList.size());
 		Page<SubMenu> subMenuPage = new PageImpl<>(subMenuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),subMenuList.size());
 		List<SubMenuWrapper> subMenuWrapperList = new ArrayList<>();
