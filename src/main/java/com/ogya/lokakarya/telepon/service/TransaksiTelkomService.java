@@ -199,7 +199,7 @@ public class TransaksiTelkomService {
 
 	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
-		Page<TransaksiTelkom> transaksiTelkomPage = transaksiTelkomRepository.findAll(paging);
+		Page<TransaksiTelkom> transaksiTelkomPage = transaksiTelkomRepository.findAllWithStatus1(paging);
 		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomPage.getContent();
 		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = toWrapperList(transaksiTelkomList);
 		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList,

@@ -34,7 +34,8 @@ public interface TransaksiTelkomRepository extends JpaRepository<TransaksiTelkom
 	@Query(value = "SELECT STATUS FROM TRANSAKSI_TELKOM WHERE ID_PELANGGAN = :idPelanggan", nativeQuery = true)
 	List<Integer> statusTagihan (@Param("idPelanggan") Long idPelanggan);
 	
-	Page<TransaksiTelkom> findAll(Pageable page);
+	@Query(value = "SELECT * FROM TRANSAKSI_TELKOM  WHERE STATUS = 1 ", nativeQuery = true)
+	Page<TransaksiTelkom> findAllWithStatus1(Pageable page);
 	
 	TransaksiTelkom findByidPelanggan(MasterPelanggan idPelanggan);
 	
