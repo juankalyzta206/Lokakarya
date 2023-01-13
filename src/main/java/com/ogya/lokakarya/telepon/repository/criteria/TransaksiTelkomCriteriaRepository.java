@@ -63,9 +63,10 @@ public class TransaksiTelkomCriteriaRepository {
 		    		predicatesValue[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
 		    	}
 		    	else {
-		    		predicatesValue[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
 		    	}
-	    	}
+	    	}	
+	    	
 	    	predicatesList.add(cb.or(predicatesValue));
 	    }
 	    
