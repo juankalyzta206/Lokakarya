@@ -55,7 +55,7 @@ public class RoleMenuService {
 
 	public PaginationList<RoleMenuWrapper, RoleMenu> ListWithPaging(PagingRequestWrapper request) { 
 		List<RoleMenu> roleMenuList = roleMenuCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), roleMenuList.size());
 		Page<RoleMenu> roleMenuPage = new PageImpl<>(roleMenuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),roleMenuList.size());
 		List<RoleMenuWrapper> roleMenuWrapperList = new ArrayList<>();

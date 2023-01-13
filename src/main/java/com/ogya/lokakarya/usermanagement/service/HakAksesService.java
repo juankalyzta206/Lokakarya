@@ -55,7 +55,7 @@ public class HakAksesService {
 
 	public PaginationList<HakAksesWrapper, HakAkses> ListWithPaging(PagingRequestWrapper request) { 
 		List<HakAkses> hakAksesList = hakAksesCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage()-1)* request.getSize();
+		int fromIndex = (request.getPage())* request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), hakAksesList.size());
 		Page<HakAkses> hakAksesPage = new PageImpl<>(hakAksesList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),hakAksesList.size());
 		List<HakAksesWrapper> hakAksesWrapperList = new ArrayList<>();
