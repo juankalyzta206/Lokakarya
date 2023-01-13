@@ -62,6 +62,8 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK hb ORDER BY ID_HISTORY_BANK DESC ", nativeQuery = true)
 	 List<HistoryBank> findLastHistory();
 	 
+//	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE ID_HISTORY_BANK = :idHistory", nativeQuery = true)
+//	 HistoryBank findByIdHistory(@Para);
 }
 
 

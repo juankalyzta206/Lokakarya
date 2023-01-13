@@ -44,7 +44,9 @@ public class MasterBankCriteriaRepository {
 	    int i = 0;
 	    for (FilterWrapper filter : filterList) {
 	        String value = (String) filter.getValue().toString().toLowerCase();
-	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	        List<String> values = new ArrayList<>();
+	        values.add(value);
+	        predicates[i] = root.get(filter.getName()).in(values);
 	        i++;
 	    }
 	    criteriaQuery.where(cb.or(predicates));
@@ -73,11 +75,12 @@ public class MasterBankCriteriaRepository {
 	    int i = 0;
 	    for (FilterWrapper filter : filterList) {
 	        String value = (String) filter.getValue().toString().toLowerCase();
-	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	        List<String> values = new ArrayList<>();
+	        values.add(value);
+	        predicates[i] = root.get(filter.getName()).in(values);
 	        i++;
 	    }
 	    criteriaQuery.where(cb.or(predicates));
-	
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;

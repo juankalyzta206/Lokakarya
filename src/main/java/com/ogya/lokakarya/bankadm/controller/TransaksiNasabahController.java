@@ -74,7 +74,25 @@ public class TransaksiNasabahController {
 	}
 
 	@GetMapping(path = "/exportToPdfSetor")
-	public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdfSetor(HttpServletResponse response) throws Exception {
 		transaksiNasabahService.ExportToPdfSetor(response);
+	}
+	
+	@GetMapping(path = "/exportToPdfTarik")
+	public void exportToPdfTarik(HttpServletResponse response) throws Exception {
+		transaksiNasabahService.ExportToPdfTarik(response);
+	}
+	@GetMapping(path = "/exportToPdfTransfer")
+	public void exportToPdfTransfer(HttpServletResponse response) throws Exception {
+		transaksiNasabahService.ExportToPdfTransfer(response);
+	}
+	@GetMapping(path = "/exportToPdfBayarTelepon")
+	public void exportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
+		transaksiNasabahService.ExportToPdfBayarTelepon(response);
+	}
+	
+	@GetMapping(path = "/exportToPdfSetorParam")
+	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfSetorParam(response, idHistory);
 	}
 }
