@@ -134,6 +134,19 @@ public class TransaksiTelkomService {
 					}
 				}
 			}
+			else if (entity.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
+					&& entity.getTahunTagihan() != wrapper.getTahunTagihan()
+					&& entity.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
+				List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
+						.findByTagihanPelanggan(wrapper.getIdPelanggan());
+				for (TransaksiTelkom entity1 : transaksiTelkomList) {
+					if (entity1.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
+							&& entity1.getTahunTagihan().equals(wrapper.getTahunTagihan())
+							&& entity1.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
+						throw new BusinessException("bulan tagihan tidak boleh sama");
+					}
+				}
+			}
 		} else {
 			List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
 					.findByTagihanPelanggan(wrapper.getIdPelanggan());
