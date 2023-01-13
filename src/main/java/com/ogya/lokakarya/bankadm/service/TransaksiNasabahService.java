@@ -528,6 +528,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Right("Setor Tunai"));
 		pdfTable.addCell(Left("Nominal"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
+		pdfTable.addCell(Left("Saldo"));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -588,6 +590,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Right("Tarik Tunai"));
 		pdfTable.addCell(Left("Nominal"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
+		pdfTable.addCell(Left("Saldo"));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -654,6 +658,8 @@ public class TransaksiNasabahService {
 				Right(String.valueOf(data.getNamaTujuan() != null ? String.valueOf(data.getNamaTujuan()) : "-")));
 		pdfTable.addCell(Left("Nominal"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
+		pdfTable.addCell(Left("Saldo"));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -727,6 +733,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal"));
 		pdfTable.addCell(
 				Right(String.valueOf(dataNasabah.getUang() != null ? String.valueOf(dataNasabah.getUang()) : "-")));
+		pdfTable.addCell(Left("Saldo"));
+		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getNama() != null ? String.valueOf(dataNasabah.getRekening().getNama()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
