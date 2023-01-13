@@ -25,6 +25,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
@@ -181,11 +183,10 @@ public class MasterPelangganService {
 			for (int i = 0; i < dataHistory.size(); i++) {
 				MasterPelangganWrapper wrapper = new MasterPelangganWrapper();
 				wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan());
-				
 				wrapper.setNama(dataHistory.get(i).getNama());
 				wrapper.setAlamat(dataHistory.get(i).getAlamat());
 				wrapper.setNoTelp(dataHistory.get(i).getNoTelp());
-				wrapper.setUserId(dataHistory.get(i).getUsers() != null ? dataHistory.get(i).getUsers().getUserId() : null);
+//				wrapper.setUserId(dataHistory.get(i).getUsers() != null ? dataHistory.get(i).getUsers().getUserId() : null);
 				masterPelangganList.add(wrapper);
 			}
 
@@ -194,7 +195,7 @@ public class MasterPelangganService {
 			PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 			pdfDoc.open();
 
-			Paragraph title = new Paragraph("Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+			Paragraph title = new Paragraph("Daftar Pelanggan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 			title.setAlignment(Element.ALIGN_CENTER);
 			pdfDoc.add(title);
 
@@ -203,21 +204,29 @@ public class MasterPelangganService {
 					"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 			// Create a table
-			PdfPTable pdfTable = new PdfPTable(5);
+			PdfPTable pdfTable = new PdfPTable(4);
 
 			pdfTable.setWidthPercentage(100);
 			pdfTable.setSpacingBefore(10f);
 			pdfTable.setSpacingAfter(10f);
 
-			pdfTable.addCell("ID Pelanggan");
-			pdfTable.addCell("Nama Pelanggan");
-			pdfTable.addCell("Alamat");
-			pdfTable.addCell("No Telp");
+			PdfPCell cell1 = new PdfPCell(new Phrase("ID Pelanggan"));
+			cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+			pdfTable.addCell(cell1);
+			PdfPCell cell2 = new PdfPCell(new Phrase("Nama Pelanggan"));
+			cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+			pdfTable.addCell(cell2);
+			PdfPCell cell3 = new PdfPCell(new Phrase("Alamat"));
+			cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+			pdfTable.addCell(cell3);
+			PdfPCell cell4 = new PdfPCell(new Phrase("No Telp"));
+			cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+			pdfTable.addCell(cell4);
 			
 			
 			BaseColor color = new BaseColor(135, 206, 235);
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 4; i++) {
 				pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 			}
 
