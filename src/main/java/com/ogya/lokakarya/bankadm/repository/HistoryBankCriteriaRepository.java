@@ -48,24 +48,19 @@ public class HistoryBankCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 String value2 = (String) filter.getValue().toString().toLowerCase();
-	    	 if (filter.getName().equalsIgnoreCase("norek")) {
-	    		    Join<HistoryBank, MasterBank> join2 = root.join("rekening", JoinType.INNER);
-	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value2+"%"));
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+	    		if (filter.getName().equalsIgnoreCase("norek")) {
+	    		    Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+	    		    predicates[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
 	    		} else {
 	    		    // add other predicates without join
-	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value2+"%"));
+	    		    predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
 	    		}
+	    	}
+	    	criteriaQuery.where(cb.or(predicates));
 	    }
-	    
-	    Predicate[] predicates = new Predicate[filterList.size()];
-	    int i = 0;
-	    for (FilterWrapper filter : filterList) {
-	        String value = (String) filter.getValue().toString().toLowerCase();
-	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
-	        i++;
-	    }
-	    criteriaQuery.where(cb.or(predicates));
 		List<HistoryBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
@@ -79,28 +74,21 @@ public class HistoryBankCriteriaRepository {
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
-	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	  
-	    	if (filter.getName().equalsIgnoreCase("norek")) {
-	    	    Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
-	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	} else {
-	    	    // add other predicates without join
-	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
-	    	
-	    	
-		}
-	    Predicate[] predicates = new Predicate[filterList.size()];
-	    int i = 0;
-	    for (FilterWrapper filter : filterList) {
-	        String value = (String) filter.getValue().toString().toLowerCase();
-	        predicates[i] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
-	        i++;
-	    }
-	    criteriaQuery.where(cb.or(predicates));
+			List<FilterWrapper> filterList = request.getFilters();
+		    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
+		    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+		    	for (int j=0; j<filter.getValue().size(); j++) {
+		    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		    		if (filter.getName().equalsIgnoreCase("norek")) {
+		    		    Join<HistoryBank, MasterBank> join = root.join("rekening", JoinType.INNER);
+		    		    predicates[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    		} else {
+		    		    // add other predicates without join
+		    		    predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    		}
+		    	}
+		    	criteriaQuery.where(cb.or(predicates));
+		    }
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;
 	}
