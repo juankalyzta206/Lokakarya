@@ -21,6 +21,7 @@ import com.ogya.lokakarya.telepon.service.TransaksiTelkomService;
 import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
+import com.ogya.lokakarya.util.PagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/transaksitelkom")
@@ -66,5 +67,9 @@ public class TransaksiTelkomController {
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
 	public void exportToPdf(HttpServletResponse response) throws Exception {
 		transaksiTelkomService.ExportToPdf(response);
+	}
+	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
+	public DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomService.ListWithPaging(request));
 	}
 }

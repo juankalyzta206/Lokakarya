@@ -26,13 +26,21 @@ public class MasterPelangganCriteriaRepository {
 	public List<MasterPelanggan> findByFilter(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<MasterPelanggan> criteriaQuery = cb.createQuery(MasterPelanggan.class);
-
 		Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
-
-		if(request.getSortOrder().equalsIgnoreCase("asc"))
-			criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
-		else
-			criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
+		if(request.getSortField().toLowerCase().equals("userid")) {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
+		}
+		else {
+			if(request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
+			else {
+				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
+		}
+		
 				
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
@@ -40,8 +48,13 @@ public class MasterPelangganCriteriaRepository {
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<MasterPelanggan,Users > join = root.join("users", JoinType.INNER);
-	    	 predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
+	    	if(filter.getName().toLowerCase().equals("userid") ) {
+	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
+	    	else {
+	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	}
 		}
 	    
 	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
