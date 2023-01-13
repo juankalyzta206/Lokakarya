@@ -33,15 +33,15 @@ public class HakAksesCriteriaRepository {
 		CriteriaQuery<HakAkses> criteriaQuery = cb.createQuery(HakAkses.class);
 		Root<HakAkses> root = criteriaQuery.from(HakAkses.class);
 		Join<HakAkses, Users> join = root.join("users", JoinType.INNER);
-		Join<HakAkses, Roles> join2 = join.join("roles", JoinType.INNER);
+		Join<HakAkses, Roles> join2 = root.join("roles", JoinType.INNER);
 		criteriaQuery.select(root);
 		
 		
 		if (request.getSortField().equalsIgnoreCase("userId")) {
 		    if(request.getSortOrder().equalsIgnoreCase("asc"))
-		        criteriaQuery.orderBy(cb.asc(join2.get("userId")));
+		        criteriaQuery.orderBy(cb.asc(join.get("userId")));
 		    else
-		        criteriaQuery.orderBy(cb.desc(join2.get("userId")));
+		        criteriaQuery.orderBy(cb.desc(join.get("userId")));
 		} else if (request.getSortField().equalsIgnoreCase("roleId")) {
 			if(request.getSortOrder().equalsIgnoreCase("asc"))
 		        criteriaQuery.orderBy(cb.asc(join2.get("roleId")));
@@ -63,7 +63,11 @@ public class HakAksesCriteriaRepository {
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	 String value = (String) filter.getValue().toString().toLowerCase();
 	    	 if (filter.getName().equalsIgnoreCase("userId")) {
-	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    		    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    		} else if (filter.getName().equalsIgnoreCase("username")) {
+	    		    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
+	    		} else if (filter.getName().equalsIgnoreCase("roleName")) {
+	    		    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
 	    		} else if (filter.getName().equalsIgnoreCase("roleId")) {
 	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
 	    		} else {
@@ -87,14 +91,18 @@ public class HakAksesCriteriaRepository {
 	    Root<HakAkses> root = criteriaQuery.from(HakAkses.class);
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    Join<HakAkses, Users> join = root.join("users", JoinType.INNER);
-		Join<HakAkses, Roles> join2 = join.join("roles", JoinType.INNER);
+		Join<HakAkses, Roles> join2 = root.join("roles", JoinType.INNER);
 	    
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	if (filter.getName().equalsIgnoreCase("userId")) {
-	    	    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	if ((filter.getName().equalsIgnoreCase("userId"))) {
+	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	} else if (filter.getName().equalsIgnoreCase("username")) {
+	    	    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
+	    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
+	    	    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
 	    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
 	    	    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
 	    	} else {
