@@ -60,36 +60,28 @@ public class HakAksesCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
     	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
 	    	for (int j=0; j<filter.getValue().size(); j++) {
 	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
-		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    		if ((filter.getName().equalsIgnoreCase("userId"))) {
+	    			predicatesValue[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("username")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else {
+		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
 	    	}
-	    	criteriaQuery.where(cb.or(predicates));
+	    	predicatesList.add(cb.or(predicatesValue));
 	    }
-	   
-	    
-//		List<FilterWrapper> filterList = request.getFilters();
-//	    for (FilterWrapper filter : filterList) {
-//	    	
-//	    	 String value = (String) filter.getValue().toString().toLowerCase();
-//	    	 if (filter.getName().equalsIgnoreCase("userId")) {
-//	    		    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    		} else if (filter.getName().equalsIgnoreCase("username")) {
-//	    		    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
-//	    		} else if (filter.getName().equalsIgnoreCase("roleName")) {
-//	    		    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
-//	    		} else if (filter.getName().equalsIgnoreCase("roleId")) {
-//	    		    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    		} else {
-//	    		    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    		}
-//	    }
 	    
 
-//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-//	    predicatesList.toArray(finalPredicates);
-//	    criteriaQuery.where(finalPredicates);
+	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+	    predicatesList.toArray(finalPredicates);
+	    criteriaQuery.where(finalPredicates);
 	
 		List<HakAkses> result = entityManager.createQuery(criteriaQuery).getResultList();
 
@@ -108,33 +100,28 @@ public class HakAksesCriteriaRepository {
 		@SuppressWarnings("rawtypes")
     	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
 	    	for (int j=0; j<filter.getValue().size(); j++) {
 	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
-		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    		if ((filter.getName().equalsIgnoreCase("userId"))) {
+	    			predicatesValue[j] = cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("username")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
+		    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	} else {
+		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
 	    	}
-	    	criteriaQuery.where(cb.or(predicates));
+	    	predicatesList.add(cb.or(predicatesValue));
 	    }
-//		List<FilterWrapper> filterList = request.getFilters();
-//	    for (FilterWrapper filter : filterList) {
-//	    	String value = (String) filter.getValue().toString().toLowerCase();
-//	    	if ((filter.getName().equalsIgnoreCase("userId"))) {
-//	    	    predicatesList.add(cb.like(cb.lower(join.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    	} else if (filter.getName().equalsIgnoreCase("username")) {
-//	    	    predicatesList.add(cb.like(cb.lower(join.get("username").as(String.class)), "%"+value+"%"));
-//	    	} else if (filter.getName().equalsIgnoreCase("roleName")) {
-//	    	    predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
-//	    	} else if (filter.getName().equalsIgnoreCase("roleId")) {
-//	    	    predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    	} else {
-//	    	    predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-//	    	}
-//	    }
-	    
-//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-//	    predicatesList.toArray(finalPredicates);
+  
+	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+	    predicatesList.toArray(finalPredicates);
 	    criteriaQuery.select(cb.count(root));
-//	    criteriaQuery.where(finalPredicates);
+	    criteriaQuery.where(finalPredicates);
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;

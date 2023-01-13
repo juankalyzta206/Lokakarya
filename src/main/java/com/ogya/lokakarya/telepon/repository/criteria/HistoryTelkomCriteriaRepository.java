@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 @Repository
@@ -50,24 +51,24 @@ public class HistoryTelkomCriteriaRepository {
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+	    List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<HistoryTelkom,MasterPelanggan > join2 = root.join("idPelanggan", JoinType.INNER);
-	    	if(filter.getName().toLowerCase().equals("idpelanggan") ) {
-	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		Join<MasterPelanggan,Users > join2 = root.join("idPelanggan", JoinType.INNER);
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+	    		if(filter.getName().toLowerCase().equals("idpelanggan") ) {
+	    			predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
+		    	else if(filter.getName().toLowerCase().equals("nama")) {
+		    		predicates[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
+		    	}
+		    	else {
+		    		predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    	}
 	    	}
-	    	else if(filter.getName().toLowerCase().equals("nama")) {
-	    		predicatesList.add(cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%"));
-	    	}
-	    	else {
-	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
-		}
-	    
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.where(finalPredicates);
+	    	criteriaQuery.where(cb.or(predicates));
+	    }
 	
 		List<HistoryTelkom> result = entityManager.createQuery(criteriaQuery).getResultList();
 

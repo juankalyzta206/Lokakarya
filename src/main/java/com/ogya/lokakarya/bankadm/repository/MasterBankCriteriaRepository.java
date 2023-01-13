@@ -34,24 +34,16 @@ public class MasterBankCriteriaRepository {
 	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-		}
-	    
-	    Predicate[] predicates = new Predicate[filterList.size()];
-	    int i = 0;
-	    for (FilterWrapper filter : filterList) {
-	        String value = (String) filter.getValue().toString().toLowerCase();
-	        List<String> values = new ArrayList<>();
-	        values.add(value);
-	        predicates[i] = root.get(filter.getName()).in(values);
-	        i++;
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	criteriaQuery.where(cb.or(predicates));
 	    }
-	    criteriaQuery.where(cb.or(predicates));
-    
-	
+	    
 		List<MasterBank> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
@@ -63,24 +55,17 @@ public class MasterBankCriteriaRepository {
 	    Root<MasterBank> root = criteriaQuery.from(MasterBank.class);
 	    
 	    List<Predicate> predicatesList = new ArrayList<>();
-	    
+	  
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	 String value = (String) filter.getValue().toString().toLowerCase();
-	    	 predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-		}
-	    
-	    Predicate[] predicates = new Predicate[filterList.size()];
-	    int i = 0;
-	    for (FilterWrapper filter : filterList) {
-	        String value = (String) filter.getValue().toString().toLowerCase();
-	        List<String> values = new ArrayList<>();
-	        values.add(value);
-	        predicates[i] = root.get(filter.getName()).in(values);
-	        i++;
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicates[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    	}
+	    	criteriaQuery.where(cb.or(predicates));
 	    }
-	    criteriaQuery.where(cb.or(predicates));
 	    
 	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;
