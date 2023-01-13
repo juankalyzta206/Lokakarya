@@ -52,21 +52,21 @@ public class TransaksiTelkomCriteriaRepository {
 	    @SuppressWarnings("rawtypes")
 	    List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
 	    	for (int j=0; j<filter.getValue().size(); j++) {
 	    		Join<MasterPelanggan,Users > join2 = root.join("idPelanggan", JoinType.INNER);
 	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
 	    		if(filter.getName().toLowerCase().equals("idpelanggan") ) {
-	    			predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+	    			predicatesValue[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
 		    	}
 		    	else if(filter.getName().toLowerCase().equals("nama")) {
-		    		predicates[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
 		    	}
 		    	else {
-		    		predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
+		    		predicatesValue[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
 		    	}
 	    	}
-	    	criteriaQuery.where(cb.or(predicates));
+	    	predicatesList.add(cb.or(predicatesValue));
 	    }
 	    
 	    
@@ -89,7 +89,9 @@ public class TransaksiTelkomCriteriaRepository {
 //	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 //	    predicatesList.toArray(finalPredicates);
 //	    criteriaQuery.where(finalPredicates);
-	
+	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+	    predicatesList.toArray(finalPredicates);
+	    criteriaQuery.where(finalPredicates);
 		List<TransaksiTelkom> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
