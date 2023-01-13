@@ -59,6 +59,8 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	            nativeQuery = true)
 	    Page<HistoryBank> findAllFilter(@Param("keyFilter") String keyfilter,  @Param("sortOrder") String sortOrder,@Param("sortField") String sortField, @Param("paging") Pageable paging);
 
+	 @Query(value = "SELECT * FROM HISTORY_BANK hb ORDER BY ID_HISTORY_BANK DESC ", nativeQuery = true)
+	 List<HistoryBank> findLastHistory();
 	 
 }
 
