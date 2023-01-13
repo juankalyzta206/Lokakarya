@@ -43,23 +43,33 @@ public class MasterPelangganCriteriaRepository {
 		
 				
 	    List<Predicate> predicatesList = new ArrayList<>();
-	    
 	    @SuppressWarnings("rawtypes")
-		List<FilterWrapper> filterList = request.getFilters();
+    	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
-	    	if(filter.getName().toLowerCase().equals("userid") ) {
-	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
+	    	for (int j=0; j<filter.getValue().size(); j++) {
+	    		Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
+	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
+		        predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
 	    	}
-	    	else {
-	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
-		}
-	    
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.where(finalPredicates);
+	    	criteriaQuery.where(cb.or(predicates));
+	    }
+//	    @SuppressWarnings("rawtypes")
+//		List<FilterWrapper> filterList = request.getFilters();
+//	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
+//	    	String value = (String) filter.getValue().toString().toLowerCase();
+//	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
+//	    	if(filter.getName().toLowerCase().equals("userid") ) {
+//	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    	}
+//	    	else {
+//	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
+//	    	}
+//		}
+//	    
+//	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+//	    predicatesList.toArray(finalPredicates);
+//	    criteriaQuery.where(finalPredicates);
 	
 		List<MasterPelanggan> result = entityManager.createQuery(criteriaQuery).getResultList();
 
