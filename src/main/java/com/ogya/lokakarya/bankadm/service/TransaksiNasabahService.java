@@ -529,7 +529,7 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -591,7 +591,7 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -659,7 +659,7 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Pengirim"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getNama() != null ? String.valueOf(data.getRekening().getNama()) : "-")));
+		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -734,7 +734,7 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(
 				Right(String.valueOf(dataNasabah.getUang() != null ? String.valueOf(dataNasabah.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getNama() != null ? String.valueOf(dataNasabah.getRekening().getNama()) : "-")));
+		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getSaldo() != null ? String.valueOf(dataNasabah.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
