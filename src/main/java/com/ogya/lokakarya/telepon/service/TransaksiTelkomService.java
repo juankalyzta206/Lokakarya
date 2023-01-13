@@ -121,6 +121,7 @@ public class TransaksiTelkomService {
 		TransaksiTelkom entity = new TransaksiTelkom();
 		if (wrapper.getIdTransaksi() != null) {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
+			//validasi untuk bulan dan tahun tidak boleh sama
 			if (entity.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
 					&& entity.getTahunTagihan().equals(wrapper.getTahunTagihan())
 					&& entity.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
