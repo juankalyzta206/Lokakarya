@@ -123,7 +123,10 @@ public class TransaksiTelkomService {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
 			if (entity.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
 					&& entity.getTahunTagihan().equals(wrapper.getTahunTagihan())
-					&& entity.getBulanTagihan() != wrapper.getBulanTagihan()) {
+					&& entity.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
+				
+			}
+			else {
 				List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
 						.findByTagihanPelanggan(wrapper.getIdPelanggan());
 				for (TransaksiTelkom entity1 : transaksiTelkomList) {
