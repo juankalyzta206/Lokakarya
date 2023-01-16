@@ -1,5 +1,8 @@
 package com.ogya.lokakarya.bankadm.controller;
 
+import java.io.IOException;
+
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.itextpdf.text.DocumentException;
 import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
@@ -72,37 +76,42 @@ public class TransaksiNasabahController {
 			@RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findTotalTagihan(rekAsal, noTelp));
 	}
-	
+
 	@GetMapping(path = "/exportToPdfSetorParam")
-	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory)
+			throws Exception {
 		transaksiNasabahService.ExportToPdfSetorParam(response, idHistory);
 	}
-	
+
 	@GetMapping(path = "/exportToPdfTarikParam")
-	public void exportToPdfTarikParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+	public void exportToPdfTarikParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory)
+			throws Exception {
 		transaksiNasabahService.ExportToPdfTarikParam(response, idHistory);
 	}
-	
+
 	@GetMapping(path = "/exportToPdfTransferParam")
-	public void exportToPdfTransferParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+	public void exportToPdfTransferParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory)
+			throws Exception {
 		transaksiNasabahService.ExportToPdfTransferParam(response, idHistory);
 	}
-	
+
 	@GetMapping(path = "/exportToPdfBayarTeleponParam")
-	public void exportToPdfBayarTeleponParam(HttpServletResponse response, @RequestParam("ID History Bank") Long idHistoryBank,
-			@RequestParam("ID History Telepon") Long idHistoryTelp) throws Exception {
+	public void exportToPdfBayarTeleponParam(HttpServletResponse response,
+			@RequestParam("ID History Bank") Long idHistoryBank, @RequestParam("ID History Telepon") Long idHistoryTelp)
+			throws Exception {
 		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
 	}
-	
+
 //	@PostMapping(path = "/transferValidate")
 //	public DataResponse<TransferWrapper> transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
 //			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
 //		return new DataResponse<TransferWrapper>(transaksiNasabahService.transferValidate(response, rekTujuan, rekAsal, nominal));
 //	}
-	
+
 	@PostMapping(path = "/transferValidate")
 	public void transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
-			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
+			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal)
+			throws MessagingException, IOException, DocumentException {
 		transaksiNasabahService.transferValidate(response, rekTujuan, rekAsal, nominal);
 	}
 }

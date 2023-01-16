@@ -318,9 +318,9 @@ public class TransaksiNasabahService {
 		}
 	}
 
-	// -------------------------------------TransferFeign-------------------------------------------------
-	public TransferWrapper transferFeign(Long rekTujuan, Long rekAsal, Long nominal) {
-		TransferWrapper transfer = new TransferWrapper();
+
+	public void transferValidate(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal)
+			throws MessagingException, IOException, DocumentException {
 		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
 		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
 
@@ -335,209 +335,43 @@ public class TransaksiNasabahService {
 				System.out.println("Reference Number : " + transferResponse.getReferenceNumber());
 				System.out.println("Success : " + transferResponse.getSuccess());
 
-				if (masterBankRepo.findById(rekAsal).isPresent()) {
-					if (masterBankRepo.findById(rekTujuan).isPresent()) {
-
-						MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
-						MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
-						TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
-
-						if (pengirim != tujuan) {
-
-							if (nominal >= 10000) {
-
-								if (pengirim.getSaldo() - nominal >= 50000) {
-
-									transaksiNasabah.setNorekDituju(rekTujuan);
-									transaksiNasabah.setStatus("K");
-									transaksiNasabah.setStatusKet((byte) 3);
-									transaksiNasabah.setUang(nominal);
-									transaksiNasabah.setMasterBank(pengirim);
-									transaksiNasabah.setNoTlp(pengirim.getNotlp());
-									transaksiNasabahRepo.save(transaksiNasabah);
-
-									pengirim.setSaldo(pengirim.getSaldo() - nominal);
-									masterBankRepo.save(pengirim);
-
-									masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
-
-									HistoryBank historyBank = new HistoryBank();
-									historyBank.setNama(pengirim.getNama());
-									historyBank.setRekening(pengirim);
-									historyBank.setNoRekTujuan(rekTujuan);
-									historyBank.setStatusKet((byte) 3);
-									historyBank.setUang(nominal);
-									historyBank.setNamaTujuan(tujuan.getNama());
-									historyBankRepo.save(historyBank);
-
-									transfer.setIdTransaksi(historyBank.getIdHistoryBank());
-									transfer.setRekAsal(rekAsal);
-									transfer.setNamaPengirim(pengirim.getNama());
-									transfer.setRekTujuan(rekTujuan);
-									transfer.setNamaPenerima(tujuan.getNama());
-									transfer.setNominal(nominal);
-									transfer.setTanggal(transaksiNasabah.getTanggal());
-									transfer.setSaldoPengirim(pengirim.getSaldo());
-									transfer.setSaldoPenerima(tujuan.getSaldo());
-
-								} else {
-									throw new BusinessException("Saldo Anda tidak cukup");
-								}
-							} else {
-								throw new BusinessException("Nominal transaksi minimal 10.000");
-							}
-						} else {
-							throw new BusinessException("Nomor rekening pemilik dan tujuan tidak boleh sama");
-						}
-					} else {
-						throw new BusinessException("Nomor rekening tujuan tidak terdaftar");
-					}
-				} else {
-					throw new BusinessException("Nomor rekening pengirim tidak terdaftar");
-				}
-			}
-		}
-		return transfer;
-	}
-
-	// ------------------------------------transferEmail---------------------------------------
-	public void sendEmailTransferPengirim(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal) throws Exception {
-		MimeMessage mailMessage = javaMailSender.createMimeMessage();
-		MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
-		List<Users> users = usersRepository.findByUserId(masterBank.getUserId());
-		try {
-			MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-
-			helper.setFrom("admin@xyzbank.com");
-			helper.setTo(users.get(0).getEmail());
-			helper.setSubject("Notifikasi dari admin");
-
-			Context ctx = new Context(LocaleContextHolder.getLocale());
-			ctx.setVariable("name", users.get(0).getNama());
-			ctx.setVariable("rekTujuan", rekTujuan.toString());
-			ctx.setVariable("nomorReference", rekTujuan.toString());
-
-			String body = templateEngine.process("transfer", ctx);
-			helper.setText(body, true);
-			
-			ExportToPdfTransferParam(response, transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
-
-			javaMailSender.send(mailMessage);
-
-			System.out.println("Email send");
-		} catch (MessagingException e) {
-			System.err.println("Failed send email");
-			e.printStackTrace();
-		}
-	}
-
-	private ByteArrayOutputStream createPdf(Long idHistory) throws DocumentException, IOException {
-		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter.getInstance(pdfDoc, outputStream);
-		pdfDoc.open();
-
-		Paragraph title = new Paragraph();
-		title.add(new Chunk("BANK ", BlueFont()));
-		title.add(new Chunk("XYZ", OrangeFont()));
-		title.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(title);
-
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
-		notif.setAlignment(Element.ALIGN_CENTER);
-		pdfDoc.add(notif);
-		// Add the generation date
-		pdfDoc.add(new Paragraph(""));
-
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(2);
-		pdfTable.getDefaultCell().setBorderWidth(1);
-		pdfTable.setPaddingTop(100);
-
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("");
-		pdfTable.addCell("");
-		pdfTable.addCell(Left("Tanggal"));
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = "-";
-		if (data.getTanggal() != null) {
-			formattedDate = formatter.format(data.getTanggal());
-		}
-		pdfTable.addCell(Right(formattedDate));
-
-		pdfTable.addCell(Left("Nomor Rekening Pengirim"));
-		pdfTable.addCell(Right(
-				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
-						: "-"));
-		pdfTable.addCell(Left("Nama Nasabah Pengirim"));
-		pdfTable.addCell(Right(String.valueOf(data.getNama() != null ? String.valueOf(data.getNama()) : "-")));
-		pdfTable.addCell(Left("Jenis Transaksi"));
-		pdfTable.addCell(Right("Transfer"));
-		pdfTable.addCell(Left("Nomor Rekening Tujuan"));
-		pdfTable.addCell(
-				Right(String.valueOf(data.getNoRekTujuan() != null ? String.valueOf(data.getNoRekTujuan()) : "-")));
-		pdfTable.addCell(Left("Nama Nasabah Tujuan"));
-		pdfTable.addCell(
-				Right(String.valueOf(data.getNamaTujuan() != null ? String.valueOf(data.getNamaTujuan()) : "-")));
-		pdfTable.addCell(Left("Nominal Transaksi"));
-		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
-		pdfTable.addCell(Left("Saldo Pengirim"));
-		pdfTable.addCell(Right(String
-				.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
-
-		// Add the table to the pdf document
-		pdfDoc.add(pdfTable);
-
-		pdfDoc.close();
-		return outputStream;
-	}
-
-	public void transferValidate(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal) throws Exception {
-		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
-		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
-
-		TransferFeignRequest transferRequest = new TransferFeignRequest();
-		transferRequest.setJumlahTranfer(nominal);
-		transferRequest.setNoRekeningPengirim(rekAsal.toString());
-		transferRequest.setNoRekeningPenerima(rekTujuan.toString());
-
-		if (rekValidatePengirim.getRegistered() == true) {
-			if (rekValidatePenerima.getRegistered() == true) {
-				TransferFeignResponse transferResponse = transferService.callTransfer(transferRequest);
-				System.out.println("Reference Number : " + transferResponse.getReferenceNumber());
-				System.out.println("Success : " + transferResponse.getSuccess());
-				
 				transfer(rekTujuan, rekAsal, nominal);
 				ExportToPdfTransferParam(response, transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
 				MimeMessage mailMessage = javaMailSender.createMimeMessage();
 				MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
 				List<Users> users = usersRepository.findByUserId(masterBank.getUserId());
 				try {
-					
+
 					MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
 
-					helper.setFrom("admin@xyzbank.com");
-					helper.setTo(users.get(0).getEmail());
-					helper.setSubject("Notifikasi dari admin");
+					ByteArrayOutputStream outputStream = ExportToPdfTransferParam(response,
+							transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
+
+//					helper.setFrom("admin@xyzbank.com");
+					helper.setTo(users.get(0).getEmail().toString());
+					helper.setSubject("Laporan Transaksi Transfer Bank");
+					helper.addAttachment("BuktiTransfer.pdf", new ByteArrayResource(outputStream.toByteArray()));
 
 					Context ctx = new Context(LocaleContextHolder.getLocale());
 					ctx.setVariable("name", users.get(0).getNama());
 					ctx.setVariable("rekTujuan", rekTujuan.toString());
 					ctx.setVariable("nomorReference", transferResponse.getReferenceNumber());
-					ctx.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal());
-					ctx.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal());
-					
-					String body = templateEngine.process("/transfer", ctx);
+					ctx.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal().toString());
+					ctx.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal().toString());
+
+					String body = templateEngine.process("transfer", ctx);
 					helper.setText(body, true);
-					
+
 					javaMailSender.send(mailMessage);
 
+					System.out.println("Email: " + users.get(0).getEmail());
+					System.out.println("name: " + users.get(0).getNama());
+					System.out.println("rekTujuan: " + rekTujuan.toString());
+					System.out.println("tanggal: " + transfer(rekTujuan, rekAsal, nominal).getTanggal());
+					System.out.println("nominal: " + transfer(rekTujuan, rekAsal, nominal).getNominal());
+					System.out.println("");
 					System.out.println("Email send");
-					
+
 				} catch (MessagingException e) {
 					System.err.println("Failed send email");
 					e.printStackTrace();
@@ -868,11 +702,13 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public void ExportToPdfTransferParam(HttpServletResponse response, Long idHistory) throws Exception {
+	public ByteArrayOutputStream ExportToPdfTransferParam(HttpServletResponse response, Long idHistory)
+			throws DocumentException, IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -930,10 +766,11 @@ public class TransaksiNasabahService {
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
-		pdfWriter.close();
+//		pdfWriter.close();
 
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=BuktiTransfer.pdf");
+		return outputStream;
 	}
 
 //	---------------------------------Bukti Transaksi Bayar Telepon--------------------------------------

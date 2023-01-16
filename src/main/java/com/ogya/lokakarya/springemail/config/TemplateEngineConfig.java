@@ -29,7 +29,7 @@ public class TemplateEngineConfig implements WebMvcConfigurer {
 	private ITemplateResolver emailTemplateResolver() {
 		final ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
 		templateResolver.setResolvablePatterns(Collections.singleton("*"));
-		templateResolver.setPrefix(":/templates/");
+		templateResolver.setPrefix("/templates/");
 		templateResolver.setSuffix(".html");
 		templateResolver.setTemplateMode(TemplateMode.HTML);
 		templateResolver.setCharacterEncoding(EMAIL_TEMPLATE_ENCODING);
