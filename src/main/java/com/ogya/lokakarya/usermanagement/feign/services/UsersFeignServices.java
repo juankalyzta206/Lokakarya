@@ -1,14 +1,13 @@
 package com.ogya.lokakarya.usermanagement.feign.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.usermanagement.feign.repository.UsersFeignRepository;
 import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
 import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
 
-
-
-
+@Service
 public class UsersFeignServices {
 	@Autowired
 	UsersFeignRepository usersFeignRepository;
@@ -18,9 +17,8 @@ public class UsersFeignServices {
 		return usersFeignResponse;
 	}
 	
-	public UsersFeignResponse callSimpleGetPost(UsersFeignResponse request) {
-		UsersFeignRequest usersFeignRequest = new UsersFeignRequest();
-		UsersFeignResponse simpleResponse = usersFeignRepository.userRoleRecord(usersFeignRequest);
+	public UsersFeignResponse callUserRoleRecord(UsersFeignRequest request) {
+		UsersFeignResponse simpleResponse = usersFeignRepository.userRoleRecord(request);
 		return simpleResponse;
 	}
 }
