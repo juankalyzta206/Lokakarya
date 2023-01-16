@@ -93,4 +93,16 @@ public class TransaksiNasabahController {
 			@RequestParam("ID History Telepon") Long idHistoryTelp) throws Exception {
 		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
 	}
+	
+//	@PostMapping(path = "/transferValidate")
+//	public DataResponse<TransferWrapper> transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
+//			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
+//		return new DataResponse<TransferWrapper>(transaksiNasabahService.transferValidate(response, rekTujuan, rekAsal, nominal));
+//	}
+	
+	@PostMapping(path = "/transferValidate")
+	public void transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
+			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
+		transaksiNasabahService.transferValidate(response, rekTujuan, rekAsal, nominal);
+	}
 }
