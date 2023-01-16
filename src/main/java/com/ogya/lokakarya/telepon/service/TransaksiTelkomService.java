@@ -121,6 +121,7 @@ public class TransaksiTelkomService {
 		TransaksiTelkom entity = new TransaksiTelkom();
 		if (wrapper.getIdTransaksi() != null) {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
+			//validasi untuk bulan dan tahun tidak boleh sama
 			if (entity.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
 					&& entity.getTahunTagihan().equals(wrapper.getTahunTagihan())
 					&& entity.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
@@ -198,7 +199,7 @@ public class TransaksiTelkomService {
 
 	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
-		Page<TransaksiTelkom> transaksiTelkomPage = transaksiTelkomRepository.findAll(paging);
+		Page<TransaksiTelkom> transaksiTelkomPage = transaksiTelkomRepository.findAllWithStatus1(paging);
 		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomPage.getContent();
 		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = toWrapperList(transaksiTelkomList);
 		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList,
