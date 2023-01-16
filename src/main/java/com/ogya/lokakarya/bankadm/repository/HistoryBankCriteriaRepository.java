@@ -1,6 +1,5 @@
 package com.ogya.lokakarya.bankadm.repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -43,7 +42,6 @@ public class HistoryBankCriteriaRepository {
 		        criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
 		}
 
-	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
@@ -71,7 +69,6 @@ public class HistoryBankCriteriaRepository {
 	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
 	    Root<HistoryBank> root = criteriaQuery.from(HistoryBank.class);
 	    
-	    List<Predicate> predicatesList = new ArrayList<>();
 	    
 	    @SuppressWarnings("rawtypes")
 			List<FilterWrapper> filterList = request.getFilters();

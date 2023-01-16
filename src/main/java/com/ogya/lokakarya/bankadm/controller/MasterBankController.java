@@ -20,8 +20,6 @@ import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.service.MasterBankService;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
-import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;

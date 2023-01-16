@@ -41,8 +41,7 @@ public class MasterPelangganCriteriaRepository {
 				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
 		}
 		
-				
-	    List<Predicate> predicatesList = new ArrayList<>();
+			
 	    @SuppressWarnings("rawtypes")
     	List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
