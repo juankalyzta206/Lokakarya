@@ -44,14 +44,10 @@ import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
-<<<<<<< HEAD
 import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
-=======
 import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
-import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
->>>>>>> 1c8fb7de48798d406e8e01bbe0d2f26c82edc9b1
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.exercise.feign.transfer.request.TransferFeignRequest;
 import com.ogya.lokakarya.exercise.feign.transfer.response.TransferFeignResponse;
