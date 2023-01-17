@@ -1,68 +1,38 @@
-//package com.ogya.lokakarya.usermanagement.controller;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//
-//import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-//import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
-//import com.ogya.lokakarya.usermanagement.feign.services.UsersFeignServices;
-//import com.ogya.lokakarya.usermanagement.service.RolesService;
-//import com.ogya.lokakarya.usermanagement.service.UsersService;
-//
-//public class WebServiceController {
-//	@Autowired
-//	UsersFeignServices usersFeignServices;
-//	
-//	@Autowired
-//	UsersService usersService;
-//	
-//	@Autowired
-//	RolesService rolesService;
-//	
-//	String noTelepon = "0857";
-//
-//	String alamat = "Mangkudranan, Margorejo, Tempel";
-//	String nama = "Irzan Maulana";
-//	String email = "maulanairzan5@gmail.com";
-//	String password = "maulanairzan5";
-//	String username = "maulanairzan5";
-//	
-//	String role = "useradm";
-//	
-//	UsersFeignRequest request = new UsersFeignRequest();
-//	request.setAlamat(alamat);
-//	request.setEmail(email);
-//	request.setNama(nama);
-//	request.setTelpon(noTelepon);
-//	
-//	System.out.println("");
-//	System.out.println("Call user role inquiry");
-//	UsersFeignResponse userRoleInquiry = usersFeignServices.callUserRoleInquiry(role);
-//	System.out.println("Program Name : "+userRoleInquiry.getProgramName());
-//	System.out.println("Success : "+userRoleInquiry.getSuccess());
-//	if (userRoleInquiry.getSuccess()) {
-//		try {
-//			rolesService.saveRolesFromWebService(userRoleInquiry, role);
-//		} catch (Exception e){
-//			System.err.print("Failed to create Role");
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	
-//	
-//	System.out.println("");
-//	System.out.println("Call user role record");
-//	UsersFeignResponse usersFeignResponse = usersFeignServices.callUserRoleRecord(request);
-//	System.out.println("Program Name : "+usersFeignResponse.getProgramName());
-//	System.out.println("Success : "+usersFeignResponse.getSuccess());
-//	if (usersFeignResponse.getSuccess()) {
-//		try {
-//			usersService.saveUsersFromWebService(username, password, usersFeignResponse, request);
-//		} catch (Exception e){
-//			System.err.print("Failed to create User");
-//			e.printStackTrace();
-//		}
-//		
-//	}
-//	
-//}
+package com.ogya.lokakarya.usermanagement.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
+import com.ogya.lokakarya.usermanagement.feign.services.UsersFeignServices;
+import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
+import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
+import com.ogya.lokakarya.util.DataResponse;
+
+
+@RestController
+@RequestMapping(value = "/webService")
+@CrossOrigin(origins = "*")
+public class WebServiceController {
+	@Autowired
+	UsersFeignServices usersFeignServices;
+
+	
+	@PostMapping(path = "/saveUsersFromWebService")
+	public DataResponse<UsersAddWrapper> saveUsersFromWebService(@RequestParam String username, @RequestParam String password, @RequestBody UsersFeignRequest request){
+		return new DataResponse<UsersAddWrapper>(usersFeignServices.callUserRoleRecord(username, password, request));
+	}
+	
+	@PostMapping(path = "/saveRolesFromWebService/{role}")
+	public DataResponse<RolesWrapper> saveRolesFromWebService(@PathVariable String role){
+		return new DataResponse<RolesWrapper>(usersFeignServices.callUserRoleInquiry(role));
+	}
+	
+	
+}
