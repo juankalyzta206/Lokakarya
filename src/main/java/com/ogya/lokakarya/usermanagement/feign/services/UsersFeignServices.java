@@ -35,7 +35,7 @@ public class UsersFeignServices {
 				throw new BusinessException("Failed to add Roles, something wrong in web services");
 			}
 		} catch (Exception e) {
-			throw new BusinessException(e);
+			throw new BusinessException(e.getMessage());
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class UsersFeignServices {
 				throw new BusinessException("Failed to add Users, something wrong in web services");
 			}
 		} catch (Exception e) {
-			throw new BusinessException(e);
+			throw new BusinessException(e.getMessage());
 		}
 		
 	}
