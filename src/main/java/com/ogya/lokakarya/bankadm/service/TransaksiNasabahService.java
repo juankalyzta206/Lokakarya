@@ -286,6 +286,7 @@ public class TransaksiNasabahService {
 				ctxTarik.setVariable("saldo", tarik.getSaldo().toString());
 
 
+				
 				ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
 						tarik.getIdTransaksi(), tarik.getSaldo());
 			
