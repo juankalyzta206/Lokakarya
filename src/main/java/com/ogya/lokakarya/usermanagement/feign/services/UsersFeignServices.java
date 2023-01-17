@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.feign.repository.UsersFeignRepository;
 import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
+import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignToWebServiceRequest;
 import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.service.RolesService;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
@@ -40,13 +41,18 @@ public class UsersFeignServices {
 	}
 	
 	
-	public UsersAddWrapper callUserRoleRecord(String username, String password, UsersFeignRequest request) {
+	public UsersAddWrapper callUserRoleRecord(UsersFeignRequest request) {
 		try {
-			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleRecord(request);
+			UsersFeignToWebServiceRequest requestWebService = new UsersFeignToWebServiceRequest();
+			requestWebService.setAlamat(request.getAlamat());
+			requestWebService.setNama(request.getNama());
+			requestWebService.setEmail(request.getEmail());
+			requestWebService.setTelpon(request.getTelpon());
+			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleRecord(requestWebService);
 			if (usersFeignResponse.getSuccess()) {
 				UsersAddWrapper addUser = new UsersAddWrapper();
-				addUser.setUsername(username);
-				addUser.setPassword(password);
+				addUser.setUsername(request.getUsername());
+				addUser.setPassword(request.getPassword());
 				addUser.setAlamat(request.getAlamat());
 				addUser.setNama(request.getNama());
 				addUser.setTelp(Long.parseLong(request.getTelpon()));
