@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.usermanagement.feign.repository;
+package com.ogya.lokakarya.exercise.feign.usermanagement.repository;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
+import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignToWebServiceRequest;
+import com.ogya.lokakarya.exercise.feign.usermanagement.response.UsersFeignResponse;
 
 
 @FeignClient(value= "user-role", url = "https://simple-rest-production.up.railway.app/")
@@ -17,5 +17,5 @@ public interface UsersFeignRepository {
 	public UsersFeignResponse userRoleInquiry(@PathVariable("name") String name);
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/user-role/record")
-	public UsersFeignResponse userRoleRecord(@RequestBody UsersFeignRequest request);
+	public UsersFeignResponse userRoleRecord(@RequestBody UsersFeignToWebServiceRequest request);
 }

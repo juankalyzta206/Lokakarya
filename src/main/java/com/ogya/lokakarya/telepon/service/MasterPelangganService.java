@@ -269,5 +269,9 @@ public class MasterPelangganService {
 //			}
 //			return wrapperList;
 //		}
+	 public MasterPelanggan findByNama(String nama) {
+		 MasterPelanggan masterPelanggan = masterPelangganRepository.findByNama(nama);
+		 return masterPelanggan;
+	 }
 	
 }

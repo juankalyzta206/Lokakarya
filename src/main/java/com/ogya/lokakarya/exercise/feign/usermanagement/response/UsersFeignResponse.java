@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.usermanagement.feign.response;
+package com.ogya.lokakarya.exercise.feign.usermanagement.response;
 
 public class UsersFeignResponse {
 	String programName;

@@ -41,6 +41,10 @@ public class MasterPelangganController {
 	public List<MasterPelangganWrapper> findAllPlan() {
 		return masterPelangganService.findAll();
 	}
+	@GetMapping(path = "/findName")
+	public MasterPelanggan findName(@RequestParam("nama") String nama) {
+		return masterPelangganService.findByNama(nama);
+	}
 	@PostMapping(path = "/")
 	public DataResponse<MasterPelangganWrapper> save(@RequestBody MasterPelangganWrapper wrapper) {
 		return new DataResponse<MasterPelangganWrapper>(masterPelangganService.save(wrapper));

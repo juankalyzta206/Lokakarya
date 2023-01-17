@@ -6,8 +6,7 @@ public class DataResponse<T> {
 	private String message;
 	private Long timeStamp;
 	private T data;
-	
-	
+
 	
 	public DataResponse() {
 		super();
@@ -56,7 +55,7 @@ public class DataResponse<T> {
 	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
-	
+
 	
 
 }

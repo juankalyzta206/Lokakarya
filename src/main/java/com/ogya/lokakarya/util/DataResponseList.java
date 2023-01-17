@@ -9,6 +9,7 @@ public class DataResponseList<E> {
 	private Long timeStamp;
 	private List<E> data;
 	
+	
 	public DataResponseList(List<E> data) {
 		this(true, null, data);
 	}
@@ -52,6 +53,7 @@ public class DataResponseList<E> {
 		this.timeStamp = timeStamp;
 	}
 	
+
 	
 
 }
