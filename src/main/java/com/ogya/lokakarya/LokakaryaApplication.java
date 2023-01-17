@@ -7,6 +7,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
+import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
+import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.exercise.feign.transfer.request.TransferFeignRequest;
 import com.ogya.lokakarya.exercise.feign.transfer.response.TransferFeignResponse;
 import com.ogya.lokakarya.exercise.feign.transfer.response.ValidateRekeningFeignResponse;
@@ -24,6 +28,9 @@ public class LokakaryaApplication implements CommandLineRunner {
 	TransferFeignService transferService;
 	@Autowired
 	TransaksiNasabahService transaksiNasabahService;
+	
+	@Autowired
+	private NasabahFeignService nasabahFeignService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(LokakaryaApplication.class, args);
@@ -36,6 +43,8 @@ public class LokakaryaApplication implements CommandLineRunner {
 		String nama = "Irzan Maulana";
 		String email = "maulanairzan5@gmail.com";
 		String noRekPenerima = "99999";
+		Long setoran = 200000L;
+		Long tarikan = 30000L;
 
 		UsersFeignRequest request = new UsersFeignRequest();
 		request.setAlamat(noTelepon);
@@ -64,6 +73,27 @@ public class LokakaryaApplication implements CommandLineRunner {
 			System.out.println("Success : " + transferResponse.getSuccess());
 		}
 		
+
+		System.out.println(" ");
+		System.out.println("=========================");
+		System.out.println("SETOR");
+		SetorFeignRequest setorReq = new SetorFeignRequest();
+		setorReq.setNoRekening(noRekeningPengirim);
+		setorReq.setTarikan(setoran);
+		NasabahFeignResponse setorRespon = nasabahFeignService.callSetor(setorReq);
+		System.out.println("Status: "+setorRespon.getSuccess());
+		System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
+		System.out.println(" ");
+		
+		System.out.println("=========================");
+		System.out.println("TARIK");
+		TarikFeignRequest tarikReq = new TarikFeignRequest();
+		tarikReq.setNoRekening(noRekeningPengirim);
+		tarikReq.setSetoran(tarikan);
+		NasabahFeignResponse tarikRespon = nasabahFeignService.callTarik(tarikReq);
+		System.out.println("Status: "+tarikRespon.getSuccess());
+		System.out.println("No Referensi: "+tarikRespon.getReferenceNumber());
+		System.out.println(" ");
 	}
 
 }
