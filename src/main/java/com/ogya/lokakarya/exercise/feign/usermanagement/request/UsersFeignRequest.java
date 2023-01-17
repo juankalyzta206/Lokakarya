@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.feign.usermanagement.request;
+package com.ogya.lokakarya.exercise.feign.usermanagement.request;
 
 public class UsersFeignRequest {
 	String username;
