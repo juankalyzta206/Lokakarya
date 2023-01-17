@@ -580,11 +580,11 @@ public class TransaksiNasabahService {
 //		transferRequest.setNoRekeningPengirim(rekAsal.toString());
 //		transferRequest.setNoRekeningPenerima(rekTujuan.toString());
 
-		if (rekValidatePengirim.getRegistered() == true) {
+//		if (rekValidatePengirim.getRegistered() == true) {
 
 		List<BayarTeleponWrapper> bayarTelponList = bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan);
 		return bayarTelponList;
-	}
+//	}
 	}
 	public PdfPCell Left(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
