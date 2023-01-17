@@ -42,6 +42,7 @@ import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
+import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
@@ -258,6 +259,67 @@ public class TransaksiNasabahService {
 		} else {
 			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
+	}
+	
+
+	public SetorAmbilWrapper tarikValidate(Long rekening, Long nominal)  throws Exception {
+		NoRekeningFeignResponse rekValidatePengirim = nasabahFeignService.cekNoRekening(rekening.toString());
+
+		TarikFeignRequest tarikReq = new TarikFeignRequest();
+		tarikReq.setNoRekening(rekening.toString());
+		tarikReq.setTarikan(nominal);
+		if (rekValidatePengirim.getRegistered() == true) {
+			
+				NasabahFeignResponse tarikRes = nasabahFeignService.callTarik(tarikReq);
+
+				SetorAmbilWrapper tarik = tarik(rekening, nominal);
+
+				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+				List<Users> userstarik = usersRepository.findByUserId(nasabah.getUserId());
+			
+				Context ctxTarik = new Context();
+				ctxTarik.setVariable("name", userstarik.get(0).getNama());
+				ctxTarik.setVariable("rekening", rekening.toString());
+				ctxTarik.setVariable("nomorReference", tarikRes.getReferenceNumber());
+				ctxTarik.setVariable("tanggal", tarik.getTanggal().toString());
+				ctxTarik.setVariable("nominal", tarik.getNominal().toString());
+				ctxTarik.setVariable("saldo", tarik.getSaldo().toString());
+
+
+				ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
+						tarik.getIdTransaksi(), tarik.getSaldo());
+			
+				sendEmailTarik(userstarik.get(0).getEmail().toString(), "Tarik", ctxTarik, pdfTarik);
+
+				
+				return tarik;
+
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
+	}
+
+
+//	-----------------------------------------KirimEmail-----------------------------------------------------
+	public void sendEmailTarik(String tujuan, String templateName, Context context, ByteArrayOutputStream pdf) {
+		try {
+			MimeMessage mailMessage = javaMailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+
+			helper.setTo(tujuan);
+			helper.setSubject("Laporan Transaksi Transfer Bank");
+			String html = templateEngine.process(templateName, context);
+			helper.setText(html, true);
+			helper.addAttachment("BuktiTransfer.pdf", new ByteArrayResource(pdf.toByteArray()));
+			javaMailSender.send(mailMessage);
+			System.out.println("Email send");
+
+		} catch (MessagingException e) {
+			System.err.println("Failed send email");
+			e.printStackTrace();
+		}
+
 	}
 
 	// -------------------------------------Transfer-------------------------------------------------
@@ -696,11 +758,12 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Tarik--------------------------------------
-	public void ExportToPdfTarikParam(HttpServletResponse response, Long idHistory) throws Exception {
+	public ByteArrayOutputStream ExportToPdfTarikParam(String noReference, Long idHistory, Long saldo) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -752,10 +815,8 @@ public class TransaksiNasabahService {
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
-		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+//		pdfWriter.close();
+		return outputStream;
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
