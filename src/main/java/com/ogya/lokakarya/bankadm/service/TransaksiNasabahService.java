@@ -87,7 +87,7 @@ public class TransaksiNasabahService {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private TemplateEngine templateEngine;
-    private Logger logger = LoggerFactory.getLogger(TransaksiNasabahService.class);
+	private Logger logger = LoggerFactory.getLogger(TransaksiNasabahService.class);
 
 	// -------------------------------------------ceksaldo----------------------------------------
 	public MasterBankWrapper cekSaldo(Long rekening) {
@@ -218,74 +218,73 @@ public class TransaksiNasabahService {
 	public DataResponseFeign<SetorAmbilWrapper> tarik(Long rekening, Long nominal) {
 		DataResponseFeign<SetorAmbilWrapper> dataResponse = new DataResponseFeign<SetorAmbilWrapper>();
 		if (masterBankRepo.findById(rekening).isPresent()) {
-		MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-		TransaksiNasabah transaksi = new TransaksiNasabah();
-		HistoryBank historyBank = new HistoryBank();
-        if (nominal >= 10000) {
-            if (nasabah.getSaldo() - nominal >= 50000) {
-                TarikFeignRequest tarikRequest = new TarikFeignRequest();
-                tarikRequest.setNoRekening(rekening.toString());
-                tarikRequest.setTarikan(nominal);
+			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			TransaksiNasabah transaksi = new TransaksiNasabah();
+			HistoryBank historyBank = new HistoryBank();
+			if (nominal >= 10000) {
+				if (nasabah.getSaldo() - nominal >= 50000) {
+					TarikFeignRequest tarikRequest = new TarikFeignRequest();
+					tarikRequest.setNoRekening(rekening.toString());
+					tarikRequest.setTarikan(nominal);
 
-                try {
-                    NasabahFeignResponse response = nasabahFeignService.callTarik(tarikRequest);
-                    if (response.getSuccess()) {
-                        nasabah.setSaldo(nasabah.getSaldo() - nominal);
-                        masterBankRepo.save(nasabah);
+					try {
+						NasabahFeignResponse response = nasabahFeignService.callTarik(tarikRequest);
+						if (response.getSuccess()) {
+							nasabah.setSaldo(nasabah.getSaldo() - nominal);
+							masterBankRepo.save(nasabah);
 
-                        transaksi.setMasterBank(nasabah);
-                        transaksi.setStatus("K");
-                        transaksi.setUang(nominal);
-                        transaksi.setStatusKet((byte) 2);
-                        transaksiNasabahRepo.save(transaksi);
+							transaksi.setMasterBank(nasabah);
+							transaksi.setStatus("K");
+							transaksi.setUang(nominal);
+							transaksi.setStatusKet((byte) 2);
+							transaksiNasabahRepo.save(transaksi);
 
-                        historyBank.setNama(nasabah.getNama());
-                        historyBank.setRekening(nasabah);
-                        historyBank.setStatusKet((byte) 2);
-                        historyBank.setUang(nominal);
-                        historyBankRepo.save(historyBank);
+							historyBank.setNama(nasabah.getNama());
+							historyBank.setRekening(nasabah);
+							historyBank.setStatusKet((byte) 2);
+							historyBank.setUang(nominal);
+							historyBankRepo.save(historyBank);
 
-                        SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-                        wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
-                        wrapper.setNamaNasabah(nasabah.getNama());
-                        wrapper.setNominal(nominal);
-                        wrapper.setNomorRekening(rekening);
-                        wrapper.setSaldo(nasabah.getSaldo());
-                        wrapper.setTanggal(transaksi.getTanggal());
-                        dataResponse.setData(wrapper);
-                        
-                        dataResponse.setSuccess(true);
-        	            dataResponse.setReferenceNumber(response.getReferenceNumber());
-                        return dataResponse;
-                        } else {
-                        dataResponse.setSuccess(false);
-                        dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
-                        return dataResponse;
-                        }
-                        } catch (Exception e) {
-                        logger.error("Error while withdrawing", e);
-                        dataResponse.setSuccess(false);
-                        dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
-                        return dataResponse;
-                        }
-                        } else {
-                        dataResponse.setSuccess(false);
-                        dataResponse.setMessage("Saldo Anda tidak cukup");
-                        return dataResponse;
-                        }
-                        } else {
-                        dataResponse.setSuccess(false);
-                        dataResponse.setMessage("Nominal transaksi minimal Rp10.000,00.");
-                        return dataResponse;
-                        }
-                        } else {
-                        dataResponse.setSuccess(false);
-                        dataResponse.setMessage("Nomor rekening tidak terdaftar");
-                        return dataResponse;
-                        }
-                        }
+							SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+							wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
+							wrapper.setNamaNasabah(nasabah.getNama());
+							wrapper.setNominal(nominal);
+							wrapper.setNomorRekening(rekening);
+							wrapper.setSaldo(nasabah.getSaldo());
+							wrapper.setTanggal(transaksi.getTanggal());
+							dataResponse.setData(wrapper);
 
-	
+							dataResponse.setSuccess(true);
+							dataResponse.setReferenceNumber(response.getReferenceNumber());
+							return dataResponse;
+						} else {
+							dataResponse.setSuccess(false);
+							dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
+							return dataResponse;
+						}
+					} catch (Exception e) {
+						logger.error("Error while withdrawing", e);
+						dataResponse.setSuccess(false);
+						dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
+						return dataResponse;
+					}
+				} else {
+					dataResponse.setSuccess(false);
+					dataResponse.setMessage("Saldo Anda tidak cukup");
+					return dataResponse;
+				}
+			} else {
+				dataResponse.setSuccess(false);
+				dataResponse.setMessage("Nominal transaksi minimal Rp10.000,00.");
+				return dataResponse;
+			}
+		} else {
+			dataResponse.setSuccess(false);
+			dataResponse.setMessage("Nomor rekening tidak terdaftar");
+			return dataResponse;
+		}
+	}
+
 	// -------------------------------------Transfer-------------------------------------------------
 	public TransferWrapper transfer(Long rekTujuan, Long rekAsal, Long nominal) {
 
@@ -354,7 +353,6 @@ public class TransaksiNasabahService {
 		}
 	}
 
-
 	public TransferWrapper transferValidate(Long rekTujuan, Long rekAsal, Long nominal) throws Exception {
 		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
 		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
@@ -369,12 +367,12 @@ public class TransaksiNasabahService {
 				TransferFeignResponse transferResponse = transferService.callTransfer(transferRequest);
 
 				TransferWrapper transfer = transfer(rekTujuan, rekAsal, nominal);
-				
+
 				MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
 				List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
 				MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
 				List<Users> userTujuan = usersRepository.findByUserId(tujuan.getUserId());
-				
+
 				Context ctxPengirim = new Context();
 				ctxPengirim.setVariable("name", userPengirim.get(0).getNama());
 				ctxPengirim.setVariable("rekTujuan", rekTujuan.toString());
@@ -384,17 +382,17 @@ public class TransaksiNasabahService {
 
 				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
 						transfer.getIdTransaksi(), transfer.getSaldoPengirim());
-				
-				sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "TransferPengirim", ctxPengirim, pdfPengirim);
 
-				
+				sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "TransferPengirim", ctxPengirim,
+						pdfPengirim);
+
 				Context ctxTujuan = new Context();
 				ctxTujuan.setVariable("name", userTujuan.get(0).getNama());
 				ctxTujuan.setVariable("rekAsal", rekAsal.toString());
 				ctxTujuan.setVariable("nomorReference", transferResponse.getReferenceNumber());
 				ctxTujuan.setVariable("tanggal", transfer.getTanggal().toString());
 				ctxTujuan.setVariable("nominal", transfer.getNominal().toString());
-				
+
 				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
 						transfer.getIdTransaksi(), transfer.getSaldoPenerima());
 				sendEmailTransfer(userTujuan.get(0).getEmail().toString(), "TransferPenerima", ctxTujuan, pdfTujuan);
@@ -603,6 +601,7 @@ public class TransaksiNasabahService {
 		return bayarTelponList;
 //	}
 	}
+
 	public PdfPCell Left(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_LEFT);
@@ -762,7 +761,8 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public ByteArrayOutputStream ExportToPdfTransferParam(String noReference, Long idHistory, Long saldo) throws Exception {
+	public ByteArrayOutputStream ExportToPdfTransferParam(String noReference, Long idHistory, Long saldo)
+			throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
