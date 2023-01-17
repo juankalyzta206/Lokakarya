@@ -7,6 +7,7 @@ import com.ogya.lokakarya.exercise.feign.nasabah.repository.NasabahFeignReposito
 import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
 
 @Service
 public class NasabahFeignService {
@@ -20,6 +21,11 @@ public class NasabahFeignService {
 	
 	public NasabahFeignResponse callTarik(TarikFeignRequest request) {
 		NasabahFeignResponse response = nasabahFeignRepository.tarik(request);
+		return response;
+	}
+	
+	public NoRekeningFeignResponse cekNoRekening(String noRekening) {
+		NoRekeningFeignResponse response = nasabahFeignRepository.cekNoRekening(noRekening);
 		return response;
 	}
 }

@@ -10,6 +10,7 @@ import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.exercise.feign.transfer.request.TransferFeignRequest;
 import com.ogya.lokakarya.exercise.feign.transfer.response.TransferFeignResponse;
@@ -43,8 +44,7 @@ public class LokakaryaApplication implements CommandLineRunner {
 		String nama = "Irzan Maulana";
 		String email = "maulanairzan5@gmail.com";
 		String noRekPenerima = "99999";
-		Long setoran = 200000L;
-		Long tarikan = 30000L;
+		Long nominal = 200000L;
 
 		UsersFeignRequest request = new UsersFeignRequest();
 		request.setAlamat(noTelepon);
@@ -73,26 +73,37 @@ public class LokakaryaApplication implements CommandLineRunner {
 			System.out.println("Success : " + transferResponse.getSuccess());
 		}
 		
-
+		System.out.println(" ");
+		System.out.println("=========================");
+		System.out.println("CEK NO REKENING");
+		NoRekeningFeignResponse validatedNoRekening = nasabahFeignService.cekNoRekening(noRekeningPengirim);
+		System.out.println("Registered?: "+validatedNoRekening.getRegistered());
 		System.out.println(" ");
 		System.out.println("=========================");
 		System.out.println("SETOR");
 		SetorFeignRequest setorReq = new SetorFeignRequest();
 		setorReq.setNoRekening(noRekeningPengirim);
-		setorReq.setTarikan(setoran);
-		NasabahFeignResponse setorRespon = nasabahFeignService.callSetor(setorReq);
-		System.out.println("Status: "+setorRespon.getSuccess());
-		System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
+		setorReq.setSetoran(nominal);
+		if (validatedNoRekening.getRegistered() == true) {
+			NasabahFeignResponse setorRespon = nasabahFeignService.callSetor(setorReq);
+			System.out.println("Status: "+setorRespon.getSuccess());
+			System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
+		} else {
+			System.out.println("No Rekening tidak valid.");
+		}
 		System.out.println(" ");
-		
 		System.out.println("=========================");
 		System.out.println("TARIK");
 		TarikFeignRequest tarikReq = new TarikFeignRequest();
 		tarikReq.setNoRekening(noRekeningPengirim);
-		tarikReq.setSetoran(tarikan);
-		NasabahFeignResponse tarikRespon = nasabahFeignService.callTarik(tarikReq);
-		System.out.println("Status: "+tarikRespon.getSuccess());
-		System.out.println("No Referensi: "+tarikRespon.getReferenceNumber());
+		tarikReq.setTarikan(nominal);
+		if (validatedNoRekening.getRegistered() == true) {
+			NasabahFeignResponse tarikRespon = nasabahFeignService.callTarik(tarikReq);
+			System.out.println("Status: "+tarikRespon.getSuccess());
+			System.out.println("No Referensi: "+tarikRespon.getReferenceNumber());
+		} else {
+			System.out.println("No Rekening tidak valid.");
+		}
 		System.out.println(" ");
 	}
 

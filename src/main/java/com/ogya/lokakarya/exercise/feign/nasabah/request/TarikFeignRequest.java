@@ -2,20 +2,17 @@ package com.ogya.lokakarya.exercise.feign.nasabah.request;
 
 public class TarikFeignRequest {
 	private String noRekening;
-	private Long setoran;
+	private Long tarikan;
 	
 	public String getNoRekening() {
 		return noRekening;
 	}
 	public void setNoRekening(String noRekening) {
 		this.noRekening = noRekening;
+	}public Long getTarikan() {
+		return tarikan;
 	}
-	public Long getSetoran() {
-		return setoran;
+	public void setTarikan(Long tarikan) {
+		this.tarikan = tarikan;
 	}
-	public void setSetoran(Long setoran) {
-		this.setoran = setoran;
-	}
-	
-
 }
