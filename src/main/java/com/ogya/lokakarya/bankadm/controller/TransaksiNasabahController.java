@@ -95,17 +95,23 @@ public class TransaksiNasabahController {
 //		transaksiNasabahService.ExportToPdfTransferParam(idHistory);
 //	}
 
-	@GetMapping(path = "/exportToPdfBayarTeleponParam")
-	public void exportToPdfBayarTeleponParam(HttpServletResponse response,
-			@RequestParam("ID History Bank") Long idHistoryBank, @RequestParam("ID History Telepon") Long idHistoryTelp)
-			throws Exception {
-		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
-	}
+//	@GetMapping(path = "/exportToPdfBayarTeleponParam")
+//	public void exportToPdfBayarTeleponParam(HttpServletResponse response,
+//			@RequestParam("ID History Bank") Long idHistoryBank, @RequestParam("ID History Telepon") Long idHistoryTelp)
+//			throws Exception {
+//		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
+//	}
 
 	@PostMapping(path = "/transferValidate")
 	public DataResponse<TransferWrapper> transferValidate(@RequestParam("Nomor Rekening Asal") Long rekAsal,
 			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
 		return new DataResponse<TransferWrapper>(transaksiNasabahService.transferValidate(rekTujuan, rekAsal, nominal));
+	}
+	
+	@PostMapping(path = "/bayarTeleponValidate")
+	public DataResponseList<BayarTeleponWrapper> bayarTeleponValidate(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelpon, @RequestParam("Bulan Tagihan") Byte bulanTagihan) throws Exception {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
 	}
 
 //	@PostMapping(path = "/transferValidate")

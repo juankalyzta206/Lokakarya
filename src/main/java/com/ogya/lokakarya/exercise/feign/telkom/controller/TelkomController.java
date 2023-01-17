@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.exercise.feign.telkom.request.BayarRequest;
 import com.ogya.lokakarya.exercise.feign.telkom.response.BayarResponse;
-import com.ogya.lokakarya.exercise.feign.telkom.services.TelkomServices;
+import com.ogya.lokakarya.exercise.feign.telkom.services.TelkomFeignServices;
 
 @RestController
 @RequestMapping(value = "/telkom")
 @CrossOrigin(origins = "*")
 public class TelkomController {
 	@Autowired
-	TelkomServices telkomServices;
+	TelkomFeignServices telkomServices;
 	@PostMapping(value = "/bayar-exercize")
 	public BayarResponse callLaporan(@RequestBody(required = true) BayarRequest request) {
 		BayarResponse bayar = telkomServices.callBayarTelkom(request);
