@@ -29,7 +29,7 @@ public class UsersFeignServices {
 		try {
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleInquiry(wrapper.getNama());
 			if (usersFeignResponse.getSuccess()) {
-				RolesWrapper addRole = new RolesWrapper();
+				wrapper.setProgramName(usersFeignResponse.getProgramName());
 				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(rolesService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
@@ -52,6 +52,7 @@ public class UsersFeignServices {
 			requestWebService.setTelpon(wrapper.getTelp().toString());
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleRecord(requestWebService);
 			if (usersFeignResponse.getSuccess()) {
+				wrapper.setProgramName(usersFeignResponse.getProgramName());
 				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(usersService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
