@@ -1,6 +1,6 @@
 package com.ogya.lokakarya.usermanagement.feign.request;
 
-public class UsersFeignRequest {
+public class UsersFeignToWebServiceRequest {
 	String alamat;
 	String email;
 	String nama;
