@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
+import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignToWebServiceRequest;
 import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
 
 
@@ -17,5 +17,5 @@ public interface UsersFeignRepository {
 	public UsersFeignResponse userRoleInquiry(@PathVariable("name") String name);
 	
 	@RequestMapping(method = RequestMethod.POST, value = "/user-role/record")
-	public UsersFeignResponse userRoleRecord(@RequestBody UsersFeignRequest request);
+	public UsersFeignResponse userRoleRecord(@RequestBody UsersFeignToWebServiceRequest request);
 }

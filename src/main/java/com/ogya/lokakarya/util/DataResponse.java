@@ -6,6 +6,8 @@ public class DataResponse<T> {
 	private String message;
 	private Long timeStamp;
 	private T data;
+	private Boolean success;
+	private String referenceNumber;
 	
 	
 	
@@ -56,6 +58,22 @@ public class DataResponse<T> {
 	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
 	
 	
 
