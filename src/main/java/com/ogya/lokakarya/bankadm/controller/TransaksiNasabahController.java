@@ -131,11 +131,12 @@ public class TransaksiNasabahController {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
 	}
 
-	@PostMapping(path = "/setorValidate")
-	public DataResponse<SetorAmbilWrapper> setorValidate(@RequestParam("Nomor Rekening") Long norek,
-			@RequestParam("Nominal") Long nominal) throws MessagingException, IOException, DocumentException, Exception {
-		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.sendBuktiSetor(norek, nominal));
-	}
+//	@PostMapping(path = "/setorValidate")
+//	public DataResponse<SetorAmbilWrapper> setorValidate(@RequestParam("Nomor Rekening") Long norek,
+//			@RequestParam("Nominal") Long nominal) throws MessagingException, IOException, DocumentException, Exception {
+//		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.sendBuktiSetor(norek, nominal));
+//	}
+	
 //	@PostMapping(path = "/transferValidate")
 //	public void transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
 //			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal)

@@ -62,6 +62,7 @@ import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.util.DataResponseFeign;
 
 @Service
 @Transactional
@@ -216,52 +217,51 @@ public class TransaksiNasabahService {
 			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 	}
-
 	// ----------------------------------tarik ---------------------------
+		public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
 
-	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
-		if (masterBankRepo.findById(rekening).isPresent()) {
-
-			if (nominal >= 10000) {
-
+			if (masterBankRepo.findById(rekening).isPresent()) {
 				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
 				TransaksiNasabah transaksi = new TransaksiNasabah();
-
-				nasabah.setSaldo(nasabah.getSaldo() - nominal);
-				masterBankRepo.save(nasabah);
-
-				transaksi.setMasterBank(nasabah);
-				transaksi.setStatus("K");
-				transaksi.setUang(nominal);
-				transaksi.setStatusKet((byte) 1);
-				transaksiNasabahRepo.save(transaksi);
-
 				HistoryBank historyBank = new HistoryBank();
-				historyBank.setNama(nasabah.getNama());
-				historyBank.setRekening(nasabah);
-				historyBank.setStatusKet((byte) 2);
-				historyBank.setUang(nominal);
-				historyBankRepo.save(historyBank);
 
-				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-				wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
-				wrapper.setNamaNasabah(nasabah.getNama());
-				wrapper.setNominal(nominal);
-				wrapper.setNomorRekening(rekening);
-				wrapper.setSaldo(nasabah.getSaldo());
-				wrapper.setTanggal(transaksi.getTanggal());
+				if (nominal >= 10000) {
 
-				return wrapper;
+					if (nasabah.getSaldo() - nominal >= 50000) {
+						nasabah.setSaldo(nasabah.getSaldo() - nominal);
+						masterBankRepo.save(nasabah);
 
+						transaksi.setMasterBank(nasabah);
+						transaksi.setStatus("K");
+						transaksi.setUang(nominal);
+						transaksi.setStatusKet((byte) 2);
+						transaksiNasabahRepo.save(transaksi);
+
+						historyBank.setNama(nasabah.getNama());
+						historyBank.setRekening(nasabah);
+						historyBank.setStatusKet((byte) 2);
+						historyBank.setUang(nominal);
+						historyBankRepo.save(historyBank);
+
+						SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+						wrapper.setNamaNasabah(nasabah.getNama());
+						wrapper.setNominal(nominal);
+						wrapper.setNomorRekening(rekening);
+						wrapper.setSaldo(nasabah.getSaldo());
+						wrapper.setTanggal(transaksi.getTanggal());
+						return wrapper;
+
+					} else {
+						throw new BusinessException("Saldo Anda tidak cukup");
+					}
+				} else {
+					throw new BusinessException("Nominal transaksi minimal Rp.10.000,00.");
+				}
 			} else {
-				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
+				throw new BusinessException("Rekening tidak terdaftar");
 			}
-		} else {
-			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
-	}
-	
-
+		
 	public SetorAmbilWrapper tarikValidate(Long rekening, Long nominal)  throws Exception {
 		NoRekeningFeignResponse rekValidatePengirim = nasabahFeignService.cekNoRekening(rekening.toString());
 
@@ -967,6 +967,60 @@ public class TransaksiNasabahService {
 		return outputStream;
 	}
 	
+//	=============================Call Setor==========================
+	public DataResponseFeign<SetorAmbilWrapper> setorFeign(Long noRekening, Long nominal) {
+		NoRekeningFeignResponse validateNorek = nasabahService.cekNoRekening(noRekening.toString());
+		
+		SetorFeignRequest setorRequest = new SetorFeignRequest();
+		setorRequest.setNoRekening(noRekening.toString());
+		setorRequest.setSetoran(nominal);
+		
+		if (validateNorek.getRegistered()) {
+			NasabahFeignResponse setorResponse = nasabahService.callSetor(setorRequest);
+			if (setorResponse.getSuccess()) {
+				SetorAmbilWrapper setor = setor(noRekening, nominal);
+				DataResponseFeign<SetorAmbilWrapper> dataResponse = new DataResponseFeign<SetorAmbilWrapper>();
+				dataResponse.setStatus(true);
+				dataResponse.setSuccess(setorResponse.getSuccess());
+				dataResponse.setReferenceNumber(setorResponse.getReferenceNumber());
+				dataResponse.setMessage("Setor tunai berhasil.");
+				dataResponse.setData(setor);
+				return dataResponse;
+			} else {
+				throw new BusinessException("Setor tunai gagal.");
+			}
+		} else {
+			throw new BusinessException("Nomor Rekening tidak terdaftar");
+		}
+	}
+	
+//	=============================Call Tarik==========================
+	public DataResponseFeign<SetorAmbilWrapper> tarikFeign(Long noRekening, Long nominal) {
+		NoRekeningFeignResponse validateNorek = nasabahService.cekNoRekening(noRekening.toString());
+		
+		TarikFeignRequest tarikRequest = new TarikFeignRequest();
+		tarikRequest.setNoRekening(noRekening.toString());
+		tarikRequest.setTarikan(nominal);
+		
+		if (validateNorek.getRegistered()) {
+			NasabahFeignResponse tarikResponse = nasabahService.callTarik(tarikRequest);
+			if (tarikResponse.getSuccess()) {
+				SetorAmbilWrapper tarik = tarik(noRekening, nominal);
+				DataResponseFeign<SetorAmbilWrapper> dataResponse = new DataResponseFeign<SetorAmbilWrapper>();
+				dataResponse.setStatus(true);
+				dataResponse.setSuccess(tarikResponse.getSuccess());
+				dataResponse.setReferenceNumber(tarikResponse.getReferenceNumber());
+				dataResponse.setMessage("Tarik tunai berhasil.");
+				dataResponse.setData(tarik);
+				return dataResponse;
+			} else {
+				throw new BusinessException("Tarik tunai gagal.");
+			}
+		} else {
+			throw new BusinessException("Nomor Rekening tidak terdaftar");
+		}
+	}
+	
 //	=========================Send Bukti Setor ======================
 	public SetorAmbilWrapper sendBuktiSetor(Long noRekening, Long nominal)
 			throws MessagingException, IOException, DocumentException, Exception  {
@@ -976,7 +1030,7 @@ public class TransaksiNasabahService {
 		setorReq.setNoRekening(noRekening.toString());
 		setorReq.setSetoran(nominal);
 		
-		if (validatedRekening.getRegistered() == true) {
+		if (validatedRekening.getRegistered()) {
 			MasterBank nasabah = masterBankRepo.getReferenceById(noRekening);
 			List<Users> user = usersRepository.findByUserId(nasabah.getUserId());
 			
@@ -984,7 +1038,7 @@ public class TransaksiNasabahService {
 			System.out.println("Success: "+setorRespon.getSuccess());
 			System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
 			
-			if (setorRespon.getSuccess() == true) {
+			if (setorRespon.getSuccess()) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
 //				transaksiNasabahService.setor(noRekening, nominal);
 				Context ctx = new Context();
