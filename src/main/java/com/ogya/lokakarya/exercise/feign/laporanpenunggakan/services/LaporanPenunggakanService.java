@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.exercise.feign.laporanpenunggakan.service;
+package com.ogya.lokakarya.exercise.feign.laporanpenunggakan.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
