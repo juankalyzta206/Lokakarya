@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.exercise.feign.usermanagement.repository.UsersFeignRepository;
-import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignRequest;
 import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignToWebServiceRequest;
 import com.ogya.lokakarya.exercise.feign.usermanagement.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.service.RolesService;

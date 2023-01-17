@@ -2,14 +2,11 @@ package com.ogya.lokakarya.usermanagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignRequest;
 import com.ogya.lokakarya.exercise.feign.usermanagement.services.UsersFeignServices;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
@@ -29,8 +26,8 @@ public class UsersWebServiceController {
 		return usersFeignServices.callUserRoleRecord(wrapper);
 	}
 	
-	@GetMapping(path = "/saveRolesFromWebService/{role}")
-	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@PathVariable RolesWrapper wrapper){
+	@PostMapping(path = "/saveRolesFromWebService")
+	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@RequestBody RolesWrapper wrapper){
 		return usersFeignServices.callUserRoleInquiry(wrapper);
 	}
 	
