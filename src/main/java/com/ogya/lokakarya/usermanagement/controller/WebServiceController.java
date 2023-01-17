@@ -2,6 +2,7 @@ package com.ogya.lokakarya.usermanagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,7 @@ public class WebServiceController {
 		return new DataResponse<UsersAddWrapper>(usersFeignServices.callUserRoleRecord(username, password, request));
 	}
 	
-	@PostMapping(path = "/saveRolesFromWebService/{role}")
+	@GetMapping(path = "/saveRolesFromWebService/{role}")
 	public DataResponse<RolesWrapper> saveRolesFromWebService(@PathVariable String role){
 		return new DataResponse<RolesWrapper>(usersFeignServices.callUserRoleInquiry(role));
 	}
