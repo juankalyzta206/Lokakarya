@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -43,6 +42,10 @@ import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.exercise.feign.transfer.request.TransferFeignRequest;
 import com.ogya.lokakarya.exercise.feign.transfer.response.TransferFeignResponse;
 import com.ogya.lokakarya.exercise.feign.transfer.response.ValidateRekeningFeignResponse;
@@ -74,6 +77,8 @@ public class TransaksiNasabahService {
 	HistoryTelkomRepository historyTelkomRepo;
 	@Autowired
 	UsersRepository usersRepository;
+	@Autowired
+	NasabahFeignService nasabahService;
 	@Autowired
 	TransferFeignService transferService;
 	@Autowired
@@ -646,11 +651,13 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Setor--------------------------------------
-	public void ExportToPdfSetorParam(HttpServletResponse response, Long idHistory) throws Exception {
+	public ByteArrayOutputStream ExportToPdfSetorParam(Long idHistory) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -704,8 +711,7 @@ public class TransaksiNasabahService {
 		pdfDoc.close();
 		pdfWriter.close();
 
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		return outputStream;
 	}
 
 //	---------------------------------Bukti Transaksi Tarik--------------------------------------
@@ -918,5 +924,45 @@ public class TransaksiNasabahService {
 
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+	}
+	
+//	=========================Send Bukti Setor ======================
+	public SetorAmbilWrapper sendBuktiSetor(Long noRekening, Long nominal)
+			throws MessagingException, IOException, DocumentException, Exception  {
+		NoRekeningFeignResponse validatedRekening = nasabahService.cekNoRekening(noRekening.toString());
+		
+		SetorFeignRequest setorReq = new SetorFeignRequest();
+		setorReq.setNoRekening(noRekening.toString());
+		setorReq.setSetoran(nominal);
+		
+		if (validatedRekening.getRegistered() == true) {
+			MasterBank nasabah = masterBankRepo.getReferenceById(noRekening);
+			Users user = usersRepository.getReferenceById(nasabah.getUserId());
+			
+			NasabahFeignResponse setorRespon = nasabahService.callSetor(setorReq);
+			System.out.println("Success: "+setorRespon.getSuccess());
+			System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
+			
+			if (setorRespon.getSuccess() == true) {
+				SetorAmbilWrapper setorData = setor(noRekening, nominal);
+//				transaksiNasabahService.setor(noRekening, nominal);
+				Context ctx = new Context();
+				ctx.setVariable("nama", user.getNama());
+				ctx.setVariable("rekening", noRekening.toString());
+				ctx.setVariable("tanggal", setorData.getTanggal());
+				ctx.setVariable("nominal", nominal);
+				ctx.setVariable("noReference", setorRespon.getReferenceNumber());
+				
+				ByteArrayOutputStream setorPdf = ExportToPdfSetorParam(setorData.getIdTransaksi());
+				sendEmailTransfer(user.getEmail(), "Setor", ctx, setorPdf);
+					
+
+				return setorData;
+			} else {
+				throw new BusinessException("Setor Gagal.");
+			} 
+		} else {
+			throw new BusinessException("No Rekening tidak terdaftar.");
+		}
 	}
 }

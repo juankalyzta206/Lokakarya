@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:remove="all">Konfirmasi Setor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+body {
+	font-family: calibri, 'DejaVu Sans', Arial, Helvetica, sans-serif;
+}
+
+a.link {
+	border: solid 1px #000;
+	background-color: #000;
+	text-decoration: none;
+	color: #fff;
+	font-weight: bold;
+	display: block;
+	width: 360px;
+	text-align: center;
+	padding: 10px 0;
+}
+</style>
+</head>
+<body>
+	<h1>Confirm your account</h1>
+	<div>
+		Dear <b th:text="${nama}">nama</b> !
+	</div>
+	<p>
+		Anda sukses melakukan setor tunai ke nomor rekening <b th:text="${rekening}">rekening</b><br /> 	
+		pada tanggal <b th:date="${tanggal}">tanggal</b><br />
+		sebesar <b th:number="${nominal}">nominal</b><br />
+		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
+						
+	</p>
+
+	<p>
+		<img src="images/spring.png" data-th-src="|cid:springLogo|"
+			height="80" />
+	</p>
+	<p>
+		Salam, <br /> &emsp; <em>Bank XYZ</em>
+	</p>
+</body>
+</html>
