@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
+import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
+import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
+import com.ogya.lokakarya.exercise.feign.bankadm.services.BankAdminFeignServices;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
@@ -27,6 +30,8 @@ public class LokakaryaApplication implements CommandLineRunner {
 	TransferFeignService transferService;
 	@Autowired
 	TransaksiNasabahService transaksiNasabahService;
+	@Autowired
+	BankAdminFeignServices bankAdminFeignService;
 	
 	@Autowired
 	private NasabahFeignService nasabahFeignService;
@@ -41,6 +46,22 @@ public class LokakaryaApplication implements CommandLineRunner {
 		String noRekeningPengirim = "1234";
 		String noRekPenerima = "99999";
 		Long nominal = 200000L;
+		String nama = "Juan Kalyzta";
+		String alamat = "Larangan Indah";
+		Long saldo = 10000000L;
+		String noTelpon = "089522842667";
+			
+		System.out.println("=========================");
+		System.out.println("Data Master Bank");
+		BankAdminFeignRequest bankAdmReq = new BankAdminFeignRequest();
+		bankAdmReq.setNama(nama);
+		bankAdmReq.setAlamat(alamat);
+		bankAdmReq.setNominalSaldo(saldo);
+		bankAdmReq.setTelpon(noTelpon);
+		BankAdminFeignResponse bankAdmRes = bankAdminFeignService.bankPost(bankAdmReq);
+		System.out.println("Status: "+bankAdmRes.getSuccess());
+		System.out.println("No Referensi: "+bankAdmRes.getReferenceNumber());
+		System.out.println(" ");
 
 		System.out.println("");
 		TransferFeignRequest transferRequest = new TransferFeignRequest();

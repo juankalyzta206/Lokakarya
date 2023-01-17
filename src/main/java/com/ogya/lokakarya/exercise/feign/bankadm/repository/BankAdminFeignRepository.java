@@ -11,6 +11,6 @@ import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse
 @FeignClient(value = "MasterBank", url = "https://simple-rest-production.up.railway.app/")
 
 public interface BankAdminFeignRepository {
-	@RequestMapping(method = RequestMethod.POST, value = "/simple/post")
+	@RequestMapping(method = RequestMethod.POST, value = "/master-data/record")
 	public BankAdminFeignResponse bankPost(@RequestBody BankAdminFeignRequest bankAdminReq);
 }
