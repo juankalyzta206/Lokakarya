@@ -1,59 +1,79 @@
 package com.ogya.lokakarya.util;
 
-import java.util.List;
-
-public class DataResponseList<E> {
-	
+public class DataResponseFeign<T> {
 	private boolean status;
 	private String message;
 	private Long timeStamp;
-	private List<E> data;
-	
-	
-	public DataResponseList(List<E> data) {
+	private T data;
+	private Boolean success;
+	private String referenceNumber;
+
+	public DataResponseFeign() {
+		super();
+	}
+
+	public DataResponseFeign(T data) {
 		this(true, null, data);
 	}
-	
-	public DataResponseList(boolean status, String message) {
+
+	public DataResponseFeign(boolean status, String message) {
 		this(status, message, null);
 	}
-	
-	public DataResponseList(boolean status, String message, List<E> data) {
+
+	public DataResponseFeign(boolean status, String message, T data) {
 		this.timeStamp = System.currentTimeMillis();
 		this.status = status;
 		this.message = message;
 		this.data = data;
 	}
+
 	public boolean isStatus() {
 		return status;
 	}
+
 	public void setStatus(boolean status) {
 		this.status = status;
 	}
-	
+
 	public String getMessage() {
 		return message;
 	}
+
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	
-	
-	public List<E> getData() {
+
+	public T getData() {
 		return data;
 	}
-	public void setData(List<E> data) {
+
+	public void setData(T data) {
 		this.data = data;
 	}
-	
+
 	public Long getTimeStamp() {
 		return timeStamp;
 	}
+
 	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
-	
+
+	public boolean isSuccess() {
+		return success;
+	}
+
+	public void setSuccess(boolean success) {
+		this.success = success;
+	}
+
+	public String getReferenceNumber() {
+		return referenceNumber;
+	}
 
 	
+	public void setReferenceNumber(String referenceNumber) {
+		this.referenceNumber = referenceNumber;
+	}
 
 }

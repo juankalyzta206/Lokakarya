@@ -34,4 +34,6 @@ public interface MasterPelangganRepository extends JpaRepository<MasterPelanggan
 	
 	//List<MasterPelanggan> findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(Long idPelanggan,String nama,String alamat,Long noTelp,Users user);
 	Page<MasterPelanggan> findByidPelangganOrNamaIgnoreCaseContainingOrAlamatIgnoreCaseContainingOrNoTelpOrUsers(Pageable page,Long idPelanggan,String nama,String alamat,Long noTelp,Users user);
+	
+	MasterPelanggan findByNama(String nama);
 }

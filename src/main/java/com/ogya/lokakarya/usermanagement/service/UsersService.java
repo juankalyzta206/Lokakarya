@@ -37,6 +37,7 @@ import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.login.UsersLoginWrapper;
+import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 

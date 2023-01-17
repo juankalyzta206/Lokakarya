@@ -7,32 +7,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-import com.ogya.lokakarya.usermanagement.feign.services.UsersFeignServices;
+import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignRequest;
+import com.ogya.lokakarya.exercise.feign.usermanagement.services.UsersFeignServices;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
-import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseFeign;
 
 
 @RestController
-@RequestMapping(value = "/webService")
+@RequestMapping(value = "/usersWebService")
 @CrossOrigin(origins = "*")
-public class WebServiceController {
+public class UsersWebServiceController {
 	@Autowired
 	UsersFeignServices usersFeignServices;
 
 	
 	@PostMapping(path = "/saveUsersFromWebService")
-	public DataResponse<UsersAddWrapper> saveUsersFromWebService(@RequestParam String username, @RequestParam String password, @RequestBody UsersFeignRequest request){
-		return new DataResponse<UsersAddWrapper>(usersFeignServices.callUserRoleRecord(username, password, request));
+	public DataResponseFeign<UsersAddWrapper> saveUsersFromWebService(@RequestBody UsersFeignRequest request){
+		return usersFeignServices.callUserRoleRecord(request);
 	}
 	
 	@GetMapping(path = "/saveRolesFromWebService/{role}")
-	public DataResponse<RolesWrapper> saveRolesFromWebService(@PathVariable String role){
-		return new DataResponse<RolesWrapper>(usersFeignServices.callUserRoleInquiry(role));
+	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@PathVariable String role){
+		return usersFeignServices.callUserRoleInquiry(role);
 	}
 	
 	

@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.exercise.feign.nasabah.controller;
+package com.ogya.lokakarya.exercise.feign.laporanpenunggakan.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.exercise.feign.laporanpenunggakan.request.LaporanPenunggakanRequest;
 import com.ogya.lokakarya.exercise.feign.laporanpenunggakan.response.LaporanPenunggakanResponse;
-import com.ogya.lokakarya.exercise.feign.laporanpenunggakan.service.LaporanPenunggakanService;
+import com.ogya.lokakarya.exercise.feign.laporanpenunggakan.services.LaporanPenunggakanService;
 
 
 @RestController
