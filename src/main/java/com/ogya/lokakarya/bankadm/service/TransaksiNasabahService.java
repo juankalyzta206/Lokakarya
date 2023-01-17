@@ -279,6 +279,7 @@ public class TransaksiNasabahService {
 							masterBankRepo.save(pengirim);
 
 							masterBankRepo.getReferenceById(rekTujuan).setSaldo(tujuan.getSaldo() + nominal);
+							masterBankRepo.save(tujuan);
 
 							HistoryBank historyBank = new HistoryBank();
 							historyBank.setNama(pengirim.getNama());
@@ -318,76 +319,8 @@ public class TransaksiNasabahService {
 		}
 	}
 
-//	public TransferWrapper transferValidate(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal)
-//			throws MessagingException, IOException, DocumentException {
-//		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
-//		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
-//
-//		TransferFeignRequest transferRequest = new TransferFeignRequest();
-//		transferRequest.setJumlahTranfer(nominal);
-//		transferRequest.setNoRekeningPengirim(rekAsal.toString());
-//		transferRequest.setNoRekeningPenerima(rekTujuan.toString());
-//
-//		if (rekValidatePengirim.getRegistered() == true) {
-//			if (rekValidatePenerima.getRegistered() == true) {
-//				TransferFeignResponse transferResponse = transferService.callTransfer(transferRequest);
-//				System.out.println("Reference Number : " + transferResponse.getReferenceNumber());
-//				System.out.println("Success : " + transferResponse.getSuccess());
-//
-//				transfer(rekTujuan, rekAsal, nominal);
-//				ExportToPdfTransferParam(response, transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
-//				MimeMessage mailMessage = javaMailSender.createMimeMessage();
-//				MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
-//				List<Users> users = usersRepository.findByUserId(masterBank.getUserId());
-//				try {
-//
-//					MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
-//
-//					ByteArrayOutputStream outputStream = ExportToPdfTransferParam(response,
-//							transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
-//
-////					helper.setFrom("admin@xyzbank.com");
-//					helper.setTo(users.get(0).getEmail().toString());
-//					helper.setSubject("Laporan Transaksi Transfer Bank");
-//					helper.addAttachment("BuktiTransfer.pdf", new ByteArrayResource(outputStream.toByteArray()));
-//
-//					Context ctx = new Context(LocaleContextHolder.getLocale());
-//					ctx.setVariable("name", users.get(0).getNama());
-//					ctx.setVariable("rekTujuan", rekTujuan.toString());
-//					ctx.setVariable("nomorReference", transferResponse.getReferenceNumber());
-//					ctx.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal().toString());
-//					ctx.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal().toString());
-//
-//					String body = templateEngine.process("TransferPengirim", ctx);
-//					helper.setText(body, true);
-//
-//					javaMailSender.send(mailMessage);
-//
-//					System.out.println("Email: " + users.get(0).getEmail());
-//					System.out.println("name: " + users.get(0).getNama());
-//					System.out.println("rekTujuan: " + rekTujuan.toString());
-//					System.out.println("tanggal: " + transfer(rekTujuan, rekAsal, nominal).getTanggal());
-//					System.out.println("nominal: " + transfer(rekTujuan, rekAsal, nominal).getNominal());
-//					System.out.println("");
-//					System.out.println("Email send");
-//
-//				} catch (MessagingException e) {
-//					System.err.println("Failed send email");
-//					e.printStackTrace();
-//				}
-//				return transfer(rekTujuan, rekAsal, nominal);
-//
-//			} else {
-//				throw new BusinessException("Rekening pengirim tidak terdaftar");
-//			}
-//		} else {
-//			throw new BusinessException("Rekening tujuan tidak terdaftar");
-//		}
-//
-//	}
-	
-	public TransferWrapper transferValidate(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal)
-			throws MessagingException, IOException, DocumentException {
+
+	public TransferWrapper transferValidate(Long rekTujuan, Long rekAsal, Long nominal) throws Exception {
 		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
 		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
 
@@ -399,36 +332,39 @@ public class TransaksiNasabahService {
 		if (rekValidatePengirim.getRegistered() == true) {
 			if (rekValidatePenerima.getRegistered() == true) {
 				TransferFeignResponse transferResponse = transferService.callTransfer(transferRequest);
-				System.out.println("Reference Number : " + transferResponse.getReferenceNumber());
-				System.out.println("Success : " + transferResponse.getSuccess());
 
-				transfer(rekTujuan, rekAsal, nominal);
-//				ExportToPdfTransferParam(response, transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
+				TransferWrapper transfer = transfer(rekTujuan, rekAsal, nominal);
+				
 				MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
 				List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
 				MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
 				List<Users> userTujuan = usersRepository.findByUserId(tujuan.getUserId());
-//				
+				
 				Context ctxPengirim = new Context();
 				ctxPengirim.setVariable("name", userPengirim.get(0).getNama());
 				ctxPengirim.setVariable("rekTujuan", rekTujuan.toString());
 				ctxPengirim.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxPengirim.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal().toString());
-				ctxPengirim.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal().toString());
+				ctxPengirim.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxPengirim.setVariable("nominal", transfer.getNominal().toString());
+
+				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
+						transfer.getIdTransaksi(), transfer.getSaldoPengirim());
 				
-				ByteArrayOutputStream pdf = ExportToPdfTransferParam(response,
-						transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
-				
-				sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "TransferPengirim", ctxPengirim, pdf);
+				sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "TransferPengirim", ctxPengirim, pdfPengirim);
+
 				
 				Context ctxTujuan = new Context();
 				ctxTujuan.setVariable("name", userTujuan.get(0).getNama());
 				ctxTujuan.setVariable("rekAsal", rekAsal.toString());
 				ctxTujuan.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxTujuan.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal().toString());
-				ctxTujuan.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal().toString());
-				sendEmailTransfer(userTujuan.get(0).getEmail().toString(), "TransferPenerima", ctxTujuan, pdf);
-				return transfer(rekTujuan, rekAsal, nominal);
+				ctxTujuan.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxTujuan.setVariable("nominal", transfer.getNominal().toString());
+				
+				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
+						transfer.getIdTransaksi(), transfer.getSaldoPenerima());
+				sendEmailTransfer(userTujuan.get(0).getEmail().toString(), "TransferPenerima", ctxTujuan, pdfTujuan);
+
+				return transfer;
 
 			} else {
 				throw new BusinessException("Rekening pengirim tidak terdaftar");
@@ -440,19 +376,24 @@ public class TransaksiNasabahService {
 	}
 
 //	-----------------------------------------KirimEmail-----------------------------------------------------
-	public void sendEmailTransfer(String tujuan, String templateName, Context context, ByteArrayOutputStream pdf)
-			throws MessagingException {
-		MimeMessage mailMessage = javaMailSender.createMimeMessage();
+	public void sendEmailTransfer(String tujuan, String templateName, Context context, ByteArrayOutputStream pdf) {
+		try {
+			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
-		MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+			MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
 
-		helper.setTo(tujuan);
-		helper.setSubject("Laporan Transaksi Transfer Bank");
-		String html = templateEngine.process(templateName, context);
-		helper.setText(html, true);
-		helper.addAttachment("file.pdf", new ByteArrayResource(pdf.toByteArray()));
-		javaMailSender.send(mailMessage);
-		System.out.println("Email send");
+			helper.setTo(tujuan);
+			helper.setSubject("Laporan Transaksi Transfer Bank");
+			String html = templateEngine.process(templateName, context);
+			helper.setText(html, true);
+			helper.addAttachment("Bukti Transfer.pdf", new ByteArrayResource(pdf.toByteArray()));
+			javaMailSender.send(mailMessage);
+			System.out.println("Email send");
+
+		} catch (MessagingException e) {
+			System.err.println("Failed send email");
+			e.printStackTrace();
+		}
 
 	}
 
@@ -613,23 +554,37 @@ public class TransaksiNasabahService {
 		return wrapperList;
 	}
 
+	public List<BayarTeleponWrapper> bayarTelponValidate(Long rekAsal, Long noTelpon, Byte bulanTagihan) {
+		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
+
+		TransferFeignRequest transferRequest = new TransferFeignRequest();
+//		transferRequest.setJumlahTranfer(nominal);
+//		transferRequest.setNoRekeningPengirim(rekAsal.toString());
+//		transferRequest.setNoRekeningPenerima(rekTujuan.toString());
+
+		if (rekValidatePengirim.getRegistered() == true) {
+
+		List<BayarTeleponWrapper> bayarTelponList = bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan);
+		return bayarTelponList;
+	}
+	}
 	public PdfPCell Left(String title) {
-		PdfPCell cell = new PdfPCell(new Phrase(title));
+		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_LEFT);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setBorder(Rectangle.NO_BORDER);
-		cell.setPadding(7);
-		cell.setPaddingLeft(5);
+		cell.setPadding(5);
+		cell.setPaddingLeft(4);
 		return cell;
 	}
 
 	public PdfPCell Right(String title) {
-		PdfPCell cell = new PdfPCell(new Phrase(title));
+		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setBorder(Rectangle.NO_BORDER);
-		cell.setPadding(7);
-		cell.setPaddingRight(5);
+		cell.setPadding(5);
+		cell.setPaddingRight(4);
 		return cell;
 	}
 
@@ -772,13 +727,13 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public ByteArrayOutputStream ExportToPdfTransferParam(HttpServletResponse response, Long idHistory)
-			throws DocumentException, IOException {
+	public ByteArrayOutputStream ExportToPdfTransferParam(String noReference, Long idHistory, Long saldo) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
 		PdfWriter.getInstance(pdfDoc, outputStream);
+
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -787,7 +742,7 @@ public class TransaksiNasabahService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
+		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
 		notif.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(notif);
 		// Add the generation date
@@ -812,6 +767,8 @@ public class TransaksiNasabahService {
 		}
 		pdfTable.addCell(Right(formattedDate));
 
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(noReference));
 		pdfTable.addCell(Left("Nomor Rekening Pengirim"));
 		pdfTable.addCell(Right(
 				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
@@ -828,18 +785,14 @@ public class TransaksiNasabahService {
 				Right(String.valueOf(data.getNamaTujuan() != null ? String.valueOf(data.getNamaTujuan()) : "-")));
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
-		pdfTable.addCell(Left("Saldo Pengirim"));
-		pdfTable.addCell(Right(String
-				.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
+		pdfTable.addCell(Left("Saldo"));
+		pdfTable.addCell(Right(saldo.toString()));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
 //		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=BuktiTransfer.pdf");
 		return outputStream;
 	}
 
