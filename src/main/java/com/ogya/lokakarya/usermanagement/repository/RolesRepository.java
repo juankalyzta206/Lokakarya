@@ -8,6 +8,10 @@ import org.springframework.data.repository.query.Param;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
 
 public interface RolesRepository extends JpaRepository<Roles, Long>{
+	@Query(value="SELECT COUNT(*) FROM ROLES r WHERE r.NAMA = :nama", 
+			nativeQuery = true)
+	Long isExistRoleName(@Param("nama") String nama);
+	
 	@Query(value="SELECT COUNT(*) FROM HAK_AKSES ha WHERE ha.ROLE_ID = :roleId", 
 			nativeQuery = true)
 	Long isExistHakAkses(@Param("roleId") Long roleId);
