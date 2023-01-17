@@ -71,6 +71,7 @@ public class DataResponseFeign<T> {
 		return referenceNumber;
 	}
 
+	
 	public void setReferenceNumber(String referenceNumber) {
 		this.referenceNumber = referenceNumber;
 	}
