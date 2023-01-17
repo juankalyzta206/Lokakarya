@@ -1,15 +1,29 @@
 package com.ogya.lokakarya.bankadm.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
@@ -29,6 +43,10 @@ import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.exercise.feign.transfer.request.TransferFeignRequest;
+import com.ogya.lokakarya.exercise.feign.transfer.response.TransferFeignResponse;
+import com.ogya.lokakarya.exercise.feign.transfer.response.ValidateRekeningFeignResponse;
+import com.ogya.lokakarya.exercise.feign.transfer.services.TransferFeignService;
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
@@ -36,6 +54,8 @@ import com.ogya.lokakarya.telepon.repository.HistoryTelkomRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
+import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 
 @Service
 @Transactional
@@ -52,6 +72,14 @@ public class TransaksiNasabahService {
 	TransaksiTelkomRepository transaksiTelkomRepo;
 	@Autowired
 	HistoryTelkomRepository historyTelkomRepo;
+	@Autowired
+	UsersRepository usersRepository;
+	@Autowired
+	TransferFeignService transferService;
+	@Autowired
+	private JavaMailSender javaMailSender;
+	@Autowired
+	private TemplateEngine templateEngine;
 
 	// -------------------------------------------ceksaldo----------------------------------------
 	public MasterBankWrapper cekSaldo(Long rekening) {
@@ -287,6 +315,74 @@ public class TransaksiNasabahService {
 			}
 		} else {
 			throw new BusinessException("Nomor rekening pengirim tidak terdaftar");
+		}
+	}
+
+
+	public void transferValidate(HttpServletResponse response, Long rekTujuan, Long rekAsal, Long nominal)
+			throws MessagingException, IOException, DocumentException {
+		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
+		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
+
+		TransferFeignRequest transferRequest = new TransferFeignRequest();
+		transferRequest.setJumlahTranfer(nominal);
+		transferRequest.setNoRekeningPengirim(rekAsal.toString());
+		transferRequest.setNoRekeningPenerima(rekTujuan.toString());
+
+		if (rekValidatePengirim.getRegistered() == true) {
+			if (rekValidatePenerima.getRegistered() == true) {
+				TransferFeignResponse transferResponse = transferService.callTransfer(transferRequest);
+				System.out.println("Reference Number : " + transferResponse.getReferenceNumber());
+				System.out.println("Success : " + transferResponse.getSuccess());
+
+				transfer(rekTujuan, rekAsal, nominal);
+				ExportToPdfTransferParam(response, transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
+				MimeMessage mailMessage = javaMailSender.createMimeMessage();
+				MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+				List<Users> users = usersRepository.findByUserId(masterBank.getUserId());
+				try {
+
+					MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+
+					ByteArrayOutputStream outputStream = ExportToPdfTransferParam(response,
+							transfer(rekTujuan, rekAsal, nominal).getIdTransaksi());
+
+//					helper.setFrom("admin@xyzbank.com");
+					helper.setTo(users.get(0).getEmail().toString());
+					helper.setSubject("Laporan Transaksi Transfer Bank");
+					helper.addAttachment("BuktiTransfer.pdf", new ByteArrayResource(outputStream.toByteArray()));
+
+					Context ctx = new Context(LocaleContextHolder.getLocale());
+					ctx.setVariable("name", users.get(0).getNama());
+					ctx.setVariable("rekTujuan", rekTujuan.toString());
+					ctx.setVariable("nomorReference", transferResponse.getReferenceNumber());
+					ctx.setVariable("tanggal", transfer(rekTujuan, rekAsal, nominal).getTanggal().toString());
+					ctx.setVariable("nominal", transfer(rekTujuan, rekAsal, nominal).getNominal().toString());
+
+					String body = templateEngine.process("transfer", ctx);
+					helper.setText(body, true);
+
+					javaMailSender.send(mailMessage);
+
+					System.out.println("Email: " + users.get(0).getEmail());
+					System.out.println("name: " + users.get(0).getNama());
+					System.out.println("rekTujuan: " + rekTujuan.toString());
+					System.out.println("tanggal: " + transfer(rekTujuan, rekAsal, nominal).getTanggal());
+					System.out.println("nominal: " + transfer(rekTujuan, rekAsal, nominal).getNominal());
+					System.out.println("");
+					System.out.println("Email send");
+
+				} catch (MessagingException e) {
+					System.err.println("Failed send email");
+					e.printStackTrace();
+				}
+
+//				return transfer(rekTujuan, rekAsal, nominal);
+			} else {
+				throw new BusinessException("Rekening pengirim tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Rekening tujuan tidak terdaftar");
 		}
 	}
 
@@ -529,7 +625,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
+		pdfTable.addCell(Right(String
+				.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -591,7 +688,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
+		pdfTable.addCell(Right(String
+				.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -604,11 +702,13 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public void ExportToPdfTransferParam(HttpServletResponse response, Long idHistory) throws Exception {
+	public ByteArrayOutputStream ExportToPdfTransferParam(HttpServletResponse response, Long idHistory)
+			throws DocumentException, IOException {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -659,16 +759,18 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(Right(String.valueOf(data.getUang() != null ? String.valueOf(data.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Pengirim"));
-		pdfTable.addCell(Right(String.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
+		pdfTable.addCell(Right(String
+				.valueOf(data.getRekening().getSaldo() != null ? String.valueOf(data.getRekening().getSaldo()) : "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
-		pdfWriter.close();
+//		pdfWriter.close();
 
 		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=BuktiTransfer.pdf");
+		return outputStream;
 	}
 
 //	---------------------------------Bukti Transaksi Bayar Telepon--------------------------------------
@@ -734,7 +836,9 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(
 				Right(String.valueOf(dataNasabah.getUang() != null ? String.valueOf(dataNasabah.getUang()) : "-")));
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getSaldo() != null ? String.valueOf(dataNasabah.getRekening().getSaldo()) : "-")));
+		pdfTable.addCell(Right(String.valueOf(
+				dataNasabah.getRekening().getSaldo() != null ? String.valueOf(dataNasabah.getRekening().getSaldo())
+						: "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
