@@ -2,7 +2,7 @@ package com.ogya.lokakarya.exercise.feign.nasabah.request;
 
 public class SetorFeignRequest {
 	private String noRekening;
-	private Long tarikan;
+	private Long setoran;
 	
 	public String getNoRekening() {
 		return noRekening;
@@ -10,11 +10,11 @@ public class SetorFeignRequest {
 	public void setNoRekening(String noRekening) {
 		this.noRekening = noRekening;
 	}
-	public Long getTarikan() {
-		return tarikan;
+	public Long getSetoran() {
+		return setoran;
 	}
-	public void setTarikan(Long tarikan) {
-		this.tarikan = tarikan;
+	public void setSetoran(Long setoran) {
+		this.setoran = setoran;
 	}
 	
 
