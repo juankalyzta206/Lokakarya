@@ -27,7 +27,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Roles;
-import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.repository.RolesRepository;
 import com.ogya.lokakarya.usermanagement.repository.criteria.RolesCriteriaRepository;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
@@ -42,13 +41,6 @@ public class RolesService {
 	
 	@Autowired
 	RolesCriteriaRepository rolesCriteriaRepository;
-
-	public void saveRolesFromWebService(UsersFeignResponse webResponse, String role) {
-		RolesWrapper addRoles = new RolesWrapper();
-		addRoles.setProgramName(webResponse.getProgramName());
-		addRoles.setNama(role);
-		save(addRoles);
-	}
 	
 	public PaginationList<RolesWrapper, Roles> ListWithPaging(PagingRequestWrapper request) { 
 		List<Roles> rolesList = rolesCriteriaRepository.findByFilter(request);

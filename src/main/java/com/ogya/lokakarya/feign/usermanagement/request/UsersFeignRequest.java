@@ -1,10 +1,25 @@
-package com.ogya.lokakarya.usermanagement.feign.request;
+package com.ogya.lokakarya.feign.usermanagement.request;
 
-public class UsersFeignToWebServiceRequest {
+public class UsersFeignRequest {
+	String username;
+	String password;
+	String nama;
 	String alamat;
 	String email;
-	String nama;
 	String telpon;
+	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
 	public String getAlamat() {
 		return alamat;
 	}
