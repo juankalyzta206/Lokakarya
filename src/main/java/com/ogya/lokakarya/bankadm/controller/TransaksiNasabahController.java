@@ -18,8 +18,10 @@ import com.ogya.lokakarya.bankadm.service.TransaksiNasabahService;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
+import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
@@ -28,6 +30,8 @@ import com.ogya.lokakarya.util.DataResponseList;
 public class TransaksiNasabahController {
 	@Autowired
 	TransaksiNasabahService transaksiNasabahService;
+	@Autowired
+	NasabahFeignService nasabahFeignService;
 
 	@PostMapping(path = "/transfer")
 	public DataResponse<TransferWrapper> transfer(@RequestParam("Nomor Rekening Asal") Long rekAsal,
@@ -59,6 +63,12 @@ public class TransaksiNasabahController {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.setor(norek, nominal));
 	}
 
+//	@PostMapping(path = "/tarik")
+//	public DataResponseFeign<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
+//	@RequestParam("Nominal") Long nominal) {
+//	return transaksiNasabahService.tarik(norek, nominal);
+//	}
+	
 	@PostMapping(path = "/tarik")
 	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
 			@RequestParam("Nominal") Long nominal) {
@@ -78,9 +88,9 @@ public class TransaksiNasabahController {
 	}
 
 	@GetMapping(path = "/exportToPdfSetorParam")
-	public void exportToPdfSetorParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory)
+	public void exportToPdfSetorParam(@RequestParam("ID History") Long idHistory)
 			throws Exception {
-		transaksiNasabahService.ExportToPdfSetorParam(response, idHistory);
+		transaksiNasabahService.ExportToPdfSetorParam(idHistory);
 	}
 
 	@GetMapping(path = "/exportToPdfTarikParam")
@@ -114,6 +124,11 @@ public class TransaksiNasabahController {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
 	}
 
+	@PostMapping(path = "/setorValidate")
+	public DataResponse<SetorAmbilWrapper> setorValidate(@RequestParam("Nomor Rekening") Long norek,
+			@RequestParam("Nominal") Long nominal) throws MessagingException, IOException, DocumentException, Exception {
+		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.sendBuktiSetor(norek, nominal));
+	}
 //	@PostMapping(path = "/transferValidate")
 //	public void transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
 //			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal)

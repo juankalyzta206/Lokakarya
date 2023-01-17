@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.bankadm.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,9 +10,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,6 +21,7 @@ import org.thymeleaf.context.Context;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
@@ -42,8 +41,9 @@ import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.exercise.feign.nasabah.request.TarikFeignRequest;
+import com.ogya.lokakarya.exercise.feign.nasabah.request.SetorFeignRequest;
 import com.ogya.lokakarya.exercise.feign.nasabah.response.NasabahFeignResponse;
+import com.ogya.lokakarya.exercise.feign.nasabah.response.NoRekeningFeignResponse;
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.exercise.feign.telkom.request.BayarRequest;
 import com.ogya.lokakarya.exercise.feign.telkom.response.BayarResponse;
@@ -82,6 +82,8 @@ public class TransaksiNasabahService {
 	@Autowired
 	UsersRepository usersRepository;
 	@Autowired
+	NasabahFeignService nasabahService;
+	@Autowired
 	TransferFeignService transferService;
 	@Autowired
 	TelkomFeignServices telkomFeignServices;
@@ -89,8 +91,6 @@ public class TransaksiNasabahService {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private TemplateEngine templateEngine;
-
-	private Logger logger = LoggerFactory.getLogger(TransaksiNasabahService.class);
 
 	// -------------------------------------------ceksaldo----------------------------------------
 	public MasterBankWrapper cekSaldo(Long rekening) {
@@ -220,52 +220,38 @@ public class TransaksiNasabahService {
 
 	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
 		if (masterBankRepo.findById(rekening).isPresent()) {
-			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-			TransaksiNasabah transaksi = new TransaksiNasabah();
-			HistoryBank historyBank = new HistoryBank();
 
 			if (nominal >= 10000) {
-				if (nasabah.getSaldo() - nominal >= 50000) {
-					TarikFeignRequest tarikRequest = new TarikFeignRequest();
-					tarikRequest.setNoRekening(rekening.toString());
-					tarikRequest.setTarikan(nominal);
 
-					try {
-						NasabahFeignResponse response = nasabahFeignService.callTarik(tarikRequest);
-						if (response.getSuccess()) {
-							nasabah.setSaldo(nasabah.getSaldo() - nominal);
-							masterBankRepo.save(nasabah);
+				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+				TransaksiNasabah transaksi = new TransaksiNasabah();
 
-							transaksi.setMasterBank(nasabah);
-							transaksi.setStatus("K");
-							transaksi.setUang(nominal);
-							transaksi.setStatusKet((byte) 2);
-							transaksiNasabahRepo.save(transaksi);
+				nasabah.setSaldo(nasabah.getSaldo() - nominal);
+				masterBankRepo.save(nasabah);
 
-							historyBank.setNama(nasabah.getNama());
-							historyBank.setRekening(nasabah);
-							historyBank.setStatusKet((byte) 2);
-							historyBank.setUang(nominal);
-							historyBankRepo.save(historyBank);
+				transaksi.setMasterBank(nasabah);
+				transaksi.setStatus("K");
+				transaksi.setUang(nominal);
+				transaksi.setStatusKet((byte) 1);
+				transaksiNasabahRepo.save(transaksi);
 
-							SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-							wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
-							wrapper.setNamaNasabah(nasabah.getNama());
-							wrapper.setNominal(nominal);
-							wrapper.setNomorRekening(rekening);
-							wrapper.setSaldo(nasabah.getSaldo());
-							wrapper.setTanggal(transaksi.getTanggal());
-							return wrapper;
-						} else {
-							throw new BusinessException("Failed to withdraw. Please contact customer service.");
-						}
-					} catch (Exception e) {
-						logger.error("Error while withdrawing", e);
-						throw new BusinessException("Failed to withdraw. Please contact customer service.");
-					}
-				} else {
-					throw new BusinessException("Saldo Anda tidak cukup");
-				}
+				HistoryBank historyBank = new HistoryBank();
+				historyBank.setNama(nasabah.getNama());
+				historyBank.setRekening(nasabah);
+				historyBank.setStatusKet((byte) 2);
+				historyBank.setUang(nominal);
+				historyBankRepo.save(historyBank);
+
+				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+				wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
+				wrapper.setNamaNasabah(nasabah.getNama());
+				wrapper.setNominal(nominal);
+				wrapper.setNomorRekening(rekening);
+				wrapper.setSaldo(nasabah.getSaldo());
+				wrapper.setTanggal(transaksi.getTanggal());
+
+				return wrapper;
+
 			} else {
 				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
@@ -646,11 +632,13 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Setor--------------------------------------
-	public void ExportToPdfSetorParam(HttpServletResponse response, Long idHistory) throws Exception {
+	public ByteArrayOutputStream ExportToPdfSetorParam(Long idHistory) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph();
@@ -704,8 +692,7 @@ public class TransaksiNasabahService {
 		pdfDoc.close();
 		pdfWriter.close();
 
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		return outputStream;
 	}
 
 //	---------------------------------Bukti Transaksi Tarik--------------------------------------
@@ -916,5 +903,45 @@ public class TransaksiNasabahService {
 
 		pdfDoc.close();
 		return outputStream;
+	}
+	
+//	=========================Send Bukti Setor ======================
+	public SetorAmbilWrapper sendBuktiSetor(Long noRekening, Long nominal)
+			throws MessagingException, IOException, DocumentException, Exception  {
+		NoRekeningFeignResponse validatedRekening = nasabahService.cekNoRekening(noRekening.toString());
+		
+		SetorFeignRequest setorReq = new SetorFeignRequest();
+		setorReq.setNoRekening(noRekening.toString());
+		setorReq.setSetoran(nominal);
+		
+		if (validatedRekening.getRegistered() == true) {
+			MasterBank nasabah = masterBankRepo.getReferenceById(noRekening);
+			Users user = usersRepository.getReferenceById(nasabah.getUserId());
+			
+			NasabahFeignResponse setorRespon = nasabahService.callSetor(setorReq);
+			System.out.println("Success: "+setorRespon.getSuccess());
+			System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
+			
+			if (setorRespon.getSuccess() == true) {
+				SetorAmbilWrapper setorData = setor(noRekening, nominal);
+//				transaksiNasabahService.setor(noRekening, nominal);
+				Context ctx = new Context();
+				ctx.setVariable("nama", user.getNama());
+				ctx.setVariable("rekening", noRekening.toString());
+				ctx.setVariable("tanggal", setorData.getTanggal());
+				ctx.setVariable("nominal", nominal);
+				ctx.setVariable("noReference", setorRespon.getReferenceNumber());
+				
+				ByteArrayOutputStream setorPdf = ExportToPdfSetorParam(setorData.getIdTransaksi());
+				sendEmailTransfer(user.getEmail(), "Setor", ctx, setorPdf);
+					
+
+				return setorData;
+			} else {
+				throw new BusinessException("Setor Gagal.");
+			} 
+		} else {
+			throw new BusinessException("No Rekening tidak terdaftar.");
+		}
 	}
 }
