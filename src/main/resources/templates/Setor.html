@@ -22,21 +22,16 @@ a.link {
 </style>
 </head>
 <body>
-	<h1>Confirm your account</h1>
+	<h1>Bukti Setor</h1>
 	<div>
-		Dear <b th:text="${nama}">nama</b> !
+		Dear <b th:text="${name}">name</b> !
 	</div>
 	<p>
 		Anda sukses melakukan setor tunai ke nomor rekening <b th:text="${rekening}">rekening</b><br /> 	
-		pada tanggal <b th:date="${tanggal}">tanggal</b><br />
-		sebesar <b th:number="${nominal}">nominal</b><br />
+		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
+		sebesar <b th:text="${nominal}">nominal</b><br />
 		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
 						
-	</p>
-
-	<p>
-		<img src="images/spring.png" data-th-src="|cid:springLogo|"
-			height="80" />
 	</p>
 	<p>
 		Salam, <br /> &emsp; <em>Bank XYZ</em>

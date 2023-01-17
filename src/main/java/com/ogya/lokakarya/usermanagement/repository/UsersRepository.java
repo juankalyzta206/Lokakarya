@@ -12,6 +12,7 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 
 
 public interface UsersRepository extends JpaRepository<Users, Long>{
+	
 	List<Users> findByEmailAndPassword (String email, String password);
 	List<Users> findByUserId (Long userId);
 	List<Users> findByUsernameAndPassword (String username, String password);
