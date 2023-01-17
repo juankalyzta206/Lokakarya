@@ -31,6 +31,10 @@ import com.ogya.lokakarya.bankadm.repository.MasterBankCriteriaRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
+import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
+import com.ogya.lokakarya.exercise.feign.bankadm.services.BankAdminFeignServices;
+import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -42,6 +46,9 @@ public class MasterBankService {
 	MasterBankRepository masterBankRepository;
 	@Autowired
 	MasterBankCriteriaRepository masterBankCriteriaRepository;
+
+    @Autowired
+    BankAdminFeignServices bankAdminFeignServices;
 
 	public PaginationList<MasterBankWrapper, MasterBank> ListWithPaging(PagingRequestWrapper request) { 
 		List<MasterBank> masterBankList = masterBankCriteriaRepository.findByFilter(request);
@@ -99,10 +106,29 @@ public class MasterBankService {
 		return entity;
 	}
 	
-	public MasterBankWrapper save(MasterBankWrapper wrapper) {
-		MasterBank employee = masterBankRepository.save(toEntity(wrapper));
-		return toWrapper(employee);
-	}
+
+	    public DataResponse<MasterBankWrapper> save(MasterBankWrapper wrapper) {
+	        MasterBank employee = masterBankRepository.save(toEntity(wrapper));
+	        BankAdminFeignRequest request = new BankAdminFeignRequest();
+	        request.setAlamat(wrapper.getAlamat());
+	        request.setNama(wrapper.getNama());
+	        request.setNominalSaldo(wrapper.getSaldo());
+	        request.setTelpon(wrapper.getNotlp().toString());
+	        BankAdminFeignResponse response = bankAdminFeignServices.bankPost(request);
+	        DataResponse<MasterBankWrapper> dataResponse = new DataResponse<MasterBankWrapper>();
+	        dataResponse.setSuccess(response.getSuccess());
+	        dataResponse.setReferenceNumber(response.getReferenceNumber());
+	        dataResponse.setData(toWrapper(employee));
+	        return dataResponse;
+	    }
+
+	/*
+	 * public MasterBankWrapper save(MasterBankWrapper wrapper) { MasterBank
+	 * employee = masterBankRepository.save(toEntity(wrapper));
+	 * BankAdminFeignRequest request = new BankAdminFeignRequest(); // set
+	 * properties of request object BankAdminFeignResponse response =
+	 * bankAdminFeignServices.bankPost(request); return toWrapper(employee); }
+	 */
 	
 	public void delete(Long norek) {
 		if(masterBankRepository.isExistMasterBank(norek) != 0)

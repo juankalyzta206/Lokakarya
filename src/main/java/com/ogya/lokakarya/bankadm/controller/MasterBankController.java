@@ -66,13 +66,13 @@ public class MasterBankController {
 	}
 	
 	@PostMapping(path = "/")
-	public DataResponse<MasterBankWrapper> save(@RequestBody MasterBankWrapper wrapper){
-		return new DataResponse<MasterBankWrapper>(masterBankService.save(wrapper));
-	}
+    public DataResponse<MasterBankWrapper> save(@RequestBody MasterBankWrapper wrapper){
+        return masterBankService.save(wrapper);
+    }
 	
 	@PutMapping(path = "/")
 	public DataResponse<MasterBankWrapper> update(@RequestBody MasterBankWrapper wrapper){
-		return new DataResponse<MasterBankWrapper>(masterBankService.save(wrapper));
+	    return masterBankService.save(wrapper);
 	}
 	
 	@DeleteMapping(path = "/deleteById") 
