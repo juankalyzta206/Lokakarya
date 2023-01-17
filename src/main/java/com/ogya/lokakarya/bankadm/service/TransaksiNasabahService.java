@@ -60,6 +60,7 @@ import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
+import com.ogya.lokakarya.util.DataResponseFeign;
 
 @Service
 @Transactional
@@ -214,61 +215,77 @@ public class TransaksiNasabahService {
 
 	// ----------------------------------tarik ---------------------------
 
-    public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
-        if (masterBankRepo.findById(rekening).isPresent()) {
-            MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-            TransaksiNasabah transaksi = new TransaksiNasabah();
-            HistoryBank historyBank = new HistoryBank();
+	public DataResponseFeign<SetorAmbilWrapper> tarik(Long rekening, Long nominal) {
+		DataResponseFeign<SetorAmbilWrapper> dataResponse = new DataResponseFeign<SetorAmbilWrapper>();
+		if (masterBankRepo.findById(rekening).isPresent()) {
+		MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+		TransaksiNasabah transaksi = new TransaksiNasabah();
+		HistoryBank historyBank = new HistoryBank();
+        if (nominal >= 10000) {
+            if (nasabah.getSaldo() - nominal >= 50000) {
+                TarikFeignRequest tarikRequest = new TarikFeignRequest();
+                tarikRequest.setNoRekening(rekening.toString());
+                tarikRequest.setTarikan(nominal);
 
-            if (nominal >= 10000) {
-                if (nasabah.getSaldo() - nominal >= 50000) {
-                    TarikFeignRequest tarikRequest = new TarikFeignRequest();
-                    tarikRequest.setNoRekening(rekening.toString());
-                    tarikRequest.setTarikan(nominal);
+                try {
+                    NasabahFeignResponse response = nasabahFeignService.callTarik(tarikRequest);
+                    if (response.getSuccess()) {
+                        nasabah.setSaldo(nasabah.getSaldo() - nominal);
+                        masterBankRepo.save(nasabah);
 
-                    try {
-                        NasabahFeignResponse response = nasabahFeignService.callTarik(tarikRequest);
-                        if (response.getSuccess()) {
-                            nasabah.setSaldo(nasabah.getSaldo() - nominal);
-                            masterBankRepo.save(nasabah);
+                        transaksi.setMasterBank(nasabah);
+                        transaksi.setStatus("K");
+                        transaksi.setUang(nominal);
+                        transaksi.setStatusKet((byte) 2);
+                        transaksiNasabahRepo.save(transaksi);
 
-                            transaksi.setMasterBank(nasabah);
-                            transaksi.setStatus("K");
-                            transaksi.setUang(nominal);
-                            transaksi.setStatusKet((byte) 2);
-                            transaksiNasabahRepo.save(transaksi);
+                        historyBank.setNama(nasabah.getNama());
+                        historyBank.setRekening(nasabah);
+                        historyBank.setStatusKet((byte) 2);
+                        historyBank.setUang(nominal);
+                        historyBankRepo.save(historyBank);
 
-                            historyBank.setNama(nasabah.getNama());
-                            historyBank.setRekening(nasabah);
-                            historyBank.setStatusKet((byte) 2);
-                            historyBank.setUang(nominal);
-                            historyBankRepo.save(historyBank);
-
-                            SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-                            wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
-                            wrapper.setNamaNasabah(nasabah.getNama());
-                            wrapper.setNominal(nominal);
-                            wrapper.setNomorRekening(rekening);
-                            wrapper.setSaldo(nasabah.getSaldo());
-                            wrapper.setTanggal(transaksi.getTanggal());
-                            return wrapper;
+                        SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+                        wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
+                        wrapper.setNamaNasabah(nasabah.getNama());
+                        wrapper.setNominal(nominal);
+                        wrapper.setNomorRekening(rekening);
+                        wrapper.setSaldo(nasabah.getSaldo());
+                        wrapper.setTanggal(transaksi.getTanggal());
+                        dataResponse.setData(wrapper);
+                        
+                        dataResponse.setSuccess(true);
+        	            dataResponse.setReferenceNumber(response.getReferenceNumber());
+                        return dataResponse;
                         } else {
-                            throw new BusinessException("Failed to withdraw. Please contact customer service.");
+                        dataResponse.setSuccess(false);
+                        dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
+                        return dataResponse;
                         }
-                    } catch (Exception e) {
+                        } catch (Exception e) {
                         logger.error("Error while withdrawing", e);
-                        throw new BusinessException("Failed to withdraw. Please contact customer service.");
-                    }
-                } else {
-	                throw new BusinessException("Saldo Anda tidak cukup");
-	            }
-	        } else {
-	            throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
-	        }
-	    } else {
-	        throw new BusinessException("Nomor rekening tidak terdaftar");
-	    }
-	}
+                        dataResponse.setSuccess(false);
+                        dataResponse.setMessage("Failed to withdraw. Please contact customer service.");
+                        return dataResponse;
+                        }
+                        } else {
+                        dataResponse.setSuccess(false);
+                        dataResponse.setMessage("Saldo Anda tidak cukup");
+                        return dataResponse;
+                        }
+                        } else {
+                        dataResponse.setSuccess(false);
+                        dataResponse.setMessage("Nominal transaksi minimal Rp10.000,00.");
+                        return dataResponse;
+                        }
+                        } else {
+                        dataResponse.setSuccess(false);
+                        dataResponse.setMessage("Nomor rekening tidak terdaftar");
+                        return dataResponse;
+                        }
+                        }
+
+	
 	// -------------------------------------Transfer-------------------------------------------------
 	public TransferWrapper transfer(Long rekTujuan, Long rekAsal, Long nominal) {
 

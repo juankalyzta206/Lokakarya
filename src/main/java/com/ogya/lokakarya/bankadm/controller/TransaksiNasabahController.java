@@ -20,6 +20,7 @@ import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
@@ -60,9 +61,9 @@ public class TransaksiNasabahController {
 	}
 
 	@PostMapping(path = "/tarik")
-	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
-			@RequestParam("Nominal") Long nominal) {
-		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.tarik(norek, nominal));
+	public DataResponseFeign<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
+	@RequestParam("Nominal") Long nominal) {
+	return transaksiNasabahService.tarik(norek, nominal);
 	}
 
 	@GetMapping(path = "/findByNoRekAndNoTelp")

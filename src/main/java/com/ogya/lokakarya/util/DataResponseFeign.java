@@ -27,6 +27,15 @@ public class DataResponseFeign<T> {
 		this.data = data;
 	}
 
+	public DataResponseFeign(DataResponseFeign<T> response) {
+	    this.status = response.isStatus();
+	    this.message = response.getMessage();
+	    this.data = response.getData();
+	    this.success = response.isSuccess();
+	    this.referenceNumber = response.getReferenceNumber();
+	}
+
+
 	public boolean isStatus() {
 		return status;
 	}
@@ -71,7 +80,6 @@ public class DataResponseFeign<T> {
 		return referenceNumber;
 	}
 
-	
 	public void setReferenceNumber(String referenceNumber) {
 		this.referenceNumber = referenceNumber;
 	}
