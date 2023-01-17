@@ -25,15 +25,12 @@ public class UsersFeignServices {
 	@Autowired
 	RolesService rolesService;
 
-	public DataResponseFeign<RolesWrapper> callUserRoleInquiry(String role) {
+	public DataResponseFeign<RolesWrapper> callUserRoleInquiry(RolesWrapper wrapper) {
 		try {
-			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleInquiry(role);
+			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleInquiry(wrapper.getNama());
 			if (usersFeignResponse.getSuccess()) {
 				RolesWrapper addRole = new RolesWrapper();
-				addRole.setNama(role);
-				addRole.setProgramName(usersFeignResponse.getProgramName());
-				
-				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(rolesService.save(addRole));
+				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(rolesService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
 				return dataResponse;
@@ -46,24 +43,16 @@ public class UsersFeignServices {
 	}
 	
 	
-	public DataResponseFeign<UsersAddWrapper> callUserRoleRecord(UsersFeignRequest request) {
+	public DataResponseFeign<UsersAddWrapper> callUserRoleRecord(UsersAddWrapper wrapper) {
 		try {
 			UsersFeignToWebServiceRequest requestWebService = new UsersFeignToWebServiceRequest();
-			requestWebService.setAlamat(request.getAlamat());
-			requestWebService.setNama(request.getNama());
-			requestWebService.setEmail(request.getEmail());
-			requestWebService.setTelpon(request.getTelpon());
+			requestWebService.setAlamat(wrapper.getAlamat());
+			requestWebService.setNama(wrapper.getNama());
+			requestWebService.setEmail(wrapper.getEmail());
+			requestWebService.setTelpon(wrapper.getTelp().toString());
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleRecord(requestWebService);
 			if (usersFeignResponse.getSuccess()) {
-				UsersAddWrapper addUser = new UsersAddWrapper();
-				addUser.setUsername(request.getUsername());
-				addUser.setPassword(request.getPassword());
-				addUser.setAlamat(request.getAlamat());
-				addUser.setNama(request.getNama());
-				addUser.setTelp(Long.parseLong(request.getTelpon()));
-				addUser.setEmail(request.getEmail());
-				
-				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(usersService.save(addUser));
+				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(usersService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
 				return dataResponse;

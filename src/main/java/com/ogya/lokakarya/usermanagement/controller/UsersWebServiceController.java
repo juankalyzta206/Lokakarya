@@ -25,13 +25,13 @@ public class UsersWebServiceController {
 
 	
 	@PostMapping(path = "/saveUsersFromWebService")
-	public DataResponseFeign<UsersAddWrapper> saveUsersFromWebService(@RequestBody UsersFeignRequest request){
-		return usersFeignServices.callUserRoleRecord(request);
+	public DataResponseFeign<UsersAddWrapper> saveUsersFromWebService(@RequestBody UsersAddWrapper wrapper){
+		return usersFeignServices.callUserRoleRecord(wrapper);
 	}
 	
 	@GetMapping(path = "/saveRolesFromWebService/{role}")
-	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@PathVariable String role){
-		return usersFeignServices.callUserRoleInquiry(role);
+	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@PathVariable RolesWrapper wrapper){
+		return usersFeignServices.callUserRoleInquiry(wrapper);
 	}
 	
 	
