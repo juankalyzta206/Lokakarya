@@ -1,13 +1,13 @@
-package com.ogya.lokakarya.usermanagement.feign.services;
+package com.ogya.lokakarya.feign.usermanagement.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.usermanagement.feign.repository.UsersFeignRepository;
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignToWebServiceRequest;
-import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
+import com.ogya.lokakarya.feign.usermanagement.repository.UsersFeignRepository;
+import com.ogya.lokakarya.feign.usermanagement.request.UsersFeignRequest;
+import com.ogya.lokakarya.feign.usermanagement.request.UsersFeignToWebServiceRequest;
+import com.ogya.lokakarya.feign.usermanagement.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.service.RolesService;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-import com.ogya.lokakarya.usermanagement.feign.services.UsersFeignServices;
+import com.ogya.lokakarya.feign.usermanagement.request.UsersFeignRequest;
+import com.ogya.lokakarya.feign.usermanagement.services.UsersFeignServices;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.util.DataResponse;
