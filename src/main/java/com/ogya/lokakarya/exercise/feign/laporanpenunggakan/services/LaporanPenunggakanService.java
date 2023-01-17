@@ -32,14 +32,12 @@ public class LaporanPenunggakanService {
 		return laporanPenunggakanResponse;
 	}
 	private TransaksiTelkom toEntity(LaporanPenunggakanRequest request) {
-		Byte status = 1;
 		TransaksiTelkom entity = new TransaksiTelkom();
 		entity.setBulanTagihan(request.getBulanTunggakan().byteValue());
 		entity.setTahunTagihan(request.getTahunTagihan());
-		entity.setStatus(status);
+		entity.setStatus(Byte.valueOf(request.getStatus()));
 		entity.setUang(request.getTagihan().longValue());
 		MasterPelanggan masterPelanggan = masterPelangganRepository.findByNama(request.getNamaPelanggan());
-		//Optional<MasterPelanggan> optionalMaster = masterPelangganRepository.findById(masterPelanggan.getIdPelanggan());
 		entity.setIdPelanggan(masterPelanggan);
 		
 		return entity;
