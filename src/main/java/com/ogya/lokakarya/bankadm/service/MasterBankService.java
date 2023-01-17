@@ -107,21 +107,32 @@ public class MasterBankService {
 		return entity;
 	}
 	
-
-	    public DataResponseFeign<MasterBankWrapper> save(MasterBankWrapper wrapper) {
-	        MasterBank employee = masterBankRepository.save(toEntity(wrapper));
+	public DataResponseFeign<MasterBankWrapper> save(MasterBankWrapper wrapper) {
+	    DataResponseFeign<MasterBankWrapper> dataResponse = new DataResponseFeign<MasterBankWrapper>();
+	    try {
 	        BankAdminFeignRequest request = new BankAdminFeignRequest();
 	        request.setAlamat(wrapper.getAlamat());
 	        request.setNama(wrapper.getNama());
 	        request.setNominalSaldo(wrapper.getSaldo());
 	        request.setTelpon(wrapper.getNotlp().toString());
 	        BankAdminFeignResponse response = bankAdminFeignServices.bankPost(request);
-	        DataResponseFeign<MasterBankWrapper> dataResponse = new DataResponseFeign<MasterBankWrapper>();
-	        dataResponse.setSuccess(response.getSuccess());
-	        dataResponse.setReferenceNumber(response.getReferenceNumber());
-	        dataResponse.setData(toWrapper(employee));
+	        if (response.getSuccess()) {
+	            MasterBank employee = masterBankRepository.save(toEntity(wrapper));
+	            dataResponse.setSuccess(true);
+	            dataResponse.setReferenceNumber(response.getReferenceNumber());
+	            dataResponse.setData(toWrapper(employee));
+	        } else {
+	            throw new Exception("Failed to save employee");
+	        }
 	        return dataResponse;
+	    } catch (Exception e) {
+	        //log the exception here
+	        //You can also return a custom message for user 
+	        return new DataResponseFeign<MasterBankWrapper>(false, e.getMessage(), null);
 	    }
+	}
+
+
 
 	/*
 	 * public MasterBankWrapper save(MasterBankWrapper wrapper) { MasterBank
