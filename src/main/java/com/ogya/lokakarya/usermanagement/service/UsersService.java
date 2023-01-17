@@ -29,8 +29,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.usermanagement.entity.Users;
-import com.ogya.lokakarya.usermanagement.feign.request.UsersFeignRequest;
-import com.ogya.lokakarya.usermanagement.feign.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.repository.criteria.UsersCriteriaRepository;
@@ -53,18 +51,6 @@ public class UsersService {
 	
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
-
-	public UsersAddWrapper saveUsersFromWebService(String username, String password, UsersFeignResponse webResponse,UsersFeignRequest request) {
-		UsersAddWrapper userAdd = new UsersAddWrapper();
-		userAdd.setNama(request.getNama());
-		userAdd.setEmail(request.getEmail());
-		userAdd.setTelp(Long.parseLong(request.getTelpon()));
-		userAdd.setAlamat(request.getAlamat());
-		userAdd.setProgramName(webResponse.getProgramName());
-		userAdd.setUsername(username);
-		userAdd.setPassword(password);
-		return save(userAdd);
-	}
 	
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
