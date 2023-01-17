@@ -924,7 +924,7 @@ public class TransaksiNasabahService {
 		
 		if (validatedRekening.getRegistered() == true) {
 			MasterBank nasabah = masterBankRepo.getReferenceById(noRekening);
-			Users user = usersRepository.getReferenceById(nasabah.getUserId());
+			List<Users> user = usersRepository.findByUserId(nasabah.getUserId());
 			
 			NasabahFeignResponse setorRespon = nasabahService.callSetor(setorReq);
 			System.out.println("Success: "+setorRespon.getSuccess());
@@ -934,14 +934,14 @@ public class TransaksiNasabahService {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
 //				transaksiNasabahService.setor(noRekening, nominal);
 				Context ctx = new Context();
-				ctx.setVariable("nama", user.getNama());
+				ctx.setVariable("name", user.get(0).getNama());
 				ctx.setVariable("rekening", noRekening.toString());
-				ctx.setVariable("tanggal", setorData.getTanggal());
-				ctx.setVariable("nominal", nominal);
-				ctx.setVariable("noReference", setorRespon.getReferenceNumber());
+				ctx.setVariable("tanggal", setorData.getTanggal().toString());
+				ctx.setVariable("nominal", nominal.toString());
+				ctx.setVariable("nomorReference", setorRespon.getReferenceNumber());
 				
 				ByteArrayOutputStream setorPdf = ExportToPdfSetorParam(setorData.getIdTransaksi());
-				sendEmailTransfer(user.getEmail(), "Setor", ctx, setorPdf);
+				sendEmailTransfer(user.get(0).getEmail(), "Setor", ctx, setorPdf);
 					
 
 				return setorData;
