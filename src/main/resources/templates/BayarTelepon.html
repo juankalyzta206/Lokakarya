@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title th:remove="all">Konfirmasi Setor</title>
+<title th:remove="all">Bayar Telepon</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
 body {
@@ -22,19 +22,21 @@ a.link {
 </style>
 </head>
 <body>
-	<h1>Bukti Setor</h1>
+	<h1>Laporan Bayar Telepon</h1>
 	<div>
 		Dear <b th:text="${name}">name</b> !
 	</div>
 	<p>
-		Anda sukses melakukan setor tunai ke nomor rekening <b th:text="${rekening}">rekening</b><br /> 	
-		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
+		Anda sukses melakukan pembayaran telpon untuk nomor <b th:text="${noTelepon}">noTelepon</b><br /> 	
+		bulan <b th:text="${bulan}">bulan</b><br />
+		tahun <b th:text="${tahun}">tahun</b><br />
 		sebesar <b th:text="${nominal}">nominal</b><br />
 		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
 						
 	</p>
+
 	<p>
-		Salam, <br /> &emsp; <em>Bank XYZ</em>
+		Salam, <br /><em>Bank XYZ</em>
 	</p>
 </body>
 </html>
