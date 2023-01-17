@@ -35,6 +35,7 @@ import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
 import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
 import com.ogya.lokakarya.exercise.feign.bankadm.services.BankAdminFeignServices;
 import com.ogya.lokakarya.util.DataResponse;
+import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -107,7 +108,7 @@ public class MasterBankService {
 	}
 	
 
-	    public DataResponse<MasterBankWrapper> save(MasterBankWrapper wrapper) {
+	    public DataResponseFeign<MasterBankWrapper> save(MasterBankWrapper wrapper) {
 	        MasterBank employee = masterBankRepository.save(toEntity(wrapper));
 	        BankAdminFeignRequest request = new BankAdminFeignRequest();
 	        request.setAlamat(wrapper.getAlamat());
@@ -115,7 +116,7 @@ public class MasterBankService {
 	        request.setNominalSaldo(wrapper.getSaldo());
 	        request.setTelpon(wrapper.getNotlp().toString());
 	        BankAdminFeignResponse response = bankAdminFeignServices.bankPost(request);
-	        DataResponse<MasterBankWrapper> dataResponse = new DataResponse<MasterBankWrapper>();
+	        DataResponseFeign<MasterBankWrapper> dataResponse = new DataResponseFeign<MasterBankWrapper>();
 	        dataResponse.setSuccess(response.getSuccess());
 	        dataResponse.setReferenceNumber(response.getReferenceNumber());
 	        dataResponse.setData(toWrapper(employee));

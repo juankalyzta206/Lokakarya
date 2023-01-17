@@ -8,8 +8,7 @@ public class DataResponseList<E> {
 	private String message;
 	private Long timeStamp;
 	private List<E> data;
-	private Boolean success;
-	private String referenceNumber;
+	
 	
 	public DataResponseList(List<E> data) {
 		this(true, null, data);
@@ -54,21 +53,7 @@ public class DataResponseList<E> {
 		this.timeStamp = timeStamp;
 	}
 	
-    public boolean isSuccess() {
-        return success;
-    }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getReferenceNumber() {
-        return referenceNumber;
-    }
-
-    public void setReferenceNumber(String referenceNumber) {
-        this.referenceNumber = referenceNumber;
-    }
 	
 
 }
