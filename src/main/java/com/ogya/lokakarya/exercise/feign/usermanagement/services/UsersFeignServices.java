@@ -1,17 +1,18 @@
-package com.ogya.lokakarya.feign.usermanagement.services;
+package com.ogya.lokakarya.exercise.feign.usermanagement.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.exception.BusinessException;
-import com.ogya.lokakarya.feign.usermanagement.repository.UsersFeignRepository;
-import com.ogya.lokakarya.feign.usermanagement.request.UsersFeignRequest;
-import com.ogya.lokakarya.feign.usermanagement.request.UsersFeignToWebServiceRequest;
-import com.ogya.lokakarya.feign.usermanagement.response.UsersFeignResponse;
+import com.ogya.lokakarya.exercise.feign.usermanagement.repository.UsersFeignRepository;
+import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignRequest;
+import com.ogya.lokakarya.exercise.feign.usermanagement.request.UsersFeignToWebServiceRequest;
+import com.ogya.lokakarya.exercise.feign.usermanagement.response.UsersFeignResponse;
 import com.ogya.lokakarya.usermanagement.service.RolesService;
 import com.ogya.lokakarya.usermanagement.service.UsersService;
 import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
+import com.ogya.lokakarya.util.DataResponseFeign;
 
 @Service
 public class UsersFeignServices {
@@ -24,14 +25,18 @@ public class UsersFeignServices {
 	@Autowired
 	RolesService rolesService;
 
-	public RolesWrapper callUserRoleInquiry(String role) {
+	public DataResponseFeign<RolesWrapper> callUserRoleInquiry(String role) {
 		try {
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleInquiry(role);
 			if (usersFeignResponse.getSuccess()) {
 				RolesWrapper addRole = new RolesWrapper();
 				addRole.setNama(role);
 				addRole.setProgramName(usersFeignResponse.getProgramName());
-				return rolesService.save(addRole);
+				
+				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(rolesService.save(addRole));
+				dataResponse.setSuccess(usersFeignResponse.getSuccess());
+				dataResponse.setReferenceNumber(null);
+				return dataResponse;
 			} else {
 				throw new BusinessException("Failed to add Roles, something wrong in web services");
 			}
@@ -41,7 +46,7 @@ public class UsersFeignServices {
 	}
 	
 	
-	public UsersAddWrapper callUserRoleRecord(UsersFeignRequest request) {
+	public DataResponseFeign<UsersAddWrapper> callUserRoleRecord(UsersFeignRequest request) {
 		try {
 			UsersFeignToWebServiceRequest requestWebService = new UsersFeignToWebServiceRequest();
 			requestWebService.setAlamat(request.getAlamat());
@@ -57,8 +62,11 @@ public class UsersFeignServices {
 				addUser.setNama(request.getNama());
 				addUser.setTelp(Long.parseLong(request.getTelpon()));
 				addUser.setEmail(request.getEmail());
-				addUser.setProgramName(usersFeignResponse.getProgramName());
-				return usersService.save(addUser);
+				
+				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(usersService.save(addUser));
+				dataResponse.setSuccess(usersFeignResponse.getSuccess());
+				dataResponse.setReferenceNumber(null);
+				return dataResponse;
 			} else {
 				throw new BusinessException("Failed to add Users, something wrong in web services");
 			}
