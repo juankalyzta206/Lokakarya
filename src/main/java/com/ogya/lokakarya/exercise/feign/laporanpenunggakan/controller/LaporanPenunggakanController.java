@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.exercise.feign.nasabah.controller;
+package com.ogya.lokakarya.exercise.feign.laporanpenunggakan.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
