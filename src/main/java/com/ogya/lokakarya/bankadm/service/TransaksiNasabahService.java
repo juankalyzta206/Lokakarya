@@ -1041,10 +1041,15 @@ public class TransaksiNasabahService {
 			if (setorRespon.getSuccess()) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
 //				transaksiNasabahService.setor(noRekening, nominal);
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(setorData.getTanggal());
+				String timeString = timeFormat.format(setorData.getTanggal());
 				Context ctx = new Context();
 				ctx.setVariable("name", user.get(0).getNama());
 				ctx.setVariable("rekening", noRekening.toString());
-				ctx.setVariable("tanggal", setorData.getTanggal().toString());
+				ctx.setVariable("tanggal", dateString);
+				ctx.setVariable("jam", timeString);
 				ctx.setVariable("nominal", nominal.toString());
 				ctx.setVariable("nomorReference", setorRespon.getReferenceNumber());
 				
