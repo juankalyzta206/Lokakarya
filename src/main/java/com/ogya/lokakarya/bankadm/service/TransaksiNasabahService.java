@@ -807,8 +807,8 @@ public class TransaksiNasabahService {
 		}
 
 	}
-//	==========================================================================================================================
-
+	
+//	=============================================ExportToPdf=====================================================
 	public PdfPCell Left(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_LEFT);
