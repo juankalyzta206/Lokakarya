@@ -33,6 +33,7 @@ public class TransaksiNasabahController {
 	@Autowired
 	NasabahFeignService nasabahFeignService;
 
+//	===========================================Transaksi==========================================================
 	@PostMapping(path = "/transfer")
 	public DataResponse<TransferWrapper> transfer(@RequestParam("Nomor Rekening Asal") Long rekAsal,
 			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) {
@@ -43,12 +44,6 @@ public class TransaksiNasabahController {
 	public DataResponseList<BayarTeleponWrapper> bayarTelpon(@RequestParam("Nomor Rekening") Long rekAsal,
 			@RequestParam("No Telepon") Long noTelpon) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelpon(rekAsal, noTelpon));
-	}
-	
-	@PostMapping(path = "/bayarTelponLoop")
-	public DataResponseList<BayarTeleponWrapper> bayarTelponLoop(@RequestParam("Nomor Rekening") Long rekAsal,
-			@RequestParam("No Telepon") Long noTelpon) {
-		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponLoop(rekAsal, noTelpon));
 	}
 
 	@PostMapping(path = "/bayarTelponPerbulan")
@@ -68,12 +63,14 @@ public class TransaksiNasabahController {
 			@RequestParam("Nominal") Long nominal) {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.setor(norek, nominal));
 	}
-	
+
 	@PostMapping(path = "/tarik")
 	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
 			@RequestParam("Nominal") Long nominal) {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.tarik(norek, nominal));
 	}
+	
+//	=========================================GetDataTransaksi===================================================
 
 	@GetMapping(path = "/findByNoRekAndNoTelp")
 	public DataResponseList<BayarTeleponWrapper> findByNoTelp(@RequestParam("Nomor Rekening") Long rekAsal,
@@ -86,67 +83,68 @@ public class TransaksiNasabahController {
 			@RequestParam("No Telepon") Long noTelp) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.findTotalTagihan(rekAsal, noTelp));
 	}
+	
+//	=======================================ExportToPDF================================================================
 
 	@GetMapping(path = "/exportToPdfSetorParam")
-	public void exportToPdfSetorParam(@RequestParam("ID History") Long idHistory)
-			throws Exception {
+	public void exportToPdfSetorParam(@RequestParam("ID History") Long idHistory) throws Exception {
 		transaksiNasabahService.ExportToPdfSetorParam(idHistory);
 	}
-//
-//	@GetMapping(path = "/exportToPdfTarikParam")
-//	public void exportToPdfTarikParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory)
-//			throws Exception {
-//		transaksiNasabahService.ExportToPdfTarikParam(response, idHistory);
-//	}
 
-//	@GetMapping(path = "/exportToPdfTransferParam")
-//	public void exportToPdfTransferParam(@RequestParam("ID History") Long idHistory)
-//			throws Exception {
-//		transaksiNasabahService.ExportToPdfTransferParam(idHistory);
-//	}
+	@GetMapping(path = "/exportToPdfTarikParam")
+	public void exportToPdfTarikParam(@RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfTarikParam(idHistory);
+	}
 
-//	@GetMapping(path = "/exportToPdfBayarTeleponParam")
-//	public void exportToPdfBayarTeleponParam(HttpServletResponse response,
-//			@RequestParam("ID History Bank") Long idHistoryBank, @RequestParam("ID History Telepon") Long idHistoryTelp)
-//			throws Exception {
-//		transaksiNasabahService.ExportToPdfBayarTeleponParam(response, idHistoryBank, idHistoryTelp);
-//	}
+	@GetMapping(path = "/exportToPdfTransferParam")
+	public void exportToPdfTransferParam(@RequestParam("ID History") Long idHistory, @RequestParam("Saldo") Long saldo)
+			throws Exception {
+		transaksiNasabahService.ExportToPdfTransferParam(idHistory, saldo);
+	}
 
+	@GetMapping(path = "/exportToPdfBayarTeleponParam")
+	public void exportToPdfBayarTeleponParam(@RequestParam("ID History Bank") Long idHistoryBank,
+			@RequestParam("ID History Telepon") Long idHistoryTelp) throws Exception {
+		transaksiNasabahService.ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
+	}
+
+	
+
+//	======================================TransaksiValidate=========================================================
+	
 	@PostMapping(path = "/transferValidate")
 	public DataResponse<TransferWrapper> transferValidate(@RequestParam("Nomor Rekening Asal") Long rekAsal,
-			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal) throws Exception {
+			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal)
+			throws Exception {
 		return new DataResponse<TransferWrapper>(transaksiNasabahService.transferValidate(rekTujuan, rekAsal, nominal));
 	}
 	
 	@PostMapping(path = "/tarikValidate")
 	public DataResponse<SetorAmbilWrapper> tarikValidate(@RequestParam("Nomor Rekening") Long norek,
-			@RequestParam("Nominal") Long nominal)throws Exception  {
+			@RequestParam("Nominal") Long nominal) throws Exception {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.tarikValidate(norek, nominal));
 	}
 
-	
-	@PostMapping(path = "/bayarTeleponValidate")
+	@PostMapping(path = "/bayarTeleponPerbulanValidate")
 	public DataResponseList<BayarTeleponWrapper> bayarTeleponValidate(@RequestParam("Nomor Rekening") Long rekAsal,
-			@RequestParam("No Telepon") Long noTelpon, @RequestParam("Bulan Tagihan") Byte bulanTagihan) throws Exception {
-		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
+			@RequestParam("No Telepon") Long noTelpon, @RequestParam("Bulan Tagihan") Byte bulanTagihan)
+			throws Exception {
+		return new DataResponseList<BayarTeleponWrapper>(
+				transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
 	}
-	
+
 	@PostMapping(path = "/bayarTeleponTotalValidate")
 	public DataResponseList<BayarTeleponWrapper> bayarTeleponTotalValidate(@RequestParam("Nomor Rekening") Long rekAsal,
 			@RequestParam("No Telepon") Long noTelpon) throws Exception {
-		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponTotalValidate(rekAsal, noTelpon));
+		return new DataResponseList<BayarTeleponWrapper>(
+				transaksiNasabahService.bayarTelponTotalValidate(rekAsal, noTelpon));
 	}
 
 	@PostMapping(path = "/setorValidate")
 	public DataResponse<SetorAmbilWrapper> setorValidate(@RequestParam("Nomor Rekening") Long norek,
-			@RequestParam("Nominal") Long nominal) throws MessagingException, IOException, DocumentException, Exception {
+			@RequestParam("Nominal") Long nominal)
+			throws MessagingException, IOException, DocumentException, Exception {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.sendBuktiSetor(norek, nominal));
 	}
-	
-//	@PostMapping(path = "/transferValidate")
-//	public void transferValidate(HttpServletResponse response, @RequestParam("Nomor Rekening Asal") Long rekAsal,
-//			@RequestParam("Nomor Rekening Tujuan") Long rekTujuan, @RequestParam("Nominal") Long nominal)
-//			throws MessagingException, IOException, DocumentException {
-//		transaksiNasabahService.transferValidate(response, rekTujuan, rekAsal, nominal);
-//	}
+
 }

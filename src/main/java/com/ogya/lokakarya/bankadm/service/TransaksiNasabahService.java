@@ -96,6 +96,7 @@ public class TransaksiNasabahService {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private TemplateEngine templateEngine;
+
 	// -------------------------------------------ceksaldo----------------------------------------
 	public MasterBankWrapper cekSaldo(Long rekening) {
 		if (masterBankRepo.findById(rekening).isPresent()) {
@@ -332,7 +333,6 @@ public class TransaksiNasabahService {
 		}
 	}
 
-
 	// --------------------------------------BayarTelponTotal----------------------------------------------
 	public List<BayarTeleponWrapper> bayarTelpon(Long rekAsal, Long noTelpon) {
 		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
@@ -567,6 +567,7 @@ public class TransaksiNasabahService {
 
 		return wrapperList;
 	}
+
 //	=================================TransaksiValidate====================================================
 	public SetorAmbilWrapper sendBuktiSetor(Long noRekening, Long nominal)
 			throws MessagingException, IOException, DocumentException, Exception {
@@ -586,17 +587,17 @@ public class TransaksiNasabahService {
 
 			if (setorRespon.getSuccess()) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
-				
+
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 				CurrencyData currencyData = new CurrencyData();
 				currencyData.setValue(nominal);
 				String dataNominal = numberFormat.format(currencyData.getValue());
-				
+
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
 				String dateString = dateFormat.format(setorData.getTanggal());
 				String timeString = timeFormat.format(setorData.getTanggal());
-				
+
 				Context ctx = new Context();
 				ctx.setVariable("name", user.get(0).getNama());
 				ctx.setVariable("rekening", noRekening.toString());
@@ -617,14 +618,14 @@ public class TransaksiNasabahService {
 			throw new BusinessException("No Rekening tidak terdaftar.");
 		}
 	}
-	
+
 	public SetorAmbilWrapper tarikValidate(Long rekening, Long nominal) throws Exception {
 		NoRekeningFeignResponse rekValidatePengirim = nasabahFeignService.cekNoRekening(rekening.toString());
 
 		TarikFeignRequest tarikReq = new TarikFeignRequest();
 		tarikReq.setNoRekening(rekening.toString());
 		tarikReq.setTarikan(nominal);
-		
+
 		if (rekValidatePengirim.getRegistered() == true) {
 
 			NasabahFeignResponse tarikRes = nasabahFeignService.callTarik(tarikReq);
@@ -634,18 +635,17 @@ public class TransaksiNasabahService {
 			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
 			System.out.println("userID :" + nasabah.getUserId());
 			List<Users> userstarik = usersRepository.findByUserId(nasabah.getUserId());
-			
 
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyData = new CurrencyData();
 			currencyData.setValue(nominal);
 			String dataNominal = numberFormat.format(currencyData.getValue());
-			
+
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
 			String dateString = dateFormat.format(tarik.getTanggal());
 			String timeString = timeFormat.format(tarik.getTanggal());
-			
+
 			Context ctxTarik = new Context();
 			ctxTarik.setVariable("name", userstarik.get(0).getNama());
 			ctxTarik.setVariable("rekening", rekening.toString());
@@ -654,8 +654,7 @@ public class TransaksiNasabahService {
 			ctxTarik.setVariable("nominal", dataNominal);
 			ctxTarik.setVariable("jam", timeString);
 
-			ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
-					tarik.getIdTransaksi(), tarik.getSaldo());
+			ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarik.getIdTransaksi());
 
 			sendEmail(userstarik.get(0).getEmail().toString(), "Laporan Transaksi Tarik Tunai", "Tarik Tunai.pdf",
 					"Tarik", ctxTarik, pdfTarik);
@@ -666,7 +665,7 @@ public class TransaksiNasabahService {
 			throw new BusinessException("Rekening tidak terdaftar");
 		}
 	}
-	
+
 	public TransferWrapper transferValidate(Long rekTujuan, Long rekAsal, Long nominal) throws Exception {
 		ValidateRekeningFeignResponse rekValidatePengirim = transferService.callValidateRekening(rekAsal.toString());
 		ValidateRekeningFeignResponse rekValidatePenerima = transferService.callValidateRekening(rekTujuan.toString());
@@ -686,17 +685,17 @@ public class TransaksiNasabahService {
 				List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
 				MasterBank tujuan = masterBankRepo.getReferenceById(rekTujuan);
 				List<Users> userTujuan = usersRepository.findByUserId(tujuan.getUserId());
-				
+
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 				CurrencyData currencyNominal = new CurrencyData();
 				currencyNominal.setValue(nominal);
 				String dataNominal = numberFormat.format(currencyNominal.getValue());
-				
+
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
 				String dateString = dateFormat.format(transfer.getTanggal());
 				String timeString = timeFormat.format(transfer.getTanggal());
-				
+
 				Context ctxPengirim = new Context();
 				ctxPengirim.setVariable("name", userPengirim.get(0).getNama());
 				ctxPengirim.setVariable("rekeningPengirim", rekAsal.toString());
@@ -706,12 +705,12 @@ public class TransaksiNasabahService {
 				ctxPengirim.setVariable("jam", timeString);
 				ctxPengirim.setVariable("nominal", dataNominal);
 
-				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
-						transfer.getIdTransaksi(), transfer.getSaldoPengirim());
+				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transfer.getIdTransaksi(),
+						transfer.getSaldoPengirim());
 
 				sendEmail(userPengirim.get(0).getEmail().toString(), "Laporan Transaksi Transfer", "Bukti Transfer.pdf",
 						"TransferPengirim", ctxPengirim, pdfPengirim);
-				
+
 				Context ctxTujuan = new Context();
 				ctxTujuan.setVariable("name", userPengirim.get(0).getNama());
 				ctxTujuan.setVariable("rekeningPengirim", rekAsal.toString());
@@ -721,8 +720,8 @@ public class TransaksiNasabahService {
 				ctxTujuan.setVariable("jam", timeString);
 				ctxTujuan.setVariable("nominal", dataNominal);
 
-				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
-						transfer.getIdTransaksi(), transfer.getSaldoPenerima());
+				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transfer.getIdTransaksi(),
+						transfer.getSaldoPenerima());
 				sendEmail(userTujuan.get(0).getEmail().toString(), "Laporan Transaksi Transfer", "Bukti Transfer.pdf",
 						"TransferPenerima", ctxTujuan, pdfTujuan);
 
@@ -742,26 +741,29 @@ public class TransaksiNasabahService {
 		ValidateRekeningFeignResponse rekValidate = transferService.callValidateRekening(rekAsal.toString());
 
 		if (rekValidate.getRegistered() == true) {
+			
 			List<BayarTeleponWrapper> bayarTelponList = bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan);
+			
 			BayarRequest bayarRequest = new BayarRequest();
 			bayarRequest.setBulan((int) bulanTagihan);
 			bayarRequest.setNoRekening(rekAsal.toString());
 			bayarRequest.setNoTelepon(noTelpon.toString());
+			
 			BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
 
 			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
 			List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
-			
+
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyData = new CurrencyData();
 			currencyData.setValue(bayarTelponList.get(0).getTagihan());
 			String tagihan = numberFormat.format(currencyData.getValue());
-			
+
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
 			String dateString = dateFormat.format(bayarTelponList.get(0).getTanggal());
 			String timeString = timeFormat.format(bayarTelponList.get(0).getTanggal());
-			
+
 			Context ctxBayarTelepon = new Context();
 			ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
 			ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
@@ -804,17 +806,17 @@ public class TransaksiNasabahService {
 				bayarRequest.setNoTelepon(noTelpon.toString());
 
 				BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
-				
+
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 				CurrencyData currencyData = new CurrencyData();
 				currencyData.setValue(bayarTelponList.get(i).getTagihan());
 				String tagihan = numberFormat.format(currencyData.getValue());
-					
+
 				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
 				String dateString = dateFormat.format(bayarTelponList.get(i).getTanggal());
 				String timeString = timeFormat.format(bayarTelponList.get(i).getTanggal());
-				
+
 				Context ctxBayarTelepon = new Context();
 				ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
 				ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
@@ -839,7 +841,7 @@ public class TransaksiNasabahService {
 		}
 
 	}
-	
+
 //	=============================================ExportToPdf=====================================================
 	public PdfPCell Left(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title, new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL)));
@@ -877,6 +879,13 @@ public class TransaksiNasabahService {
 	public ByteArrayOutputStream ExportToPdfSetorParam(Long idHistory) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
+
+		TarikFeignRequest request = new TarikFeignRequest();
+		request.setNoRekening(data.getRekening().getNorek().toString());
+		request.setTarikan(data.getUang());
+
+		NasabahFeignResponse response = nasabahFeignService.callTarik(request);
+
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, outputStream);
@@ -913,6 +922,9 @@ public class TransaksiNasabahService {
 		}
 		pdfTable.addCell(Right(formattedDate));
 
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(response.getReferenceNumber()));
+
 		pdfTable.addCell(Left("Nomor Rekening"));
 		pdfTable.addCell(Right(
 				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
@@ -921,21 +933,23 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Right(String.valueOf(data.getNama() != null ? String.valueOf(data.getNama()) : "-")));
 		pdfTable.addCell(Left("Jenis Transaksi"));
 		pdfTable.addCell(Right("Setor Tunai"));
-		
+
 		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 		CurrencyData currencyNominal = new CurrencyData();
 		currencyNominal.setValue(data.getUang());
-		
+
 		pdfTable.addCell(Left("Nominal Transaksi"));
-		pdfTable.addCell(
-				Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null ? String.valueOf(numberFormat.format(currencyNominal.getValue())) : "-")));
-		
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+				? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+				: "-")));
+
 		CurrencyData currencySaldo = new CurrencyData();
 		currencySaldo.setValue(data.getRekening().getSaldo());
-		
+
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(
-				numberFormat.format(currencySaldo.getValue()) != null ? String.valueOf(numberFormat.format(currencySaldo.getValue())) : "-")));
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencySaldo.getValue()) != null
+				? String.valueOf(numberFormat.format(currencySaldo.getValue()))
+				: "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -947,10 +961,16 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Tarik--------------------------------------
-	public ByteArrayOutputStream ExportToPdfTarikParam(String noReference, Long idHistory, Long saldo)
-			throws Exception {
+	public ByteArrayOutputStream ExportToPdfTarikParam(Long idHistory) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
+
+		TarikFeignRequest request = new TarikFeignRequest();
+		request.setNoRekening(data.getRekening().getNorek().toString());
+		request.setTarikan(data.getUang());
+
+		NasabahFeignResponse response = nasabahFeignService.callTarik(request);
+
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -987,6 +1007,9 @@ public class TransaksiNasabahService {
 		}
 		pdfTable.addCell(Right(formattedDate));
 
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(response.getReferenceNumber()));
+
 		pdfTable.addCell(Left("Nomor Rekening"));
 		pdfTable.addCell(Right(
 				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
@@ -995,21 +1018,23 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Right(String.valueOf(data.getNama() != null ? String.valueOf(data.getNama()) : "-")));
 		pdfTable.addCell(Left("Jenis Transaksi"));
 		pdfTable.addCell(Right("Tarik Tunai"));
-		
+
 		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 		CurrencyData currencyNominal = new CurrencyData();
 		currencyNominal.setValue(data.getUang());
-		
+
 		pdfTable.addCell(Left("Nominal Transaksi"));
-		pdfTable.addCell(
-				Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null ? String.valueOf(numberFormat.format(currencyNominal.getValue())) : "-")));
-		
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+				? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+				: "-")));
+
 		CurrencyData currencySaldo = new CurrencyData();
 		currencySaldo.setValue(data.getRekening().getSaldo());
-		
+
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(
-				numberFormat.format(currencySaldo.getValue()) != null ? String.valueOf(numberFormat.format(currencySaldo.getValue())) : "-")));
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencySaldo.getValue()) != null
+				? String.valueOf(numberFormat.format(currencySaldo.getValue()))
+				: "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -1020,10 +1045,18 @@ public class TransaksiNasabahService {
 	}
 
 //	---------------------------------Bukti Transaksi Transfer--------------------------------------
-	public ByteArrayOutputStream ExportToPdfTransferParam(String noReference, Long idHistory, Long saldo)
-			throws Exception {
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	public ByteArrayOutputStream ExportToPdfTransferParam(Long idHistory, Long saldo) throws Exception {
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
+
+		TransferFeignRequest transferRequest = new TransferFeignRequest();
+		transferRequest.setJumlahTranfer(data.getUang());
+		transferRequest.setNoRekeningPengirim(data.getRekening().getNorek().toString());
+		transferRequest.setNoRekeningPenerima(data.getNoRekTujuan().toString());
+
+		TransferFeignResponse transferFeignResponse = transferService.callTransfer(transferRequest);
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -1062,7 +1095,8 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Right(formattedDate));
 
 		pdfTable.addCell(Left("Nomor Reference"));
-		pdfTable.addCell(Right(noReference));
+		pdfTable.addCell(Right(transferFeignResponse.getReferenceNumber()));
+		
 		pdfTable.addCell(Left("Nomor Rekening Pengirim"));
 		pdfTable.addCell(Right(
 				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
@@ -1077,13 +1111,15 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Nama Nasabah Tujuan"));
 		pdfTable.addCell(
 				Right(String.valueOf(data.getNamaTujuan() != null ? String.valueOf(data.getNamaTujuan()) : "-")));
-				
+
 		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 		CurrencyData currencyNominal = new CurrencyData();
 		currencyNominal.setValue(data.getUang());
 		pdfTable.addCell(Left("Nominal Transaksi"));
-		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null ? String.valueOf(numberFormat.format(currencyNominal.getValue())) : "-")));
-		
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+				? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+				: "-")));
+
 		CurrencyData currencySaldo = new CurrencyData();
 		currencySaldo.setValue(saldo);
 		pdfTable.addCell(Left("Saldo"));
@@ -1102,6 +1138,13 @@ public class TransaksiNasabahService {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryTelkom dataTelepon = historyTelkomRepo.getReferenceById(idHistoryTelp);
 		HistoryBank dataNasabah = historyBankRepo.getReferenceById(idHistoryBank);
+		
+		BayarRequest bayarRequest = new BayarRequest();
+		bayarRequest.setBulan((int) dataTelepon.getBulanTagihan());
+		bayarRequest.setNoRekening(dataNasabah.getRekening().getNorek().toString());
+		bayarRequest.setNoTelepon(dataTelepon.getIdPelanggan().getNoTelp().toString());
+		
+		BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
@@ -1134,6 +1177,9 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Tanggal"));
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		String formattedDate = "-";
+		
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(bayarResponse.getReferenceNumber()));
 
 		if (dataNasabah.getTanggal() != null) {
 			formattedDate = formatter.format(dataNasabah.getTanggal());
@@ -1162,17 +1208,19 @@ public class TransaksiNasabahService {
 		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 		CurrencyData currencyNominal = new CurrencyData();
 		currencyNominal.setValue(dataNasabah.getUang());
-		
+
 		pdfTable.addCell(Left("Nominal Transaksi"));
-		pdfTable.addCell(
-				Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null ? String.valueOf(numberFormat.format(currencyNominal.getValue())) : "-")));
-		
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+				? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+				: "-")));
+
 		CurrencyData currencySaldo = new CurrencyData();
 		currencySaldo.setValue(dataNasabah.getRekening().getSaldo());
-		
+
 		pdfTable.addCell(Left("Saldo Nasabah"));
-		pdfTable.addCell(Right(String.valueOf(
-				numberFormat.format(currencySaldo.getValue()) != null ? String.valueOf(numberFormat.format(currencySaldo.getValue())) : "-")));
+		pdfTable.addCell(Right(String.valueOf(numberFormat.format(currencySaldo.getValue()) != null
+				? String.valueOf(numberFormat.format(currencySaldo.getValue()))
+				: "-")));
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
