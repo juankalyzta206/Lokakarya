@@ -587,16 +587,16 @@ public class TransaksiNasabahService {
 
 			if (setorRespon.getSuccess()) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
-//				transaksiNasabahService.setor(noRekening, nominal);
-				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
-				String dateString = dateFormat.format(setorData.getTanggal());
-				String timeString = timeFormat.format(setorData.getTanggal());
 				
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 				CurrencyData currencyData = new CurrencyData();
 				currencyData.setValue(nominal);
 				String dataNominal = numberFormat.format(currencyData.getValue());
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(setorData.getTanggal());
+				String timeString = timeFormat.format(setorData.getTanggal());
 				
 				Context ctx = new Context();
 				ctx.setVariable("name", user.get(0).getNama());
@@ -639,13 +639,18 @@ public class TransaksiNasabahService {
 			currencyData.setValue(nominal);
 			String dataNominal = numberFormat.format(currencyData.getValue());
 			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+			String dateString = dateFormat.format(tarik.getTanggal());
+			String timeString = timeFormat.format(tarik.getTanggal());
+			
 			Context ctxTarik = new Context();
 			ctxTarik.setVariable("name", userstarik.get(0).getNama());
 			ctxTarik.setVariable("rekening", rekening.toString());
-			ctxTarik.setVariable("nomorReference", tarikRes.getReferenceNumber());
-			ctxTarik.setVariable("tanggal", tarik.getTanggal().toString());
+			ctxTarik.setVariable("tanggal", dateString);
+			ctxTarik.setVariable("jam", timeString);
 			ctxTarik.setVariable("nominal", dataNominal);
-			ctxTarik.setVariable("saldo", tarik.getSaldo().toString());
+			ctxTarik.setVariable("nomorReference", tarikRes.getReferenceNumber());
 
 			ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
 					tarik.getIdTransaksi(), tarik.getSaldo());
