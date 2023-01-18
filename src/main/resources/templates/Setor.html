@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title th:remove="all">Konfirmasi Setor</title>
+<title th:remove="all">Notifikasi Setor</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
 body {
@@ -27,11 +27,18 @@ a.link {
 		Dear <b th:text="${name}">name</b> !
 	</div>
 	<p>
-		Anda sukses melakukan setor tunai ke nomor rekening <b th:text="${rekening}">rekening</b><br /> 	
-		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
-		sebesar <b th:text="${nominal}">nominal</b><br />
-		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
-						
+		Terima kasih Anda telah menggunakan fasilitas Bank XYZ.<br />
+		Berikut ini adalah informasi transaksi yang telah Anda lakukan:<br />
+		&nbsp;Tanggal&nbsp;: <b th:text="${tanggal}">tanggal</b><br />
+		&nbsp;Jam&nbsp;: <b th:text="${jam}">jam</b><br />
+		&nbsp;Jenis Transaksi : <b>Setor Tunai</b><br />
+		&nbsp;Rekening tujuan : <b th:text="${rekening}">rekening</b><br />
+		&nbsp;Nominal&nbsp;: <b th:text="${nominal}">nominal</b><br />
+		&nbsp;No. Referensi : <b th:text="${nomorReference}">nomorReference</b><br />
+		&nbsp;Status&nbsp;: <b>BERHASIL</b><br />
+		<br />
+		Semoga informasi ini bermanfaat bagi Anda.<br /> Terima kasih.
+		<br />			
 	</p>
 	<p>
 		Salam, <br /> &emsp; <em>Bank XYZ</em>
