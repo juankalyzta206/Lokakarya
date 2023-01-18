@@ -2,6 +2,7 @@ package com.ogya.lokakarya.bankadm.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,7 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.entity.TransaksiNasabah;
@@ -1305,5 +1308,50 @@ public class TransaksiNasabahService {
 			e.printStackTrace();
 		}
 
+	}
+	
+//	==========================================DownloadPDF======================================================
+	public void ExportToPdfSetor(HttpServletResponse response, Long idHistory) throws Exception {
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Setor Tunai.pdf");
+	    ByteArrayOutputStream baos = ExportToPdfSetorParam(idHistory);
+	    response.setContentLength(baos.size());
+	    OutputStream os = response.getOutputStream();
+	    baos.writeTo(os);
+	    os.flush();
+	    os.close();
+	}
+	
+	public void ExportToPdfTarik(HttpServletResponse response, Long idHistory) throws Exception {
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+	    ByteArrayOutputStream baos = ExportToPdfTarikParam(idHistory);
+	    response.setContentLength(baos.size());
+	    OutputStream os = response.getOutputStream();
+	    baos.writeTo(os);
+	    os.flush();
+	    os.close();
+	}
+	
+	public void ExportToPdfTransfer(HttpServletResponse response, Long idHistory, Long saldo) throws Exception {
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+	    ByteArrayOutputStream baos = ExportToPdfTransferParam(idHistory,saldo);
+	    response.setContentLength(baos.size());
+	    OutputStream os = response.getOutputStream();
+	    baos.writeTo(os);
+	    os.flush();
+	    os.close();
+	}
+	
+	public void ExportToPdfBayarTelepon(HttpServletResponse response, Long idHistoryBank, Long idHistoryTelp) throws Exception {
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+	    ByteArrayOutputStream baos = ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
+	    response.setContentLength(baos.size());
+	    OutputStream os = response.getOutputStream();
+	    baos.writeTo(os);
+	    os.flush();
+	    os.close();
 	}
 }

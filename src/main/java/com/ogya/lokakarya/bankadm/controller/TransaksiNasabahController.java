@@ -21,7 +21,6 @@ import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.util.DataResponse;
-import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.DataResponseList;
 
 @RestController
@@ -87,29 +86,28 @@ public class TransaksiNasabahController {
 //	=======================================ExportToPDF================================================================
 
 	@GetMapping(path = "/exportToPdfSetorParam")
-	public void exportToPdfSetorParam(@RequestParam("ID History") Long idHistory) throws Exception {
-		transaksiNasabahService.ExportToPdfSetorParam(idHistory);
+	public void exportToPdfSetor(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfSetor(response, idHistory);
 	}
 
 	@GetMapping(path = "/exportToPdfTarikParam")
-	public void exportToPdfTarikParam(@RequestParam("ID History") Long idHistory) throws Exception {
-		transaksiNasabahService.ExportToPdfTarikParam(idHistory);
+	public void exportToPdfTarikParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory) throws Exception {
+		transaksiNasabahService.ExportToPdfTarik(response, idHistory);
 	}
 
 	@GetMapping(path = "/exportToPdfTransferParam")
-	public void exportToPdfTransferParam(@RequestParam("ID History") Long idHistory, @RequestParam("Saldo") Long saldo)
+	public void exportToPdfTransferParam(HttpServletResponse response, @RequestParam("ID History") Long idHistory, @RequestParam("Saldo") Long saldo)
 			throws Exception {
-		transaksiNasabahService.ExportToPdfTransferParam(idHistory, saldo);
+		transaksiNasabahService.ExportToPdfTransfer(response, idHistory, saldo);
 	}
 
 	@GetMapping(path = "/exportToPdfBayarTeleponParam")
-	public void exportToPdfBayarTeleponParam(@RequestParam("ID History Bank") Long idHistoryBank,
+	public void exportToPdfBayarTeleponParam(HttpServletResponse response, @RequestParam("ID History Bank") Long idHistoryBank,
 			@RequestParam("ID History Telepon") Long idHistoryTelp) throws Exception {
-		transaksiNasabahService.ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
+		transaksiNasabahService.ExportToPdfBayarTelepon(response, idHistoryBank, idHistoryTelp);
 	}
 
 	
-
 //	======================================TransaksiValidate=========================================================
 	
 	@PostMapping(path = "/transferValidate")

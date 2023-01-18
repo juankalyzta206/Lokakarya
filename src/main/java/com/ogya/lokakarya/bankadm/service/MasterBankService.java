@@ -34,7 +34,7 @@ import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
 import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
 import com.ogya.lokakarya.exercise.feign.bankadm.services.BankAdminFeignServices;
-import com.ogya.lokakarya.util.DataResponse;
+
 import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
