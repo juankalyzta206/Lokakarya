@@ -868,13 +868,13 @@ public class TransaksiNasabahService {
 
 	public Font BlueFont() {
 		BaseColor color = new BaseColor(15, 122, 252);
-		Font font1 = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color);
+		Font font1 = new Font(Font.FontFamily.HELVETICA, 17, Font.BOLD, color);
 		return font1;
 	}
 
 	public Font OrangeFont() {
 		BaseColor color = new BaseColor(245, 128, 11);
-		Font font2 = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD, color);
+		Font font2 = new Font(Font.FontFamily.HELVETICA, 17, Font.BOLD, color);
 		return font2;
 	}
 
@@ -900,7 +900,7 @@ public class TransaksiNasabahService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
+		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD));
 		notif.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(notif);
 		// Add the generation date
@@ -985,7 +985,7 @@ public class TransaksiNasabahService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
+		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD));
 		notif.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(notif);
 		// Add the generation date
@@ -1072,7 +1072,7 @@ public class TransaksiNasabahService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD));
+		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD));
 		notif.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(notif);
 		// Add the generation date
@@ -1160,7 +1160,7 @@ public class TransaksiNasabahService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 15, Font.BOLD));
+		Paragraph notif = new Paragraph("Transaksi Berhasil", new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD));
 		notif.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(notif);
 		// Add the generation date
