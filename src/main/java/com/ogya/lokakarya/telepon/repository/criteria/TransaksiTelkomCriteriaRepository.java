@@ -53,6 +53,7 @@ public class TransaksiTelkomCriteriaRepository {
 	    List<FilterWrapper> filterList = request.getFilters();
 	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
 	    	Predicate[] predicatesValue = new Predicate[filter.getValue().size()];
+	    	Boolean existStatus = false;
 	    	for (int j=0; j<filter.getValue().size(); j++) {
 	    		Join<MasterPelanggan,Users > join2 = root.join("idPelanggan", JoinType.INNER);
 	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
@@ -61,13 +62,18 @@ public class TransaksiTelkomCriteriaRepository {
 		    	}
 		    	else if(filter.getName().toLowerCase().equals("nama")) {
 		    		predicatesValue[j] = cb.like(cb.lower(join2.get("nama").as(String.class)), "%"+value+"%");
-		    	}
-		    	else {
+		    	} else if(filter.getName().toLowerCase().equals("status")) {
+		    		existStatus = true;
+		    		predicatesValue[j] = cb.like(cb.lower(root.get("status").as(String.class)), "%"+1+"%");
+		    	} else {
 		    		predicatesValue[j] = cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%");
 		    	}
-	    	}	
-	    	
+	    	}
 	    	predicatesList.add(cb.or(predicatesValue));
+	    	if (!existStatus) {
+	    		Predicate predictedStatus = cb.like(cb.lower(root.get("status").as(String.class)), "%"+1+"%");
+	    		predicatesList.add(predictedStatus);
+	    	}	
 	    }
 	    
 	    
