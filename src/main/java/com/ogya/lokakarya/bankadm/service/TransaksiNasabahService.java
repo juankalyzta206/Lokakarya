@@ -224,44 +224,43 @@ public class TransaksiNasabahService {
 	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
 
 		if (masterBankRepo.findById(rekening).isPresent()) {
-			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-			TransaksiNasabah transaksi = new TransaksiNasabah();
-			HistoryBank historyBank = new HistoryBank();
 
 			if (nominal >= 10000) {
 
-				if (nasabah.getSaldo() - nominal >= 50000) {
-					nasabah.setSaldo(nasabah.getSaldo() - nominal);
-					masterBankRepo.save(nasabah);
+				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+				TransaksiNasabah transaksi = new TransaksiNasabah();
 
-					transaksi.setMasterBank(nasabah);
-					transaksi.setStatus("K");
-					transaksi.setUang(nominal);
-					transaksi.setStatusKet((byte) 2);
-					transaksiNasabahRepo.save(transaksi);
+				nasabah.setSaldo(nasabah.getSaldo() - nominal);
+				masterBankRepo.save(nasabah);
 
-					historyBank.setNama(nasabah.getNama());
-					historyBank.setRekening(nasabah);
-					historyBank.setStatusKet((byte) 2);
-					historyBank.setUang(nominal);
-					historyBankRepo.save(historyBank);
+				transaksi.setMasterBank(nasabah);
+				transaksi.setStatus("D");
+				transaksi.setUang(nominal);
+				transaksi.setStatusKet((byte) 1);
+				transaksiNasabahRepo.save(transaksi);
 
-					SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-					wrapper.setNamaNasabah(nasabah.getNama());
-					wrapper.setNominal(nominal);
-					wrapper.setNomorRekening(rekening);
-					wrapper.setSaldo(nasabah.getSaldo());
-					wrapper.setTanggal(transaksi.getTanggal());
-					return wrapper;
+				HistoryBank historyBank = new HistoryBank();
+				historyBank.setNama(nasabah.getNama());
+				historyBank.setRekening(nasabah);
+				historyBank.setStatusKet((byte) 1);
+				historyBank.setUang(nominal);
+				historyBankRepo.save(historyBank);
 
-				} else {
-					throw new BusinessException("Saldo Anda tidak cukup");
-				}
+				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+				wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
+				wrapper.setNamaNasabah(nasabah.getNama());
+				wrapper.setNominal(nominal);
+				wrapper.setNomorRekening(rekening);
+				wrapper.setSaldo(nasabah.getSaldo());
+				wrapper.setTanggal(transaksi.getTanggal());
+
+				return wrapper;
+
 			} else {
-				throw new BusinessException("Nominal transaksi minimal Rp.10.000,00.");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 	}
 
@@ -625,6 +624,7 @@ public class TransaksiNasabahService {
 		TarikFeignRequest tarikReq = new TarikFeignRequest();
 		tarikReq.setNoRekening(rekening.toString());
 		tarikReq.setTarikan(nominal);
+		
 		if (rekValidatePengirim.getRegistered() == true) {
 
 			NasabahFeignResponse tarikRes = nasabahFeignService.callTarik(tarikReq);
@@ -632,7 +632,9 @@ public class TransaksiNasabahService {
 			SetorAmbilWrapper tarik = tarik(rekening, nominal);
 
 			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			System.out.println("userID :" + nasabah.getUserId());
 			List<Users> userstarik = usersRepository.findByUserId(nasabah.getUserId());
+			
 
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyData = new CurrencyData();
@@ -647,10 +649,10 @@ public class TransaksiNasabahService {
 			Context ctxTarik = new Context();
 			ctxTarik.setVariable("name", userstarik.get(0).getNama());
 			ctxTarik.setVariable("rekening", rekening.toString());
-			ctxTarik.setVariable("tanggal", dateString);
-			ctxTarik.setVariable("jam", timeString);
-			ctxTarik.setVariable("nominal", dataNominal);
 			ctxTarik.setVariable("nomorReference", tarikRes.getReferenceNumber());
+			ctxTarik.setVariable("tanggal", dateString);
+			ctxTarik.setVariable("nominal", dataNominal);
+			ctxTarik.setVariable("jam", timeString);
 
 			ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
 					tarik.getIdTransaksi(), tarik.getSaldo());
