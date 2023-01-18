@@ -44,6 +44,12 @@ public class TransaksiNasabahController {
 			@RequestParam("No Telepon") Long noTelpon) {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelpon(rekAsal, noTelpon));
 	}
+	
+	@PostMapping(path = "/bayarTelponLoop")
+	public DataResponseList<BayarTeleponWrapper> bayarTelponLoop(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelpon) {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponLoop(rekAsal, noTelpon));
+	}
 
 	@PostMapping(path = "/bayarTelponPerbulan")
 	public DataResponseList<BayarTeleponWrapper> bayarTelponPerbulan(@RequestParam("Nomor Rekening") Long rekAsal,
@@ -62,12 +68,6 @@ public class TransaksiNasabahController {
 			@RequestParam("Nominal") Long nominal) {
 		return new DataResponse<SetorAmbilWrapper>(transaksiNasabahService.setor(norek, nominal));
 	}
-
-//	@PostMapping(path = "/tarik")
-//	public DataResponseFeign<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
-//	@RequestParam("Nominal") Long nominal) {
-//	return transaksiNasabahService.tarik(norek, nominal);
-//	}
 	
 	@PostMapping(path = "/tarik")
 	public DataResponse<SetorAmbilWrapper> tarik(@RequestParam("Nomor Rekening") Long norek,
@@ -122,6 +122,12 @@ public class TransaksiNasabahController {
 	public DataResponseList<BayarTeleponWrapper> bayarTeleponValidate(@RequestParam("Nomor Rekening") Long rekAsal,
 			@RequestParam("No Telepon") Long noTelpon, @RequestParam("Bulan Tagihan") Byte bulanTagihan) throws Exception {
 		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponValidate(rekAsal, noTelpon, bulanTagihan));
+	}
+	
+	@PostMapping(path = "/bayarTeleponTotalValidate")
+	public DataResponseList<BayarTeleponWrapper> bayarTeleponTotalValidate(@RequestParam("Nomor Rekening") Long rekAsal,
+			@RequestParam("No Telepon") Long noTelpon) throws Exception {
+		return new DataResponseList<BayarTeleponWrapper>(transaksiNasabahService.bayarTelponTotalValidate(rekAsal, noTelpon));
 	}
 
 	@PostMapping(path = "/setorValidate")

@@ -10,6 +10,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -405,6 +406,30 @@ public class TransaksiNasabahService {
 
 	}
 
+	public void sendEmailBayarTelepon(String tujuan, String templateName, Context context, ByteArrayOutputStream pdf) {
+		try {
+			MimeMessage mailMessage = javaMailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+			helper.setTo(tujuan);
+			helper.setSubject("Laporan Transaksi Transfer Bank");
+			String html = templateEngine.process(templateName, context);
+			helper.setText(html, true);
+
+//				DataSource dataSource = new ByteArrayDataSource(pdf.get(i).toByteArray(),"application/pdf");
+//		        helper.addAttachment("Bayar Telepon"+i+".pdf", dataSource);
+
+			helper.addAttachment("Bayar Telepon.pdf", new ByteArrayResource(pdf.toByteArray()));
+			javaMailSender.send(mailMessage);
+			System.out.println("Email send");
+
+		} catch (MessagingException e) {
+			System.err.println("Failed send email");
+			e.printStackTrace();
+		}
+
+	}
+
 	// --------------------------------------BayarTelponTotal----------------------------------------------
 	public List<BayarTeleponWrapper> bayarTelpon(Long rekAsal, Long noTelpon) {
 		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
@@ -467,6 +492,84 @@ public class TransaksiNasabahService {
 					wrapper.setSaldo(masterBank.getSaldo());
 					wrapper.setTanggal(historyBank.getTanggal());
 					wrapperList.add(wrapper);
+
+				} else {
+					throw new BusinessException("Saldo Anda tidak cukup");
+				}
+			} else {
+				throw new BusinessException("Nomor telepon tidak terdaftar");
+			}
+		} else {
+			throw new BusinessException("Nomor rekening tidak terdaftar");
+		}
+
+		return wrapperList;
+	}
+
+	public List<BayarTeleponWrapper> bayarTelponLoop(Long rekAsal, Long noTelpon) {
+		List<BayarTeleponWrapper> wrapperList = new ArrayList<BayarTeleponWrapper>();
+
+		if (masterBankRepo.findById(rekAsal).isPresent()) {
+			MasterBank masterBank = masterBankRepo.getReferenceById(rekAsal);
+
+			if (masterPelangganRepo.findByNoTelp(noTelpon) != null) {
+				MasterPelanggan masterPelanggan = masterPelangganRepo.findByNoTelp(noTelpon);
+				List<TransaksiTelkom> transaksiTelkom = transaksiTelkomRepo
+						.findByTagihanPelanggan(masterPelanggan.getIdPelanggan());
+
+				Long tagihan = transaksiTelkomRepo.tagihanTelpon(masterPelanggan.getIdPelanggan());
+
+				if (masterBank.getSaldo() - tagihan >= 50000) {
+
+					for (int i = 0; i < transaksiTelkom.size(); i++) {
+						if (transaksiTelkom.get(i).getStatus() == 1) {
+
+							masterBank.setSaldo(masterBank.getSaldo() - transaksiTelkom.get(i).getUang());
+							masterBankRepo.save(masterBank);
+
+							HistoryBank historyBank = new HistoryBank();
+							historyBank.setNama(masterBank.getNama());
+							historyBank.setRekening(masterBank);
+							historyBank.setStatusKet((byte) 4);
+							historyBank.setUang(transaksiTelkom.get(i).getUang());
+							historyBank.setNoTlp(masterBank.getNotlp());
+							historyBankRepo.save(historyBank);
+
+							HistoryTelkom historyTelkom = new HistoryTelkom();
+							historyTelkom.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+							historyTelkom.setIdPelanggan(masterPelanggan);
+							historyTelkom.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+							historyTelkom.setUang(transaksiTelkom.get(i).getUang());
+							historyTelkom.setIdHistory(historyTelkom.getIdHistory());
+							historyTelkomRepo.save(historyTelkom);
+
+							TransaksiNasabah transaksiNasabah = new TransaksiNasabah();
+							transaksiNasabah.setStatus("K");
+							transaksiNasabah.setStatusKet((byte) 4);
+							transaksiNasabah.setUang(transaksiTelkom.get(i).getUang());
+							transaksiNasabah.setMasterBank(masterBank);
+							transaksiNasabahRepo.save(transaksiNasabah);
+
+							transaksiTelkom.get(i).setStatus((byte) 2);
+							transaksiTelkomRepo.save(transaksiTelkom.get(i));
+
+							BayarTeleponWrapper wrapper = new BayarTeleponWrapper();
+							wrapper.setIdTransaksiBank(historyBank.getIdHistoryBank());
+							wrapper.setIdTransaksiTelp(historyTelkom.getIdHistory());
+							wrapper.setIdPelanggan(masterPelanggan.getIdPelanggan());
+							wrapper.setNamaPelanggan(masterPelanggan.getNama());
+							wrapper.setBulanTagihan(transaksiTelkom.get(i).getBulanTagihan());
+							wrapper.setTahunTagihan(transaksiTelkom.get(i).getTahunTagihan());
+							wrapper.setStatus(transaksiTelkom.get(i).getStatus());
+							wrapper.setNoTelepon(masterPelanggan.getNoTelp());
+							wrapper.setTagihan(transaksiTelkom.get(i).getUang());
+							wrapper.setNoRekening(rekAsal);
+							wrapper.setNamaRekening(masterBank.getNama());
+							wrapper.setSaldo(masterBank.getSaldo());
+							wrapper.setTanggal(historyBank.getTanggal());
+							wrapperList.add(wrapper);
+						}
+					}
 
 				} else {
 					throw new BusinessException("Saldo Anda tidak cukup");
@@ -566,15 +669,13 @@ public class TransaksiNasabahService {
 			throws Exception {
 		ValidateRekeningFeignResponse rekValidate = transferService.callValidateRekening(rekAsal.toString());
 
-		BayarRequest bayarRequest = new BayarRequest();
-		bayarRequest.setBulan((int) bulanTagihan);
-		bayarRequest.setNoRekening(rekAsal.toString());
-		bayarRequest.setNoTelepon(noTelpon.toString());
-
 		if (rekValidate.getRegistered() == true) {
-			BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
-
 			List<BayarTeleponWrapper> bayarTelponList = bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan);
+			BayarRequest bayarRequest = new BayarRequest();
+			bayarRequest.setBulan((int) bulanTagihan);
+			bayarRequest.setNoRekening(rekAsal.toString());
+			bayarRequest.setNoTelepon(noTelpon.toString());
+			BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
 
 			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
 			List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
@@ -590,13 +691,55 @@ public class TransaksiNasabahService {
 			ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
 					bayarTelponList.get(0).getIdTransaksiBank(), bayarTelponList.get(0).getIdTransaksiTelp());
 
-			sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "BayarTelepon", ctxBayarTelepon, pdfBayarTelepon);
+			sendEmailTransfer(userPengirim.get(0).getEmail().toString(), "BayarTelepon", ctxBayarTelepon,
+					pdfBayarTelepon);
 
 			return bayarTelponList;
 
 		} else {
 			throw new BusinessException("Rekening tidak terdaftar");
 		}
+	}
+
+	public List<BayarTeleponWrapper> bayarTelponTotalValidate(Long rekAsal, Long noTelpon) throws Exception {
+		ValidateRekeningFeignResponse rekValidate = transferService.callValidateRekening(rekAsal.toString());
+
+		if (rekValidate.getRegistered() == true) {
+
+			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
+
+			List<Users> userPengirim = usersRepository.findByUserId(pengirim.getUserId());
+			List<BayarTeleponWrapper> bayarTelponList = bayarTelponLoop(rekAsal, noTelpon);
+
+			for (int i = 0; i < bayarTelponList.size(); i++) {
+
+				BayarRequest bayarRequest = new BayarRequest();
+				bayarRequest.setBulan((int) bayarTelponList.get(i).getBulanTagihan());
+				bayarRequest.setNoRekening(rekAsal.toString());
+				bayarRequest.setNoTelepon(noTelpon.toString());
+
+				BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
+
+				Context ctxBayarTelepon = new Context();
+				ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
+				ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(i).getTahunTagihan().toString());
+				ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
+				ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
+				ctxBayarTelepon.setVariable("bulan", bayarResponse.getBulan().toString());
+				ctxBayarTelepon.setVariable("nominal", bayarTelponList.get(i).getTagihan().toString());
+
+				ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
+						bayarTelponList.get(i).getIdTransaksiBank(), bayarTelponList.get(i).getIdTransaksiTelp());
+
+				sendEmailBayarTelepon(userPengirim.get(0).getEmail().toString(), "BayarTelepon", ctxBayarTelepon,
+						pdfBayarTelepon);
+			}
+
+			return bayarTelponList;
+		} else {
+			throw new BusinessException("Rekening tidak terdaftar");
+		}
+
 	}
 
 	public PdfPCell Left(String title) {
@@ -637,7 +780,6 @@ public class TransaksiNasabahService {
 		HistoryBank data = historyBankRepo.getReferenceById(idHistory);
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A6);
-//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, outputStream);
 		pdfDoc.open();
 
@@ -832,7 +974,7 @@ public class TransaksiNasabahService {
 //	---------------------------------Bukti Transaksi Bayar Telepon--------------------------------------
 	public ByteArrayOutputStream ExportToPdfBayarTeleponParam(Long idHistoryBank, Long idHistoryTelp) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		List<HistoryTelkom> dataTelepon = historyTelkomRepo.findByIdHistory(idHistoryTelp);
+		HistoryTelkom dataTelepon = historyTelkomRepo.getReferenceById(idHistoryTelp);
 		HistoryBank dataNasabah = historyBankRepo.getReferenceById(idHistoryBank);
 
 		// Now create a new iText PDF document
@@ -883,13 +1025,13 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Jenis Transaksi"));
 		pdfTable.addCell(Right("Bayar Telepon"));
 		pdfTable.addCell(Left("Nomor Telepon"));
-		pdfTable.addCell(Right(String.valueOf(dataTelepon.get(0).getIdPelanggan().getNoTelp()) != null
-				? String.valueOf(dataTelepon.get(0).getIdPelanggan().getNoTelp())
+		pdfTable.addCell(Right(String.valueOf(dataTelepon.getIdPelanggan().getNoTelp()) != null
+				? String.valueOf(dataTelepon.getIdPelanggan().getNoTelp())
 				: "-"));
 		pdfTable.addCell(Left("Nama Pelanggan Telepon"));
-		pdfTable.addCell(Right(String.valueOf(dataTelepon.get(0).getIdPelanggan().getNama() != null
-				? String.valueOf(dataTelepon.get(0).getIdPelanggan().getNama())
-				: "-")));
+		pdfTable.addCell(Right(String.valueOf(
+				dataTelepon.getIdPelanggan().getNama() != null ? String.valueOf(dataTelepon.getIdPelanggan().getNama())
+						: "-")));
 		pdfTable.addCell(Left("Nominal Transaksi"));
 		pdfTable.addCell(
 				Right(String.valueOf(dataNasabah.getUang() != null ? String.valueOf(dataNasabah.getUang()) : "-")));
@@ -900,28 +1042,29 @@ public class TransaksiNasabahService {
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
+//		}
 
 		pdfDoc.close();
 		return outputStream;
 	}
-	
+
 //	=========================Send Bukti Setor ======================
 	public SetorAmbilWrapper sendBuktiSetor(Long noRekening, Long nominal)
-			throws MessagingException, IOException, DocumentException, Exception  {
+			throws MessagingException, IOException, DocumentException, Exception {
 		NoRekeningFeignResponse validatedRekening = nasabahService.cekNoRekening(noRekening.toString());
-		
+
 		SetorFeignRequest setorReq = new SetorFeignRequest();
 		setorReq.setNoRekening(noRekening.toString());
 		setorReq.setSetoran(nominal);
-		
+
 		if (validatedRekening.getRegistered() == true) {
 			MasterBank nasabah = masterBankRepo.getReferenceById(noRekening);
 			Users user = usersRepository.getReferenceById(nasabah.getUserId());
-			
+
 			NasabahFeignResponse setorRespon = nasabahService.callSetor(setorReq);
-			System.out.println("Success: "+setorRespon.getSuccess());
-			System.out.println("No Referensi: "+setorRespon.getReferenceNumber());
-			
+			System.out.println("Success: " + setorRespon.getSuccess());
+			System.out.println("No Referensi: " + setorRespon.getReferenceNumber());
+
 			if (setorRespon.getSuccess() == true) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
 //				transaksiNasabahService.setor(noRekening, nominal);
@@ -931,15 +1074,14 @@ public class TransaksiNasabahService {
 				ctx.setVariable("tanggal", setorData.getTanggal());
 				ctx.setVariable("nominal", nominal);
 				ctx.setVariable("noReference", setorRespon.getReferenceNumber());
-				
+
 				ByteArrayOutputStream setorPdf = ExportToPdfSetorParam(setorData.getIdTransaksi());
 				sendEmailTransfer(user.getEmail(), "Setor", ctx, setorPdf);
-					
 
 				return setorData;
 			} else {
 				throw new BusinessException("Setor Gagal.");
-			} 
+			}
 		} else {
 			throw new BusinessException("No Rekening tidak terdaftar.");
 		}
