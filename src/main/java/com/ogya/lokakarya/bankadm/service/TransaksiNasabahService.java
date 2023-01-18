@@ -681,15 +681,22 @@ public class TransaksiNasabahService {
 				List<Users> userTujuan = usersRepository.findByUserId(tujuan.getUserId());
 				
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
-				CurrencyData currencyData = new CurrencyData();
-				currencyData.setValue(nominal);
-				String dataNominal = numberFormat.format(currencyData.getValue());
+				CurrencyData currencyNominal = new CurrencyData();
+				currencyNominal.setValue(nominal);
+				String dataNominal = numberFormat.format(currencyNominal.getValue());
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(transfer.getTanggal());
+				String timeString = timeFormat.format(transfer.getTanggal());
 				
 				Context ctxPengirim = new Context();
 				ctxPengirim.setVariable("name", userPengirim.get(0).getNama());
-				ctxPengirim.setVariable("rekTujuan", rekTujuan.toString());
+				ctxPengirim.setVariable("rekeningPengirim", rekAsal.toString());
+				ctxPengirim.setVariable("rekeningTujuan", rekTujuan.toString());
 				ctxPengirim.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxPengirim.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxPengirim.setVariable("tanggal", dateString);
+				ctxPengirim.setVariable("jam", timeString);
 				ctxPengirim.setVariable("nominal", dataNominal);
 
 				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
@@ -699,10 +706,12 @@ public class TransaksiNasabahService {
 						"TransferPengirim", ctxPengirim, pdfPengirim);
 				
 				Context ctxTujuan = new Context();
-				ctxTujuan.setVariable("name", userTujuan.get(0).getNama());
-				ctxTujuan.setVariable("rekAsal", rekAsal.toString());
+				ctxTujuan.setVariable("name", userPengirim.get(0).getNama());
+				ctxTujuan.setVariable("rekeningPengirim", rekAsal.toString());
+				ctxTujuan.setVariable("rekeningTujuan", rekTujuan.toString());
 				ctxTujuan.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxTujuan.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxTujuan.setVariable("tanggal", dateString);
+				ctxTujuan.setVariable("jam", timeString);
 				ctxTujuan.setVariable("nominal", dataNominal);
 
 				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
@@ -741,13 +750,21 @@ public class TransaksiNasabahService {
 			currencyData.setValue(bayarTelponList.get(0).getTagihan());
 			String tagihan = numberFormat.format(currencyData.getValue());
 			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+			String dateString = dateFormat.format(bayarTelponList.get(0).getTanggal());
+			String timeString = timeFormat.format(bayarTelponList.get(0).getTanggal());
+			
 			Context ctxBayarTelepon = new Context();
 			ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
-			ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(0).getTahunTagihan().toString());
 			ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
-			ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
 			ctxBayarTelepon.setVariable("bulan", bayarResponse.getBulan().toString());
 			ctxBayarTelepon.setVariable("nominal", tagihan);
+			ctxBayarTelepon.setVariable("tanggal", dateString);
+			ctxBayarTelepon.setVariable("jam", timeString);
+			ctxBayarTelepon.setVariable("rekening", pengirim.getNorek());
+			ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
+			ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(0).getTahunTagihan().toString());
 
 			ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
 					bayarTelponList.get(0).getIdTransaksiBank(), bayarTelponList.get(0).getIdTransaksiTelp());
@@ -786,13 +803,21 @@ public class TransaksiNasabahService {
 				currencyData.setValue(bayarTelponList.get(i).getTagihan());
 				String tagihan = numberFormat.format(currencyData.getValue());
 					
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(bayarTelponList.get(i).getTanggal());
+				String timeString = timeFormat.format(bayarTelponList.get(i).getTanggal());
+				
 				Context ctxBayarTelepon = new Context();
 				ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
-				ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(i).getTahunTagihan().toString());
 				ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
-				ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
 				ctxBayarTelepon.setVariable("bulan", bayarResponse.getBulan().toString());
 				ctxBayarTelepon.setVariable("nominal", tagihan);
+				ctxBayarTelepon.setVariable("tanggal", dateString);
+				ctxBayarTelepon.setVariable("jam", timeString);
+				ctxBayarTelepon.setVariable("rekening", pengirim.getNorek());
+				ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
+				ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(i).getTahunTagihan().toString());
 
 				ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
 						bayarTelponList.get(i).getIdTransaksiBank(), bayarTelponList.get(i).getIdTransaksiTelp());

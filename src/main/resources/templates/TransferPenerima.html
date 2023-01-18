@@ -22,15 +22,60 @@ a.link {
 </style>
 </head>
 <body>
-	<h1>Bukti Transfer</h1>
+	<h2>Notifikasi Transfer</h2>
 	<div>
 		Dear <b th:text="${name}">name</b> !
 	</div>
 	<p>
-		Anda menerima transfer dana dari nomor rekening <b th:text="${rekAsal}">rekAsal</b><br /> 	
-		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
-		sebesar <b th:text="${nominal}">nominal</b><br />
-		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
+        Terima kasih Anda telah menggunakan fasilitas Bank XYZ. <br/>
+        Anda telah menerima transfer dana dari Nomor Rekening <span th:text="${rekeningPengirim}">rekeningPengirim</span><br/>
+        Berikut ini adalah informasi transaksi yang dilakukan : 
+        <table style="margin-left: 40px; margin: top 0;">
+            <tr>
+                <td>Tanggal</td>
+                <td>:</td>
+                <td th:text="${tanggal}">tanggal</td>
+            </tr>
+            <tr>
+                <td>Jam</td>
+                <td>:</td>
+                <td th:text="${jam}">jam</td>
+            </tr>
+            <tr>
+                <td>Jenis Transaksi</td>
+                <td>:</td>
+                <td>Transfer</td>
+            </tr>
+            <tr>
+                <td>Rekening Pengirim</td>
+                <td>:</td>
+                <td th:text="${rekeningPengirim}">rekeningPengirim</td>
+            </tr>
+            <tr>
+                <td>Rekening Tujuan</td>
+                <td>:</td>
+                <td th:text="${rekeningTujuan}">rekeningTujuan</td>
+            </tr>
+            <tr>
+                <td>Nominal</td>
+                <td>:</td>
+                <td th:text="${nominal}">nominal</td>
+            </tr>
+            <tr>
+                <td>No. Referensi</td>
+                <td>:</td>
+                <td th:text="${nomorReference}">nomorReference</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>:</td>
+                <td><b>BERHASIL</b></td>
+            </tr>
+        </table>
+		<br />
+		Semoga informasi ini bermanfaat bagi Anda.<br />
+        Terima kasih.
+		<br />
 						
 	</p>
 
