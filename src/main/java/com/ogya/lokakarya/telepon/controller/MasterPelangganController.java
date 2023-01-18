@@ -35,7 +35,7 @@ import com.ogya.lokakarya.util.PagingRequestWrapper;
 public class MasterPelangganController {
 	@Autowired
 	MasterPelangganService masterPelangganService;
-	@Autowired
+	
 	
 	@GetMapping(path = "/findAllPlan")
 	public List<MasterPelangganWrapper> findAllPlan() {
