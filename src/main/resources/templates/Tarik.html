@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title th:remove="all">Konfirmasi Tarik</title>
+<title th:remove="all">Tarik Tunai</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <style type="text/css">
 body {
@@ -22,20 +22,59 @@ a.link {
 </style>
 </head>
 <body>
-
-	<h1>Bukti Tarik</h1>
+	<h2>Notifikasi Tarik Tunai</h2>
 	<div>
 		Dear <b th:text="${name}">name</b> !
 	</div>
 	<p>
-		Anda sukses melakukan tarik tunai ke nomor rekening <b th:text="${rekening}">rekening</b><br /> 	
-		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
-		sebesar <b th:text="${nominal}">nominal</b><br />
-		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
+        Terima kasih Anda telah menggunakan fasilitas Bank XYZ. <br/>
+        Berikut ini adalah informasi transaksi yang telah Anda lakukan  : 
+        <table style="margin-left: 40px; margin: top 0;">
+            <tr>
+                <td>Tanggal</td>
+                <td>:</td>
+                <td th:text="${tanggal}">tanggal</td>
+            </tr>
+            <tr>
+                <td>Jam</td>
+                <td>:</td>
+                <td th:text="${jam}">jam</td>
+            </tr>
+            <tr>
+                <td>Jenis Transaksi</td>
+                <td>:</td>
+                <td>Tarik Tunai</td>
+            </tr>
+            <tr>
+                <td>Rekening</td>
+                <td>:</td>
+                <td th:text="${rekening}">rekening</td>
+            </tr>
+            <tr>
+                <td>Nominal</td>
+                <td>:</td>
+                <td th:text="${nominal}">nominal</td>
+            </tr>
+            <tr>
+                <td>No. Referensi</td>
+                <td>:</td>
+                <td th:text="${nomorReference}">nomorReference</td>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td>:</td>
+                <td><b>BERHASIL</b></td>
+            </tr>
+        </table>
+		<br />
+		Semoga informasi ini bermanfaat bagi Anda.<br />
+        Terima kasih.
+		<br />
 						
 	</p>
+
 	<p>
-		Salam, <br /> &emsp; <em>Bank XYZ</em>
+		Salam, <br /><em>Bank XYZ</em>
 	</p>
 </body>
 </html>

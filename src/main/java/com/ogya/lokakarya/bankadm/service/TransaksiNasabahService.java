@@ -224,44 +224,43 @@ public class TransaksiNasabahService {
 	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
 
 		if (masterBankRepo.findById(rekening).isPresent()) {
-			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-			TransaksiNasabah transaksi = new TransaksiNasabah();
-			HistoryBank historyBank = new HistoryBank();
 
 			if (nominal >= 10000) {
 
-				if (nasabah.getSaldo() - nominal >= 50000) {
-					nasabah.setSaldo(nasabah.getSaldo() - nominal);
-					masterBankRepo.save(nasabah);
+				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+				TransaksiNasabah transaksi = new TransaksiNasabah();
 
-					transaksi.setMasterBank(nasabah);
-					transaksi.setStatus("K");
-					transaksi.setUang(nominal);
-					transaksi.setStatusKet((byte) 2);
-					transaksiNasabahRepo.save(transaksi);
+				nasabah.setSaldo(nasabah.getSaldo() - nominal);
+				masterBankRepo.save(nasabah);
 
-					historyBank.setNama(nasabah.getNama());
-					historyBank.setRekening(nasabah);
-					historyBank.setStatusKet((byte) 2);
-					historyBank.setUang(nominal);
-					historyBankRepo.save(historyBank);
+				transaksi.setMasterBank(nasabah);
+				transaksi.setStatus("D");
+				transaksi.setUang(nominal);
+				transaksi.setStatusKet((byte) 1);
+				transaksiNasabahRepo.save(transaksi);
 
-					SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-					wrapper.setNamaNasabah(nasabah.getNama());
-					wrapper.setNominal(nominal);
-					wrapper.setNomorRekening(rekening);
-					wrapper.setSaldo(nasabah.getSaldo());
-					wrapper.setTanggal(transaksi.getTanggal());
-					return wrapper;
+				HistoryBank historyBank = new HistoryBank();
+				historyBank.setNama(nasabah.getNama());
+				historyBank.setRekening(nasabah);
+				historyBank.setStatusKet((byte) 1);
+				historyBank.setUang(nominal);
+				historyBankRepo.save(historyBank);
 
-				} else {
-					throw new BusinessException("Saldo Anda tidak cukup");
-				}
+				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+				wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
+				wrapper.setNamaNasabah(nasabah.getNama());
+				wrapper.setNominal(nominal);
+				wrapper.setNomorRekening(rekening);
+				wrapper.setSaldo(nasabah.getSaldo());
+				wrapper.setTanggal(transaksi.getTanggal());
+
+				return wrapper;
+
 			} else {
-				throw new BusinessException("Nominal transaksi minimal Rp.10.000,00.");
+				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
-			throw new BusinessException("Rekening tidak terdaftar");
+			throw new BusinessException("Nomor rekening tidak terdaftar");
 		}
 	}
 
@@ -587,16 +586,16 @@ public class TransaksiNasabahService {
 
 			if (setorRespon.getSuccess()) {
 				SetorAmbilWrapper setorData = setor(noRekening, nominal);
-//				transaksiNasabahService.setor(noRekening, nominal);
-				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
-				String dateString = dateFormat.format(setorData.getTanggal());
-				String timeString = timeFormat.format(setorData.getTanggal());
 				
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 				CurrencyData currencyData = new CurrencyData();
 				currencyData.setValue(nominal);
 				String dataNominal = numberFormat.format(currencyData.getValue());
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(setorData.getTanggal());
+				String timeString = timeFormat.format(setorData.getTanggal());
 				
 				Context ctx = new Context();
 				ctx.setVariable("name", user.get(0).getNama());
@@ -625,6 +624,7 @@ public class TransaksiNasabahService {
 		TarikFeignRequest tarikReq = new TarikFeignRequest();
 		tarikReq.setNoRekening(rekening.toString());
 		tarikReq.setTarikan(nominal);
+		
 		if (rekValidatePengirim.getRegistered() == true) {
 
 			NasabahFeignResponse tarikRes = nasabahFeignService.callTarik(tarikReq);
@@ -632,20 +632,27 @@ public class TransaksiNasabahService {
 			SetorAmbilWrapper tarik = tarik(rekening, nominal);
 
 			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			System.out.println("userID :" + nasabah.getUserId());
 			List<Users> userstarik = usersRepository.findByUserId(nasabah.getUserId());
+			
 
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyData = new CurrencyData();
 			currencyData.setValue(nominal);
 			String dataNominal = numberFormat.format(currencyData.getValue());
 			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+			String dateString = dateFormat.format(tarik.getTanggal());
+			String timeString = timeFormat.format(tarik.getTanggal());
+			
 			Context ctxTarik = new Context();
 			ctxTarik.setVariable("name", userstarik.get(0).getNama());
 			ctxTarik.setVariable("rekening", rekening.toString());
 			ctxTarik.setVariable("nomorReference", tarikRes.getReferenceNumber());
-			ctxTarik.setVariable("tanggal", tarik.getTanggal().toString());
+			ctxTarik.setVariable("tanggal", dateString);
 			ctxTarik.setVariable("nominal", dataNominal);
-			ctxTarik.setVariable("saldo", tarik.getSaldo().toString());
+			ctxTarik.setVariable("jam", timeString);
 
 			ByteArrayOutputStream pdfTarik = ExportToPdfTarikParam(tarikRes.getReferenceNumber(),
 					tarik.getIdTransaksi(), tarik.getSaldo());
@@ -681,15 +688,22 @@ public class TransaksiNasabahService {
 				List<Users> userTujuan = usersRepository.findByUserId(tujuan.getUserId());
 				
 				NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
-				CurrencyData currencyData = new CurrencyData();
-				currencyData.setValue(nominal);
-				String dataNominal = numberFormat.format(currencyData.getValue());
+				CurrencyData currencyNominal = new CurrencyData();
+				currencyNominal.setValue(nominal);
+				String dataNominal = numberFormat.format(currencyNominal.getValue());
+				
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(transfer.getTanggal());
+				String timeString = timeFormat.format(transfer.getTanggal());
 				
 				Context ctxPengirim = new Context();
 				ctxPengirim.setVariable("name", userPengirim.get(0).getNama());
-				ctxPengirim.setVariable("rekTujuan", rekTujuan.toString());
+				ctxPengirim.setVariable("rekeningPengirim", rekAsal.toString());
+				ctxPengirim.setVariable("rekeningTujuan", rekTujuan.toString());
 				ctxPengirim.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxPengirim.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxPengirim.setVariable("tanggal", dateString);
+				ctxPengirim.setVariable("jam", timeString);
 				ctxPengirim.setVariable("nominal", dataNominal);
 
 				ByteArrayOutputStream pdfPengirim = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
@@ -699,10 +713,12 @@ public class TransaksiNasabahService {
 						"TransferPengirim", ctxPengirim, pdfPengirim);
 				
 				Context ctxTujuan = new Context();
-				ctxTujuan.setVariable("name", userTujuan.get(0).getNama());
-				ctxTujuan.setVariable("rekAsal", rekAsal.toString());
+				ctxTujuan.setVariable("name", userPengirim.get(0).getNama());
+				ctxTujuan.setVariable("rekeningPengirim", rekAsal.toString());
+				ctxTujuan.setVariable("rekeningTujuan", rekTujuan.toString());
 				ctxTujuan.setVariable("nomorReference", transferResponse.getReferenceNumber());
-				ctxTujuan.setVariable("tanggal", transfer.getTanggal().toString());
+				ctxTujuan.setVariable("tanggal", dateString);
+				ctxTujuan.setVariable("jam", timeString);
 				ctxTujuan.setVariable("nominal", dataNominal);
 
 				ByteArrayOutputStream pdfTujuan = ExportToPdfTransferParam(transferResponse.getReferenceNumber(),
@@ -741,13 +757,21 @@ public class TransaksiNasabahService {
 			currencyData.setValue(bayarTelponList.get(0).getTagihan());
 			String tagihan = numberFormat.format(currencyData.getValue());
 			
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+			String dateString = dateFormat.format(bayarTelponList.get(0).getTanggal());
+			String timeString = timeFormat.format(bayarTelponList.get(0).getTanggal());
+			
 			Context ctxBayarTelepon = new Context();
 			ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
-			ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(0).getTahunTagihan().toString());
 			ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
-			ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
 			ctxBayarTelepon.setVariable("bulan", bayarResponse.getBulan().toString());
 			ctxBayarTelepon.setVariable("nominal", tagihan);
+			ctxBayarTelepon.setVariable("tanggal", dateString);
+			ctxBayarTelepon.setVariable("jam", timeString);
+			ctxBayarTelepon.setVariable("rekening", pengirim.getNorek());
+			ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
+			ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(0).getTahunTagihan().toString());
 
 			ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
 					bayarTelponList.get(0).getIdTransaksiBank(), bayarTelponList.get(0).getIdTransaksiTelp());
@@ -786,13 +810,21 @@ public class TransaksiNasabahService {
 				currencyData.setValue(bayarTelponList.get(i).getTagihan());
 				String tagihan = numberFormat.format(currencyData.getValue());
 					
+				SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm:ss");
+				String dateString = dateFormat.format(bayarTelponList.get(i).getTanggal());
+				String timeString = timeFormat.format(bayarTelponList.get(i).getTanggal());
+				
 				Context ctxBayarTelepon = new Context();
 				ctxBayarTelepon.setVariable("name", userPengirim.get(0).getNama());
-				ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(i).getTahunTagihan().toString());
 				ctxBayarTelepon.setVariable("noTelepon", bayarResponse.getNoTelepon());
-				ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
 				ctxBayarTelepon.setVariable("bulan", bayarResponse.getBulan().toString());
 				ctxBayarTelepon.setVariable("nominal", tagihan);
+				ctxBayarTelepon.setVariable("tanggal", dateString);
+				ctxBayarTelepon.setVariable("jam", timeString);
+				ctxBayarTelepon.setVariable("rekening", pengirim.getNorek());
+				ctxBayarTelepon.setVariable("nomorReference", bayarResponse.getReferenceNumber());
+				ctxBayarTelepon.setVariable("tahun", bayarTelponList.get(i).getTahunTagihan().toString());
 
 				ByteArrayOutputStream pdfBayarTelepon = ExportToPdfBayarTeleponParam(
 						bayarTelponList.get(i).getIdTransaksiBank(), bayarTelponList.get(i).getIdTransaksiTelp());
