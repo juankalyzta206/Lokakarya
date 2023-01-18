@@ -1335,7 +1335,7 @@ public class TransaksiNasabahService {
 	
 	public void ExportToPdfTransfer(HttpServletResponse response, Long idHistory, Long saldo) throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Transfer.pdf");
 	    ByteArrayOutputStream baos = ExportToPdfTransferParam(idHistory,saldo);
 	    response.setContentLength(baos.size());
 	    OutputStream os = response.getOutputStream();
@@ -1346,7 +1346,7 @@ public class TransaksiNasabahService {
 	
 	public void ExportToPdfBayarTelepon(HttpServletResponse response, Long idHistoryBank, Long idHistoryTelp) throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+	    response.setHeader("Content-Disposition", "attachment; filename=Bayar Telepon.pdf");
 	    ByteArrayOutputStream baos = ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
 	    response.setContentLength(baos.size());
 	    OutputStream os = response.getOutputStream();
