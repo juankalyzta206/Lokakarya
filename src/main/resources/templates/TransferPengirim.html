@@ -29,7 +29,7 @@ a.link {
 	<p>
 		Anda sukses melakukan pengiriman ke nomor rekening <b th:text="${rekTujuan}">rekTujuan</b><br /> 	
 		pada tanggal <b th:text="${tanggal}">tanggal</b><br />
-		sebesar <b th:text="${nominal}">nominal</b><br />
+		sebesar <b th:text="${nominal}">nominal|currency:'IDR ':'symbol':'3.2-2'</b><br />
 		dengan nomor referensi <b th:text="${nomorReference}">nomorReference</b><br />
 						
 	</p>
