@@ -239,13 +239,13 @@ public class TransaksiNasabahService {
 				transaksi.setMasterBank(nasabah);
 				transaksi.setStatus("D");
 				transaksi.setUang(nominal);
-				transaksi.setStatusKet((byte) 1);
+				transaksi.setStatusKet((byte) 2);
 				transaksiNasabahRepo.save(transaksi);
 
 				HistoryBank historyBank = new HistoryBank();
 				historyBank.setNama(nasabah.getNama());
 				historyBank.setRekening(nasabah);
-				historyBank.setStatusKet((byte) 1);
+				historyBank.setStatusKet((byte) 2);
 				historyBank.setUang(nominal);
 				historyBankRepo.save(historyBank);
 
