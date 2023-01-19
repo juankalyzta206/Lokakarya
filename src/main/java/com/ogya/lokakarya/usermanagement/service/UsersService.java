@@ -53,9 +53,26 @@ public class UsersService {
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
 	
-	@Scheduled(cron = "0 0 0 * * *") // <-- second, minute, hour, day, month
-	public void runEveryThreeSeconds() {
-		System.out.println("Executed in  : "+ new Date());
+	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
+	
+	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
+	public void dailyNotification() {
+		Date date = new Date();
+		date = findPrevDay(date);
+		System.out.println("Executed in  : "+ date);
+	}
+	
+	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
+	public void monthlyNotification() {
+		Date date = new Date();
+		date = findPrevDay(date);
+		System.out.println("Executed in  : "+ date);
+	}
+	
+	
+	private static Date findPrevDay(Date date)
+	{
+	  return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
 	
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
