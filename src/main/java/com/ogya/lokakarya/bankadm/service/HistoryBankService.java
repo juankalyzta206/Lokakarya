@@ -1,6 +1,9 @@
 package com.ogya.lokakarya.bankadm.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -435,13 +438,16 @@ public class HistoryBankService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 
-	public void ExportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
+	public ByteArrayOutputStream ExportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Call the findAll method to retrieve the data
 		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
-		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		PdfWriter.getInstance(pdfDoc, outputStream);
+//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
 		Paragraph title = new Paragraph("Laporan Transaksi Bank Bayar Telepon", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
@@ -490,10 +496,88 @@ public class HistoryBankService {
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
-		pdfWriter.close();
+//		pdfWriter.close();
 
 		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=Laporan Bayar Telepon.pdf");
+		response.setContentLength(outputStream.size());
+	    OutputStream os = response.getOutputStream();
+	    outputStream.writeTo(os);
+	    os.flush();
+	    os.close();
+	    
+		return outputStream;
+	}
+	
+public ByteArrayOutputStream ExportToPdfBayarTeleponParam(HttpServletResponse response, LocalDate tanggal) throws Exception {
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		// Call the findAll method to retrieve the data
+		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
+
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter.getInstance(pdfDoc, outputStream);
+//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		pdfDoc.open();
+
+		Paragraph title = new Paragraph("Laporan Transaksi Bank Bayar Telepon", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
+
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(6);
+
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+
+		pdfTable.addCell(Align("Nomor Rekening"));
+		pdfTable.addCell(Align("Nama Nasabah"));
+		pdfTable.addCell(Align("Tanggal Transaksi"));
+		pdfTable.addCell(Align("Nominal"));
+		pdfTable.addCell(Align("No Telepon"));
+		pdfTable.addCell(Align("Keterangan"));
+		for (int i = 0; i < 6; i++) {
+			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
+		}
+
+		// Iterate through the data and add it to the table
+		for (HistoryBank entity : data) {
+			pdfTable.addCell(Align(String.valueOf(
+					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (entity.getTanggal() != null) {
+				formattedDate = formatter.format(entity.getTanggal());
+			}
+			pdfTable.addCell(Align(formattedDate));
+			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-")));
+			pdfTable.addCell(Align("BayarTelepon"));
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+//		pdfWriter.close();
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=Laporan Bayar Telepon.pdf");
+		response.setContentLength(outputStream.size());
+	    OutputStream os = response.getOutputStream();
+	    outputStream.writeTo(os);
+	    os.flush();
+	    os.close();
+	    
+		return outputStream;
 	}
 
 }

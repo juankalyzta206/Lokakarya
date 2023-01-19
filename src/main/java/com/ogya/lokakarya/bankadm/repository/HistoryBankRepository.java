@@ -1,5 +1,7 @@
 package com.ogya.lokakarya.bankadm.repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -53,6 +55,9 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4", nativeQuery = true)
 	    List<HistoryBank> laporanBayarTelepon();
+	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4 AND TANGGAL = :tanggal", nativeQuery = true)
+	    List<HistoryBank> laporanBayarTeleponToday(@Param("tanggal") LocalDate tanggal);
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE :sortField LIKE '%' || :keyFilter || '%' ORDER BY :sortField :sortOrder",
 	            countQuery = "SELECT count(*) FROM HISTORY_BANK",
