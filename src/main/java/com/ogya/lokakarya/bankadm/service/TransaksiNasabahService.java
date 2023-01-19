@@ -35,7 +35,6 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
 import com.ogya.lokakarya.bankadm.entity.MasterBank;
 import com.ogya.lokakarya.bankadm.entity.TransaksiNasabah;
