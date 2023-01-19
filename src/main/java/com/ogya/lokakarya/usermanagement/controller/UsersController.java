@@ -89,7 +89,7 @@ public class UsersController {
 	
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
 	    public void exportToPdf(HttpServletResponse response) throws Exception {
-		userService.ExportToPdf(response, userService.findListUser());
+		userService.ExportToPdf(response);
 	}
 	
 	
