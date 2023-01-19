@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +52,11 @@ public class UsersService {
 	
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
+	
+	@Scheduled(cron = "0 0 0 * * *") // <-- second, minute, hour, day, month
+	public void runEveryThreeSeconds() {
+		System.out.println("Executed in  : "+ new Date());
+	}
 	
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
