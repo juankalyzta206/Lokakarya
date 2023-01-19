@@ -2,12 +2,14 @@ package com.ogya.lokakarya.usermanagement.service;
 
 
 import java.io.ByteArrayOutputStream;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -42,6 +44,7 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.repository.criteria.UsersCriteriaRepository;
+import com.ogya.lokakarya.usermanagement.wrapper.NotificationWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
@@ -76,11 +79,21 @@ public class UsersService {
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
 		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		NotificationWrapper description = new NotificationWrapper();
+		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Daily Report Created User("+year+"_"+month+"_"+day+")");
+		description.setTopHeader("Daily Report Created User");
+		description.setBotHeader("Berikut lampiran file daily report user untuk tanggal "+day+" bulan "+getMonthForInt(month)+" tahun "+year);
+		description.setTitlePdf("List Created Users Daily("+year+"_"+month+"_"+day+")");
+		description.setFileName("newUsersDaily("+year+"_"+month+"_"+day+")");
 		List<Users> dailyData = usersRepository.newUsersDaily(year,month,day);
-		ExportToPdfNotification(dailyData, "List Created Users Daily");
+		ExportToPdfNotification(dailyData, description);
 	}
 	
-	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
@@ -88,10 +101,32 @@ public class UsersService {
 		calendar.setTime(date);
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
-		List<Users> dailyData = usersRepository.newUsersMonthly(year,month);
-		ExportToPdfNotification(dailyData, "List Created Users Monthly");
+		NotificationWrapper description = new NotificationWrapper();
+		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Monthly Report Created User("+year+"_"+month+")");
+		description.setTopHeader("Monthly Report Created User");
+		description.setBotHeader("Berikut lampiran file monthly report user untuk bulan "+getMonthForInt(month)+" tahun "+year);
+		description.setTitlePdf("List Created Users Monthly("+year+"_"+month+")");
+		description.setFileName("newUsersMonthly("+year+"_"+month+")");
+		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
+		ExportToPdfNotification(monthlyData, description);
 	}
 	
+	
+	String getMonthForInt(int num) {
+		num = num-1;
+		String month = "wrong";
+		Locale id = new Locale("in", "ID");
+    	DateFormatSymbols dfs = new DateFormatSymbols(id);
+    	String[] months = dfs.getMonths();
+    	if (num >= 0 && num <= 12) {
+    		month = months[num];
+    	}
+    	return month;
+	}
 	
 	private static Date FindPrevDay(Date date)
 	{
@@ -390,21 +425,21 @@ public class UsersService {
 		
 	}
 	
-	public void SendEmailWithAttachment(InputStreamSource data) {
+	public void SendEmailWithAttachment(InputStreamSource data,NotificationWrapper description) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-			mimeMessageHelper.setFrom("irzan@maulana.com");
-			mimeMessageHelper.setTo("maulanairzan5@gmail.com");
-			mimeMessageHelper.setSubject("Test Subject");
+			mimeMessageHelper.setTo(description.getReceiver());
+			mimeMessageHelper.setCc(description.getCc());
+			mimeMessageHelper.setSubject(description.getSubject());
 			
 			StringBuffer buffer = new StringBuffer();
-			buffer.append("<h3>Dear My Darling</h3>");
-			buffer.append("<h5>Tolong buka file yang aku kirim</h5>");
+			buffer.append("<h3>"+description.getTopHeader()+"</h3>");
+			buffer.append("<h5>"+description.getBotHeader()+"</h5>");
 			String body = buffer.toString();
 			mimeMessageHelper.setText(body, true);
 			
-			mimeMessageHelper.addAttachment("attachment.pdf", data);
+			mimeMessageHelper.addAttachment(description.getFileName()+".pdf", data);
 			javaMailSender.send(mimeMessage);
 			System.out.println("Email sent");
 		} catch (MessagingException e){
@@ -413,14 +448,14 @@ public class UsersService {
 		}
 	}
 	
-	public void ExportToPdfNotification(List<Users> data, String titleName) throws Exception{
+	public void ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception{
 		 // Now create a new iText PDF document
 	    Document pdfDoc = new Document(PageSize.A4.rotate());
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, baos);
 	    pdfDoc.open();
 	    
-	    Paragraph title = new Paragraph(titleName,
+	    Paragraph title = new Paragraph(description.getTitlePdf(),
 	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 	    title.setAlignment(Element.ALIGN_CENTER);
 	    pdfDoc.add(title);
@@ -485,7 +520,7 @@ public class UsersService {
 	    pdfWriter.close();
 	    byte[] bytes = baos.toByteArray();
 	    InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-	    SendEmailWithAttachment(attachmentSource);
+	    SendEmailWithAttachment(attachmentSource, description);
 	    
 	}
 	
