@@ -55,19 +55,19 @@ public class UsersService {
 	
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 	
-	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
-	public void dailyNotification() {
-		Date date = new Date();
-		date = findPrevDay(date);
-		System.out.println("Executed in  : "+ date);
-	}
-	
-	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
-	public void monthlyNotification() {
-		Date date = new Date();
-		date = findPrevDay(date);
-		System.out.println("Executed in  : "+ date);
-	}
+//	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
+//	public void dailyNotification() {
+//		Date date = new Date();
+//		date = findPrevDay(date);
+//		System.out.println("Executed in  : "+ date);
+//	}
+//	
+//	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
+//	public void monthlyNotification() {
+//		Date date = new Date();
+//		date = findPrevDay(date);
+//		System.out.println("Executed in  : "+ date);
+//	}
 	
 	
 	private static Date findPrevDay(Date date)
@@ -218,6 +218,11 @@ public class UsersService {
 		return toWrapperList(userList);
 	}
 	
+	public List<Users> findListUser(){
+		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
+		return userList;
+	}
+	
 	
 	public List<UsersWrapper> findByUserId(Long userId) {
 		List<Users> userList = usersRepository.findByUserId(userId);
@@ -362,9 +367,7 @@ public class UsersService {
 		
 	}
 	
-	public void ExportToPdf(HttpServletResponse response) throws Exception{
-		 // Call the findAll method to retrieve the data
-	    List<Users> data = usersRepository.findAll();
+	public void ExportToPdf(HttpServletResponse response, List<Users> data) throws Exception{
 	    
 	    // Now create a new iText PDF document
 	    Document pdfDoc = new Document(PageSize.A4.rotate());
