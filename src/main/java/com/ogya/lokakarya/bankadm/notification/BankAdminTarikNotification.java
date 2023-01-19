@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.bankadm.notification;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -151,7 +152,11 @@ public class BankAdminTarikNotification {
 			String body = buffer.toString();
 			mimeMessageHelper.setText(body, true);
 			
-			mimeMessageHelper.addAttachment("attachment.pdf", data);
+			DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+			Date date = new Date();
+			String formattedDate = dateFormat.format(date);
+			String attachmentName = "Laporan("+formattedDate+").pdf";
+			mimeMessageHelper.addAttachment(attachmentName, data);
 			javaMailSender.send(mimeMessage);
 			System.out.println("Email sent");
 		} catch (MessagingException e){
