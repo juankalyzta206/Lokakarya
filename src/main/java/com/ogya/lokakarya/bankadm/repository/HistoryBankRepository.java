@@ -87,16 +87,20 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 List<HistoryBank> setorDaily (@Param("hari") String hari);
 	 
+//	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL=TO_DATE(':hari','yyyy-MM-dd')", nativeQuery = true)
+//	 Long adaSetoran (@Param("hari") String hari);
 	 
 	 @Query(value = "SELECT SUM(UANG) FROM HISTORY_BANK WHERE STATUS_KET=1  AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long totalSetorHarian (@Param("hari") String hari);
 	 
 	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1  AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long jumlahSetorHarian (@Param("hari") String hari);
-
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
 	 List<HistoryBank> setorRekap (@Param("start") String start, @Param("end") String end);
+	 
+//	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd')", nativeQuery = true)
+//	 Long adaSetorRekap (@Param("start") String start, @Param("end") String end);
 	 
 	 @Query(value = "SELECT SUM(UANG) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long totalSetorRekap (@Param("start") String start, @Param("end") String end);

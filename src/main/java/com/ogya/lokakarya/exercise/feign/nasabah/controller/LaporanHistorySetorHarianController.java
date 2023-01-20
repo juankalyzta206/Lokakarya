@@ -20,10 +20,6 @@ public class LaporanHistorySetorHarianController {
 	@Autowired
 	SetorNotification setor;
 	
-//	@RequestMapping(value = "/laporanSetor", method = RequestMethod.GET)
-//    public void notifSetorHarian() throws MessagingException, IOException, DocumentException {
-//		setor.historyNotification();
-//	}
 	@RequestMapping(value = "/laporanSetorDaily", method = RequestMethod.GET)
     public void notifSetorDaily() throws MessagingException, IOException, DocumentException {
 		setor.historyNotificationDaily();
@@ -38,9 +34,4 @@ public class LaporanHistorySetorHarianController {
     public void notifSetorMonthly() throws MessagingException, IOException, DocumentException {
 		setor.historyNotificationMonthly();
 	}
-	
-//	@RequestMapping(value = "/exportToPdfALLSetor", method = RequestMethod.GET)
-//    public void exportToPdfsetor() throws Exception {
-//        setor.historyNotification();
-//      }
 }

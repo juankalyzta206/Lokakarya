@@ -40,7 +40,7 @@ public class SetorNotification {
 	private TransaksiNasabahService transaksiNasabahService;
 	
 	//	Setiap hari jam 7
-	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "0 0 7 * * *")
 	public void historyNotificationDaily() throws MessagingException, IOException, DocumentException {
 		try {
 			Calendar cal = Calendar.getInstance();
@@ -104,7 +104,7 @@ public class SetorNotification {
 			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+startDay+" - "+endDay);
 
 			Context ctx = new Context();
-			ctx.setVariable("hari", startDay+" "+endDay);
+			ctx.setVariable("hari", startDay+" - "+endDay);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
