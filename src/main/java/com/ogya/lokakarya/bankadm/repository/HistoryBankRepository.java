@@ -56,8 +56,8 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4", nativeQuery = true)
 	    List<HistoryBank> laporanBayarTelepon();
 	 
-	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4 AND TANGGAL = :tanggal", nativeQuery = true)
-	    List<HistoryBank> laporanBayarTeleponToday(@Param("tanggal") LocalDate tanggal);
+	 @Query(value = "SELECT * FROM HISTORY_BANK hb WHERE STATUS_KET = 4 AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')= :tanggal", nativeQuery = true)
+	    List<HistoryBank> laporanBayarTeleponToday(@Param("tanggal") String tanggal);
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE :sortField LIKE '%' || :keyFilter || '%' ORDER BY :sortField :sortOrder",
 	            countQuery = "SELECT count(*) FROM HISTORY_BANK",
@@ -66,6 +66,8 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 
 	 @Query(value = "SELECT * FROM HISTORY_BANK hb ORDER BY ID_HISTORY_BANK DESC ", nativeQuery = true)
 	 List<HistoryBank> findLastHistory();
+	 
+//	 List<HistoryBank> findByStatusKetAndTanggal (Byte status, Date tanggal);
 	 
 //	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE ID_HISTORY_BANK = :idHistory", nativeQuery = true)
 //	 HistoryBank findByIdHistory(@Para);

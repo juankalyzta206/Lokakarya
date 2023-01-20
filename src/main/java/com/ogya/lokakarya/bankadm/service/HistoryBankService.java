@@ -438,11 +438,13 @@ public class HistoryBankService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 
-	public ByteArrayOutputStream ExportToPdfBayarTelepon(HttpServletResponse response) throws Exception {
+	public ByteArrayOutputStream ExportToPdfBayarTelepon(HttpServletResponse response, String tanggal) throws Exception {
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Call the findAll method to retrieve the data
-		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
+//		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
+		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
+		System.out.println(data);
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
@@ -509,11 +511,12 @@ public class HistoryBankService {
 		return outputStream;
 	}
 	
-public ByteArrayOutputStream ExportToPdfBayarTeleponParam(HttpServletResponse response, LocalDate tanggal) throws Exception {
+public ByteArrayOutputStream ExportToPdfBayarTeleponParam(String tanggal) throws Exception {
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Call the findAll method to retrieve the data
 		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
+		System.out.println(data);
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
@@ -568,15 +571,6 @@ public ByteArrayOutputStream ExportToPdfBayarTeleponParam(HttpServletResponse re
 
 		pdfDoc.close();
 //		pdfWriter.close();
-
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment; filename=Laporan Bayar Telepon.pdf");
-		response.setContentLength(outputStream.size());
-	    OutputStream os = response.getOutputStream();
-	    outputStream.writeTo(os);
-	    os.flush();
-	    os.close();
-	    
 		return outputStream;
 	}
 

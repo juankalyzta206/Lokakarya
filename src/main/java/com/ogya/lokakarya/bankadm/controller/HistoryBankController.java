@@ -1,5 +1,8 @@
 package com.ogya.lokakarya.bankadm.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -139,15 +142,21 @@ public class HistoryBankController {
        }
     
 	
-    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
-    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
-        historyBankService.ExportToPdfBayarTelepon(response);
-       }
-    
-//    @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
-//    public void exportToPdfbayarteleponscheduled(HttpServletResponse response) throws Exception {
-//        bayarTelkomNotification.sendEmail(response);
+//    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
+//    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
+//        historyBankService.ExportToPdfBayarTelepon(response);
 //       }
+    
+    @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
+    public void exportToPdfbayarteleponscheduled(HttpServletResponse response) throws Exception {
+    	Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, - 1);
+		Date date = cal.getTime();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String yesterday = dateFormat.format(date);
+		System.out.println(yesterday);
+        historyBankService.ExportToPdfBayarTelepon(response, yesterday.toString());
+       }
     
     
 
