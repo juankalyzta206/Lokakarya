@@ -67,7 +67,7 @@ public class SetorNotification {
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Setor History "+day,
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+day,
 					"History Setor " + day + ".pdf", "SetorHarian", ctx, historySetorPdf);
 
 		} catch (Exception e) {
@@ -108,7 +108,7 @@ public class SetorNotification {
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Setor History "+startDay+" - "+endDay, 
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+startDay+" - "+endDay, 
 					"History Setor " + startDay+" - "+endDay + ".pdf", "SetorMingguan", ctx, historySetorPdf);
 
 		} catch (Exception e) {
@@ -149,7 +149,7 @@ public class SetorNotification {
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Setor History Bulan "+bulan, 
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan, 
 					"History Setor " + bulan + ".pdf", "SetorBulanan", ctx, historySetorPdf);
 
 		} catch (Exception e) {
