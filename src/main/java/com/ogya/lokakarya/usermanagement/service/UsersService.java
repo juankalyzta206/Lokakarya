@@ -118,7 +118,7 @@ public class UsersService {
 		ExportToPdfNotification(monthlyData, description);
 	}
 	
-	@Scheduled(cron = "0 0 7 * * SUN") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
 	public void WeeklyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
