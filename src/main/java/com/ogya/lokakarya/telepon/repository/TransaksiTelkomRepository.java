@@ -39,4 +39,21 @@ public interface TransaksiTelkomRepository extends JpaRepository<TransaksiTelkom
 	
 	TransaksiTelkom findByidPelanggan(MasterPelanggan idPelanggan);
 	
+	@Query(value = "SELECT * FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN = :bulan ", nativeQuery = true)
+	List<TransaksiTelkom> laporanPenunggakanMonthly(@Param("bulan")  String bulan);
+	
+	@Query(value = "SELECT COUNT(*) FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN = :bulan ", nativeQuery = true)
+	Long jumlahLaporanPenunggakanMonthly(@Param("bulan")  String bulan);
+	
+	@Query(value = "SELECT SUM(UANG) FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN = :bulan ", nativeQuery = true)
+	Long totalLaporanPenunggakanMonthly(@Param("bulan")  String bulan);
+	
+	@Query(value = "SELECT * FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN BETWEEN :bawal AND :bakhir;", nativeQuery = true)
+	List<TransaksiTelkom> laporanPenunggakanYearly(@Param("bawal")  String bawal, @Param("bakhir") String bakhir);
+	
+	@Query(value = "SELECT COUNT(*) FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN BETWEEN :bawal AND :bakhir;", nativeQuery = true)
+	Long jumlahLaporanPenunggakanYearly(@Param("bawal")  String bawal, @Param("bakhir") String bakhir);
+	
+	@Query(value = "SELECT SUM(UANG) FROM TRANSAKSI_TELKOM WHERE STATUS = 1 AND BULAN_TAGIHAN BETWEEN :bawal AND :bakhir;", nativeQuery = true)
+	Long totalLaporanPenunggakanYearly(@Param("bawal")  String bawal, @Param("bakhir") String bakhir);
 }
