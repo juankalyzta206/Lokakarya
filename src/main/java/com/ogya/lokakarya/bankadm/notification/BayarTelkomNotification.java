@@ -33,7 +33,7 @@ public class BayarTelkomNotification {
 
 	
 //	===========================================KirimEmail=====================================================
-	@Scheduled(cron = "0 46 9 * * *")
+	@Scheduled(cron = "0 0 7 * * *")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -62,7 +62,7 @@ public class BayarTelkomNotification {
 			System.out.println("Email send");
 	}
 	
-	@Scheduled(cron = "0 46 9 * * *")
+	@Scheduled(cron = "0 0 7 * * MON")
 	public void sendEmailWeek() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -99,7 +99,7 @@ public class BayarTelkomNotification {
 			System.out.println("Email send");
 	}
 	
-	@Scheduled(cron = "0 46 9 * * *")
+	@Scheduled(cron = "0 0 7 1 * *")
 	public void sendEmailMonth() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
