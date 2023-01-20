@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -555,8 +555,11 @@ public class HistoryBankService {
 		pdfTable.addCell(Align("Nominal"));
 		pdfTable.addCell(Align("No Telepon"));
 		pdfTable.addCell(Align("Keterangan"));
+		
+		BaseColor color = new BaseColor(135, 206, 235);
+				
 		for (int i = 0; i < 6; i++) {
-			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
 		// Iterate through the data and add it to the table
