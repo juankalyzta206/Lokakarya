@@ -2,7 +2,6 @@ package com.ogya.lokakarya.bankadm.notification;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.DateFormatSymbols;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,7 +39,7 @@ public class SetorNotification {
 	private TransaksiNasabahService transaksiNasabahService;
 	
 	//	Setiap hari jam 7
-	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "0 0 7 * * *")
 	public void historyNotificationDaily() throws MessagingException, IOException, DocumentException {
 		try {
 			Calendar cal = Calendar.getInstance();
@@ -104,7 +103,7 @@ public class SetorNotification {
 			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+startDay+" - "+endDay);
 
 			Context ctx = new Context();
-			ctx.setVariable("hari", startDay+" "+endDay);
+			ctx.setVariable("hari", startDay+" - "+endDay);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
