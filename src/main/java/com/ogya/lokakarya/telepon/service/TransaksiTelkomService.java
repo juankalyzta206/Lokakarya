@@ -266,11 +266,6 @@ public class TransaksiTelkomService {
 		PdfPCell cell6 = new PdfPCell(new Phrase("Status"));
 		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell6);
-//		pdfTable.addCell("Nama Pelanggan");
-//		pdfTable.addCell("Bulan Tagihan");
-//		pdfTable.addCell("Tahun Tagihan");
-//		pdfTable.addCell("Nominal");
-//		pdfTable.addCell("Status");
 
 		BaseColor color = new BaseColor(135, 206, 235);
 
@@ -302,9 +297,6 @@ public class TransaksiTelkomService {
 	}
 
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
-		// Call the findAll method to retrieve the data
-		// List<TransaksiTelkom> dataTransaksi =
-		// transaksiTelkomRepository.findStatus1();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		List<TransaksiTelkomWrapper> wrapperList = new ArrayList<TransaksiTelkomWrapper>();
