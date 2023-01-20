@@ -17,18 +17,29 @@ public interface UsersRepository extends JpaRepository<Users, Long>{
 	List<Users> findByUserId (Long userId);
 	List<Users> findByUsernameAndPassword (String username, String password);
 	
-	@Query(value="SELECT * FROM USERS WHERE EXTRACT(YEAR FROM CREATED_DATE)= :year "
-			+ "AND EXTRACT(MONTH FROM CREATED_DATE)= :month "
-			+ "AND EXTRACT(DAY FROM CREATED_DATE)= :date "
+	@Query(value="SELECT * "
+			+ "FROM   USERS "
+			+ "WHERE  CREATED_DATE < TRUNC( SYSDATE ) "
+			+ "AND  CREATED_DATE > TRUNC( SYSDATE ) - INTERVAL '1' DAY "
 			+ "ORDER BY CREATED_DATE", 
 			nativeQuery = true)
-	List<Users> newUsersDaily (@Param("year") Integer year, @Param("month") Integer month, @Param("date") Integer date);
+	List<Users> newUsersDaily ();
 	
-	@Query(value="SELECT * FROM USERS WHERE EXTRACT(YEAR FROM CREATED_DATE)= :year "
-			+ "AND EXTRACT(MONTH FROM CREATED_DATE)= :month "
+	@Query(value="SELECT * "
+			+ "FROM   USERS "
+			+ "WHERE  CREATED_DATE < TRUNC( SYSDATE ) "
+			+ "AND  CREATED_DATE > TRUNC( SYSDATE ) - INTERVAL '1' MONTH "
 			+ "ORDER BY CREATED_DATE", 
 			nativeQuery = true)
-	List<Users> newUsersMonthly (@Param("year") Integer year, @Param("month") Integer month);
+	List<Users> newUsersMonthly ();
+	
+	@Query(value="SELECT * "
+			+ "FROM   USERS "
+			+ "WHERE  CREATED_DATE < TRUNC( SYSDATE ) "
+			+ "AND  CREATED_DATE > TRUNC( SYSDATE ) - INTERVAL '7' DAY "
+			+ "ORDER BY CREATED_DATE", 
+			nativeQuery = true)
+	List<Users> newUsersWeekly ();
 	
 	
 	@Query(value="SELECT COUNT(*) FROM USERS u WHERE u.EMAIL = :email", 

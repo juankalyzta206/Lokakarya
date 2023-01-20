@@ -1,6 +1,5 @@
 package com.ogya.lokakarya.bankadm.repository;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -10,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> {
 	List<HistoryBank> findByidHistoryBank(Long idHistoryBank);
 	List<HistoryBank> findByStatusKet(Byte statusKet);
@@ -56,6 +54,9 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE status_ket = 4", nativeQuery = true)
 	    List<HistoryBank> laporanBayarTelepon();
 	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK hb WHERE STATUS_KET = 4 AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')= :tanggal", nativeQuery = true)
+	    List<HistoryBank> laporanBayarTeleponToday(@Param("tanggal") String tanggal);
+	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE :sortField LIKE '%' || :keyFilter || '%' ORDER BY :sortField :sortOrder",
 	            countQuery = "SELECT count(*) FROM HISTORY_BANK",
 	            nativeQuery = true)
@@ -64,6 +65,7 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK hb ORDER BY ID_HISTORY_BANK DESC ", nativeQuery = true)
 	 List<HistoryBank> findLastHistory();
 	 
+
 	 
 	 
 	 @Query(value="SELECT * FROM HISTORY_BANK WHERE EXTRACT(YEAR FROM TANGGAL)= :year "
@@ -81,15 +83,12 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 				nativeQuery = true)
 		List<HistoryBank> newTarikMonthly (@Param("year") Integer year, @Param("month") Integer month);
 			 
-//	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE ID_HISTORY_BANK = :idHistory", nativeQuery = true)
-//	 HistoryBank findByIdHistory(@Para);
 	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 List<HistoryBank> setorDaily (@Param("hari") String hari);
 	 
-//	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL=TO_DATE(':hari','yyyy-MM-dd')", nativeQuery = true)
-//	 List<HistoryBank> setorDaily (@Param("hari") String hari);
-	 
+//	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL=TO_DATE(':hari','yyyy-MM-dd')", nativeQuery = true)
+//	 Long adaSetoran (@Param("hari") String hari);
 	 
 	 @Query(value = "SELECT SUM(UANG) FROM HISTORY_BANK WHERE STATUS_KET=1  AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long totalSetorHarian (@Param("hari") String hari);
@@ -97,11 +96,11 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1  AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long jumlahSetorHarian (@Param("hari") String hari);
 	 
-//	 @Query(value = "SELECT * FROM HISTORY_BANK hb WHERE EXTRACT(YEAR FROM TANGGAL)=:tahun AND EXTRACT(MONTH FROM TANGGAL)= :bulan AND EXTRACT(DAY FROM TANGGAL)= :hari", nativeQuery = true)
-//	 List<HistoryBank> setorHariIni (@Param("tahun") String tahun, @Param("bulan") String bulan, @Param("hari") String hari);
-	 
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
 	 List<HistoryBank> setorRekap (@Param("start") String start, @Param("end") String end);
+	 
+//	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd')", nativeQuery = true)
+//	 Long adaSetorRekap (@Param("start") String start, @Param("end") String end);
 	 
 	 @Query(value = "SELECT SUM(UANG) FROM HISTORY_BANK WHERE STATUS_KET=1 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long totalSetorRekap (@Param("start") String start, @Param("end") String end);
