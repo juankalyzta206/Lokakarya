@@ -104,6 +104,9 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT COUNT(*) FROM HISTORY_BANK WHERE STATUS_KET=1  AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
 	 Long jumlahSetorRekap (@Param("start") String start, @Param("end") String end);
 	 
+	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=4 AND TANGGAL BETWEEN TO_DATE(:start, 'yyyy-MM-dd') AND TO_DATE(:end, 'yyyy-MM-dd') ORDER BY TANGGAL ASC", nativeQuery = true)
+	 List<HistoryBank> bayarTeleponRekap (@Param("start") String start, @Param("end") String end);
+	 
 }
 
 

@@ -2,11 +2,13 @@ package com.ogya.lokakarya.bankadm.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +38,7 @@ import com.ogya.lokakarya.bankadm.repository.HistoryBankCriteriaRepository;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.repository.MasterBankRepository;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
+import com.ogya.lokakarya.util.CurrencyData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -49,16 +52,17 @@ public class HistoryBankService {
 	@Autowired
 	HistoryBankCriteriaRepository historyBankCriteriaRepository;
 
-	public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequestWrapper request) { 
+	public PaginationList<HistoryBankWrapper, HistoryBank> ListWithPaging(PagingRequestWrapper request) {
 		List<HistoryBank> historyBankList = historyBankCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage())* (request.getSize());
+		int fromIndex = (request.getPage()) * (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), historyBankList.size());
-		Page<HistoryBank> historyBankPage = new PageImpl<>(historyBankList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), historyBankList.size());
+		Page<HistoryBank> historyBankPage = new PageImpl<>(historyBankList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), historyBankList.size());
 		List<HistoryBankWrapper> historyBankWrapperList = new ArrayList<>();
-		for(HistoryBank entity : historyBankPage) {
-		    historyBankWrapperList.add(toWrapper(entity));
+		for (HistoryBank entity : historyBankPage) {
+			historyBankWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);	
+		return new PaginationList<HistoryBankWrapper, HistoryBank>(historyBankWrapperList, historyBankPage);
 	}
 
 	public HistoryBankWrapper getByidHistoryBank(Long idHistoryBank) {
@@ -262,7 +266,8 @@ public class HistoryBankService {
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("Laporan Transaksi Bank Setor", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("Laporan Transaksi Bank Setor",
+				new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -321,7 +326,8 @@ public class HistoryBankService {
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("Laporan Transaksi Bank Tarik", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("Laporan Transaksi Bank Tarik",
+				new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -380,7 +386,8 @@ public class HistoryBankService {
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("Laporan Transaksi Bank Transfer", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("Laporan Transaksi Bank Transfer",
+				new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -438,12 +445,13 @@ public class HistoryBankService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 
-	public ByteArrayOutputStream ExportToPdfBayarTelepon(HttpServletResponse response, String tanggal) throws Exception {
-		
+	public ByteArrayOutputStream ExportToPdfBayarTelepon(HttpServletResponse response)
+			throws Exception {
+
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Call the findAll method to retrieve the data
 //		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
-		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
+		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
 		System.out.println(data);
 
 		// Now create a new iText PDF document
@@ -452,7 +460,8 @@ public class HistoryBankService {
 //		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("Laporan Transaksi Bank Bayar Telepon", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("Laporan Transaksi Bank Bayar Telepon",
+				new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -490,7 +499,8 @@ public class HistoryBankService {
 			}
 			pdfTable.addCell(Align(formattedDate));
 			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-")));
+			pdfTable.addCell(
+					Align(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-")));
 			pdfTable.addCell(Align("BayarTelepon"));
 		}
 
@@ -503,28 +513,28 @@ public class HistoryBankService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=Laporan Bayar Telepon.pdf");
 		response.setContentLength(outputStream.size());
-	    OutputStream os = response.getOutputStream();
-	    outputStream.writeTo(os);
-	    os.flush();
-	    os.close();
-	    
+		OutputStream os = response.getOutputStream();
+		outputStream.writeTo(os);
+		os.flush();
+		os.close();
+
 		return outputStream;
 	}
-	
-public ByteArrayOutputStream ExportToPdfBayarTeleponParam(String tanggal) throws Exception {
-		
+
+	public ByteArrayOutputStream ExportToPdfBayarTeleponParam(List<HistoryBank> data, String judul) throws Exception {
+
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Call the findAll method to retrieve the data
-		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
+//		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
 		System.out.println(data);
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter.getInstance(pdfDoc, outputStream);
-//		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("Laporan Transaksi Bank Bayar Telepon", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph(judul,
+				new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -561,9 +571,16 @@ public ByteArrayOutputStream ExportToPdfBayarTeleponParam(String tanggal) throws
 				formattedDate = formatter.format(entity.getTanggal());
 			}
 			pdfTable.addCell(Align(formattedDate));
-			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-")));
-			pdfTable.addCell(Align("BayarTelepon"));
+			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
+			CurrencyData currencyNominal = new CurrencyData();
+			currencyNominal.setValue(entity.getUang());
+
+			pdfTable.addCell(Align(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+					? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+					: "-")));
+			pdfTable.addCell(
+					Align(String.valueOf(entity.getNoTlp() != null ? String.valueOf(entity.getNoTlp()) : "-")));
+			pdfTable.addCell(Align("Bayar Telepon"));
 		}
 
 		// Add the table to the pdf document
