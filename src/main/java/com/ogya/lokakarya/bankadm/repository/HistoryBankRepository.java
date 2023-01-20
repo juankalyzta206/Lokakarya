@@ -83,7 +83,16 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 				nativeQuery = true)
 		List<HistoryBank> newTarikMonthly (@Param("year") Integer year, @Param("month") Integer month);
 			 
-	 
+		@Query(value="SELECT * FROM HISTORY_BANK WHERE EXTRACT(YEAR FROM TANGGAL)= :year "
+				+ "AND EXTRACT(MONTH FROM TANGGAL)= :month "
+				+ "AND EXTRACT(DAY FROM TANGGAL)= :date "
+				+ "AND EXTRACT(DOW FROM TANGGAL)= :dayOfWeek "
+				+ "AND STATUS_KET = 2 "
+				+ "ORDER BY TANGGAL", 
+				nativeQuery = true)
+		List<HistoryBank> newTarikWeekly (@Param("year") Integer year, @Param("month") Integer month, @Param("date") Integer date, @Param("dayOfWeek") Integer dayOfWeek);
+
+		
 	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE STATUS_KET=1 AND TO_CHAR(TANGGAL, 'yyyy-MM-dd')=:hari ORDER BY TANGGAL ASC", nativeQuery = true)
 	 List<HistoryBank> setorDaily (@Param("hari") String hari);
 	 
