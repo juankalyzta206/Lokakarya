@@ -19,6 +19,7 @@ import com.ogya.lokakarya.bankadm.wrapper.MasterBankWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.SetorAmbilWrapper;
 import com.ogya.lokakarya.bankadm.wrapper.TransferWrapper;
 import com.ogya.lokakarya.exercise.feign.nasabah.services.NasabahFeignService;
+import com.ogya.lokakarya.telepon.notification.LaporanPenunggakanNotification;
 import com.ogya.lokakarya.telepon.wrapper.BayarTeleponWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
@@ -31,6 +32,8 @@ public class TransaksiNasabahController {
 	TransaksiNasabahService transaksiNasabahService;
 	@Autowired
 	NasabahFeignService nasabahFeignService;
+	@Autowired
+	LaporanPenunggakanNotification laporanPenunggakanNotification;
 
 //	===========================================Transaksi==========================================================
 	@PostMapping(path = "/transfer")
