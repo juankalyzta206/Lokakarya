@@ -79,41 +79,44 @@ public class UsersService {
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
 		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		SimpleDateFormat f = new SimpleDateFormat("EEEE");
+		String dayName = f.format(date);
 		NotificationWrapper description = new NotificationWrapper();
 		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
 		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
 		description.setReceiver(receiver);
 		description.setCc(cc);
-		description.setSubject("Daily Report Created User("+year+"_"+month+"_"+day+")");
-		description.setTopHeader("Daily Report Created User");
-		description.setBotHeader("Berikut lampiran file daily report user untuk tanggal "+day+" bulan "+getMonthForInt(month)+" tahun "+year);
-		description.setTitlePdf("List Created Users Daily("+year+"_"+month+"_"+day+")");
-		description.setFileName("newUsersDaily("+year+"_"+month+"_"+day+")");
+		description.setSubject("Laporan Penambahan User");
+		description.setTopHeader("Laporan Penambahan User Harian");
+		description.setBotHeader("Hari : "+dayName+", "+day+"/"+month+"/"+year);
+		description.setTitlePdf("Laporan Penambahan User Harian("+day+" "+getMonthForInt(month)+" "+year+")");
+		description.setFileName("LaporanPenambahanUserHarian("+day+"/"+month+"/"+year+")");
 		List<Users> dailyData = usersRepository.newUsersDaily(year,month,day);
 		ExportToPdfNotification(dailyData, description);
 	}
 	
-	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
-	public void MonthlyNotification() throws Exception {
-		Date date = new Date();
-		date = FindPrevDay(date);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
-		NotificationWrapper description = new NotificationWrapper();
-		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
-		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
-		description.setReceiver(receiver);
-		description.setCc(cc);
-		description.setSubject("Monthly Report Created User("+year+"_"+month+")");
-		description.setTopHeader("Monthly Report Created User");
-		description.setBotHeader("Berikut lampiran file monthly report user untuk bulan "+getMonthForInt(month)+" tahun "+year);
-		description.setTitlePdf("List Created Users Monthly("+year+"_"+month+")");
-		description.setFileName("newUsersMonthly("+year+"_"+month+")");
-		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
-		ExportToPdfNotification(monthlyData, description);
-	}
+	
+//	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+//	public void MonthlyNotification() throws Exception {
+//		Date date = new Date();
+//		date = FindPrevDay(date);
+//		Calendar calendar = new GregorianCalendar();
+//		calendar.setTime(date);
+//		int year = calendar.get(Calendar.YEAR);
+//		int month = calendar.get(Calendar.MONTH) + 1;
+//		NotificationWrapper description = new NotificationWrapper();
+//		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+//		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+//		description.setReceiver(receiver);
+//		description.setCc(cc);
+//		description.setSubject("Laporan Penambahan User");
+//		description.setTopHeader("Laporan Penambahan User Bulanan");
+//		description.setBotHeader("Bulan "+getMonthForInt(month)+" tahun "+year);
+//		description.setTitlePdf("Laporan Penambahan User Bulanan("+getMonthForInt(month)+" "+year+")");
+//		description.setFileName("LaporanPenambahanUserBulanan("+month+"/"+year+")");
+//		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
+//		ExportToPdfNotification(monthlyData, description);
+//	}
 	
 	
 	String getMonthForInt(int num) {

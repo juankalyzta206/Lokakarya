@@ -1,5 +1,8 @@
 package com.ogya.lokakarya.bankadm.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
+import com.ogya.lokakarya.bankadm.notification.BayarTelkomNotification;
 import com.ogya.lokakarya.bankadm.repository.HistoryBankRepository;
 import com.ogya.lokakarya.bankadm.service.HistoryBankService;
 import com.ogya.lokakarya.bankadm.wrapper.HistoryBankWrapper;
@@ -33,6 +37,8 @@ public class HistoryBankController {
 	HistoryBankRepository historyBankRepository;
 	@Autowired
 	HistoryBankService historyBankService;
+//	@Autowired
+//	BayarTelkomNotification bayarTelkomNotification;
 	
 	@GetMapping(path = "/getByIdPlan")
 	public HistoryBankWrapper getByidHistoryBank(@RequestParam("id") Long idHistoryBank) {
@@ -136,9 +142,20 @@ public class HistoryBankController {
        }
     
 	
-    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
-    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
-        historyBankService.ExportToPdfBayarTelepon(response);
+//    @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
+//    public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
+//        historyBankService.ExportToPdfBayarTelepon(response);
+//       }
+    
+    @RequestMapping(value = "/scheduled", method = RequestMethod.GET)
+    public void exportToPdfbayarteleponscheduled(HttpServletResponse response) throws Exception {
+    	Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DATE, - 1);
+		Date date = cal.getTime();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		String yesterday = dateFormat.format(date);
+		System.out.println(yesterday);
+        historyBankService.ExportToPdfBayarTelepon(response, yesterday.toString());
        }
     
     
