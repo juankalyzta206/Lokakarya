@@ -3,11 +3,9 @@ package com.ogya.lokakarya.exercise.feign.nasabah.controller;
 import java.io.IOException;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +20,6 @@ public class LaporanHistorySetorHarianController {
 	@Autowired
 	SetorNotification setor;
 	
-//	@RequestMapping(value = "/laporanSetor", method = RequestMethod.GET)
-//    public void notifSetorHarian() throws MessagingException, IOException, DocumentException {
-//		setor.historyNotification();
-//	}
 	@RequestMapping(value = "/laporanSetorDaily", method = RequestMethod.GET)
     public void notifSetorDaily() throws MessagingException, IOException, DocumentException {
 		setor.historyNotificationDaily();
@@ -40,9 +34,4 @@ public class LaporanHistorySetorHarianController {
     public void notifSetorMonthly() throws MessagingException, IOException, DocumentException {
 		setor.historyNotificationMonthly();
 	}
-	
-//	@RequestMapping(value = "/exportToPdfALLSetor", method = RequestMethod.GET)
-//    public void exportToPdfsetor() throws Exception {
-//        setor.historyNotification();
-//      }
 }
