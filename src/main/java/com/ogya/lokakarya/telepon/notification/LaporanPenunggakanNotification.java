@@ -39,8 +39,10 @@ public class LaporanPenunggakanNotification {
 	@Autowired
 	TransaksiTelkomRepository transaksiTelkomRepository;
 	
+	
+	
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * ?")
+	@Scheduled(cron = "* 58 * * * ?")
 	public void historyNotificationMonthly() throws MessagingException, IOException, DocumentException {
 		try {
 //			Date harini = new Date();
@@ -71,7 +73,7 @@ public class LaporanPenunggakanNotification {
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Penunggakan bulan "+bulan, 
+			transaksiNasabahService.sendEmail("haha1hihi2huhu3@gmail.com", "Laporan Penunggakan bulan "+bulan, 
 					 ".pdf", "SetorBulanan", ctx, laporanPenunggakan);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
