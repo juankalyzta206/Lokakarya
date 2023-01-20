@@ -28,75 +28,71 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
-
 @RestController
 @RequestMapping(value = "/users")
 @CrossOrigin(origins = "*")
 public class UsersController {
 	@Autowired
 	UsersService userService;
-	
-	
+
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
-	public DataResponsePagination<UsersWrapper, Users> findAllWithPagination(@RequestParam("page") int page,@RequestParam("size") int size) {
+	public DataResponsePagination<UsersWrapper, Users> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
 		return new DataResponsePagination<UsersWrapper, Users>(userService.findAllWithPagination(page, size));
 	}
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<UsersWrapper> findAllPlan() {
 		return userService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<UsersWrapper> findAll() {
 		return new DataResponseList<UsersWrapper>(userService.findAll());
 	}
-	
+
 	@GetMapping(path = "/findById")
-	public DataResponseList<UsersWrapper> findById(@RequestParam("id")  Long userId) {
+	public DataResponseList<UsersWrapper> findById(@RequestParam("id") Long userId) {
 		return new DataResponseList<UsersWrapper>(userService.findByUserId(userId));
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<UsersAddWrapper> save(@RequestBody UsersAddWrapper wrapper){
+	public DataResponse<UsersAddWrapper> save(@RequestBody UsersAddWrapper wrapper) {
 		return new DataResponse<UsersAddWrapper>(userService.save(wrapper));
 	}
-	
 
 	@PutMapping(path = "/")
-	public DataResponse<UsersWrapper> update(@RequestBody UsersUpdateWrapper wrapper){
+	public DataResponse<UsersWrapper> update(@RequestBody UsersUpdateWrapper wrapper) {
 		return new DataResponse<UsersWrapper>(userService.update(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long userId) {
+	public void deleteId(@RequestParam("id") Long userId) {
 		userService.delete(userId);
 	}
-	
+
 	@PostMapping(path = "/register")
-	public DataResponse<UsersRegisterWrapper> register(@RequestBody UsersRegisterWrapper wrapper){
+	public DataResponse<UsersRegisterWrapper> register(@RequestBody UsersRegisterWrapper wrapper) {
 		return new DataResponse<UsersRegisterWrapper>(userService.register(wrapper));
 	}
-	
-	
+
 	@PostMapping(path = "/login")
-	public DataResponseList<UsersLoginWrapper> findAll(@RequestParam("identity") String identity, @RequestParam("password") String password) {
-		return new DataResponseList<UsersLoginWrapper>(userService.findByEmailOrUsernameAndPassword(identity, password));
+	public DataResponseList<UsersLoginWrapper> findAll(@RequestParam("identity") String identity,
+			@RequestParam("password") String password) {
+		return new DataResponseList<UsersLoginWrapper>(
+				userService.findByEmailOrUsernameAndPassword(identity, password));
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-	    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		userService.ExportToPdf(response);
 	}
-	
-	
+
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<UsersWrapper, Users> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<UsersWrapper, Users> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<UsersWrapper, Users>(userService.ListWithPaging(request));
 	}
-	
 
 }

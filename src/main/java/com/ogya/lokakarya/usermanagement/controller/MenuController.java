@@ -24,56 +24,54 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
 @RestController
 @RequestMapping(value = "/menu")
 @CrossOrigin(origins = "*")
 public class MenuController {
 	@Autowired
 	MenuService menuService;
-	
+
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
 	public DataResponsePagination<MenuWrapper, Menu> findAllWithPagination(@RequestParam("page") int page,
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<MenuWrapper, Menu>(menuService.findAllWithPagination(page, size));
 	}
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<MenuWrapper> findAllPlan() {
 		return menuService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<MenuWrapper> findAll() {
 		return new DataResponseList<MenuWrapper>(menuService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<MenuWrapper> save(@RequestBody MenuWrapper wrapper){
+	public DataResponse<MenuWrapper> save(@RequestBody MenuWrapper wrapper) {
 		return new DataResponse<MenuWrapper>(menuService.save(wrapper));
 	}
-	
+
 	@PutMapping(path = "/")
-	public DataResponse<MenuWrapper> update(@RequestBody MenuWrapper wrapper){
+	public DataResponse<MenuWrapper> update(@RequestBody MenuWrapper wrapper) {
 		return new DataResponse<MenuWrapper>(menuService.save(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long menuId) {
+	public void deleteId(@RequestParam("id") Long menuId) {
 		menuService.delete(menuId);
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		menuService.ExportToPdf(response);
 	}
-	
+
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<MenuWrapper, Menu> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<MenuWrapper, Menu> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<MenuWrapper, Menu>(menuService.ListWithPaging(request));
 	}
-	
-	
+
 }

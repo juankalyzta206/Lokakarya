@@ -17,10 +17,10 @@ import com.ogya.lokakarya.util.DataResponseFeign;
 public class UsersFeignServices {
 	@Autowired
 	UsersFeignRepository usersFeignRepository;
-	
+
 	@Autowired
 	UsersService usersService;
-	
+
 	@Autowired
 	RolesService rolesService;
 
@@ -29,7 +29,8 @@ public class UsersFeignServices {
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleInquiry(wrapper.getNama());
 			if (usersFeignResponse.getSuccess()) {
 				wrapper.setProgramName(usersFeignResponse.getProgramName());
-				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(rolesService.save(wrapper));
+				DataResponseFeign<RolesWrapper> dataResponse = new DataResponseFeign<RolesWrapper>(
+						rolesService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
 				return dataResponse;
@@ -40,8 +41,7 @@ public class UsersFeignServices {
 			throw new BusinessException(e.getMessage());
 		}
 	}
-	
-	
+
 	public DataResponseFeign<UsersAddWrapper> callUserRoleRecord(UsersAddWrapper wrapper) {
 		try {
 			UsersFeignToWebServiceRequest requestWebService = new UsersFeignToWebServiceRequest();
@@ -52,7 +52,8 @@ public class UsersFeignServices {
 			UsersFeignResponse usersFeignResponse = usersFeignRepository.userRoleRecord(requestWebService);
 			if (usersFeignResponse.getSuccess()) {
 				wrapper.setProgramName(usersFeignResponse.getProgramName());
-				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(usersService.save(wrapper));
+				DataResponseFeign<UsersAddWrapper> dataResponse = new DataResponseFeign<UsersAddWrapper>(
+						usersService.save(wrapper));
 				dataResponse.setSuccess(usersFeignResponse.getSuccess());
 				dataResponse.setReferenceNumber(null);
 				return dataResponse;
@@ -62,6 +63,6 @@ public class UsersFeignServices {
 		} catch (Exception e) {
 			throw new BusinessException(e.getMessage());
 		}
-		
+
 	}
 }
