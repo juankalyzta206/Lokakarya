@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.ogya.lokakarya.bankadm.entity.HistoryBank;
+import com.ogya.lokakarya.usermanagement.entity.Users;
 public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> {
 	List<HistoryBank> findByidHistoryBank(Long idHistoryBank);
 	List<HistoryBank> findByStatusKet(Byte statusKet);
@@ -63,6 +64,23 @@ public interface HistoryBankRepository extends JpaRepository<HistoryBank, Long> 
 	 @Query(value = "SELECT * FROM HISTORY_BANK hb ORDER BY ID_HISTORY_BANK DESC ", nativeQuery = true)
 	 List<HistoryBank> findLastHistory();
 	 
+	 
+	 
+	 @Query(value="SELECT * FROM HISTORY_BANK WHERE EXTRACT(YEAR FROM TANGGAL)= :year "
+				+ "AND EXTRACT(MONTH FROM TANGGAL)= :month "
+				+ "AND EXTRACT(DAY FROM TANGGAL)= :date "
+				+ "AND STATUS_KET = 2 "
+				+ "ORDER BY TANGGAL", 
+				nativeQuery = true)
+		List<HistoryBank> newTarikDaily (@Param("year") Integer year, @Param("month") Integer month, @Param("date") Integer date);
+		
+		@Query(value="SELECT * FROM HISTORY_BANK WHERE EXTRACT(YEAR FROM TANGGAL)= :year "
+				+ "AND EXTRACT(MONTH FROM TANGGAL)= :month "
+				+ "AND STATUS_KET = 2 "
+				+ "ORDER BY TANGGAL", 
+				nativeQuery = true)
+		List<HistoryBank> newTarikMonthly (@Param("year") Integer year, @Param("month") Integer month);
+			 
 //	 @Query(value = "SELECT * FROM HISTORY_BANK WHERE ID_HISTORY_BANK = :idHistory", nativeQuery = true)
 //	 HistoryBank findByIdHistory(@Para);
 	 

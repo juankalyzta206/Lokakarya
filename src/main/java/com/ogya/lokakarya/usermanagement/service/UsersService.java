@@ -1,21 +1,32 @@
 package com.ogya.lokakarya.usermanagement.service;
 
 
+import java.io.ByteArrayOutputStream;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +44,7 @@ import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.usermanagement.repository.HakAksesRepository;
 import com.ogya.lokakarya.usermanagement.repository.UsersRepository;
 import com.ogya.lokakarya.usermanagement.repository.criteria.UsersCriteriaRepository;
+import com.ogya.lokakarya.usermanagement.wrapper.NotificationWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersRegisterWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersUpdateWrapper;
@@ -53,9 +65,72 @@ public class UsersService {
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
 	
-	@Scheduled(cron = "0 0 0 * * *") // <-- second, minute, hour, day, month
-	public void runEveryThreeSeconds() {
-		System.out.println("Executed in  : "+ new Date());
+	@Autowired
+	private JavaMailSender javaMailSender;
+	
+	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
+	
+	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
+	public void DailyNotification() throws Exception {
+		Date date = new Date();
+		date = FindPrevDay(date);
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		NotificationWrapper description = new NotificationWrapper();
+		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Daily Report Created User("+year+"_"+month+"_"+day+")");
+		description.setTopHeader("Daily Report Created User");
+		description.setBotHeader("Berikut lampiran file daily report user untuk tanggal "+day+" bulan "+getMonthForInt(month)+" tahun "+year);
+		description.setTitlePdf("List Created Users Daily("+year+"_"+month+"_"+day+")");
+		description.setFileName("newUsersDaily("+year+"_"+month+"_"+day+")");
+		List<Users> dailyData = usersRepository.newUsersDaily(year,month,day);
+		ExportToPdfNotification(dailyData, description);
+	}
+	
+	@Scheduled(cron = "* * * * * *") // <-- second, minute, hour, day, month
+	public void MonthlyNotification() throws Exception {
+		Date date = new Date();
+		date = FindPrevDay(date);
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		NotificationWrapper description = new NotificationWrapper();
+		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Monthly Report Created User("+year+"_"+month+")");
+		description.setTopHeader("Monthly Report Created User");
+		description.setBotHeader("Berikut lampiran file monthly report user untuk bulan "+getMonthForInt(month)+" tahun "+year);
+		description.setTitlePdf("List Created Users Monthly("+year+"_"+month+")");
+		description.setFileName("newUsersMonthly("+year+"_"+month+")");
+		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
+		ExportToPdfNotification(monthlyData, description);
+	}
+	
+	
+	String getMonthForInt(int num) {
+		num = num-1;
+		String month = "wrong";
+		Locale id = new Locale("in", "ID");
+    	DateFormatSymbols dfs = new DateFormatSymbols(id);
+    	String[] months = dfs.getMonths();
+    	if (num >= 0 && num <= 12) {
+    		month = months[num];
+    	}
+    	return month;
+	}
+	
+	private static Date FindPrevDay(Date date)
+	{
+	  return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
 	
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
@@ -199,6 +274,11 @@ public class UsersService {
 	public List<UsersWrapper> findAll() {
 		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
 		return toWrapperList(userList);
+	}
+	
+	public List<Users> findListUser(){
+		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
+		return userList;
 	}
 	
 	
@@ -345,10 +425,111 @@ public class UsersService {
 		
 	}
 	
+	public void SendEmailWithAttachment(InputStreamSource data,NotificationWrapper description) {
+		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+		try {
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+			mimeMessageHelper.setTo(description.getReceiver());
+			mimeMessageHelper.setCc(description.getCc());
+			mimeMessageHelper.setSubject(description.getSubject());
+			
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("<h3>"+description.getTopHeader()+"</h3>");
+			buffer.append("<h5>"+description.getBotHeader()+"</h5>");
+			String body = buffer.toString();
+			mimeMessageHelper.setText(body, true);
+			
+			mimeMessageHelper.addAttachment(description.getFileName()+".pdf", data);
+			javaMailSender.send(mimeMessage);
+			System.out.println("Email sent");
+		} catch (MessagingException e){
+			System.err.print("Failed send email");
+			e.printStackTrace();
+		}
+	}
+	
+	public void ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception{
+		 // Now create a new iText PDF document
+	    Document pdfDoc = new Document(PageSize.A4.rotate());
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, baos);
+	    pdfDoc.open();
+	    
+	    Paragraph title = new Paragraph(description.getTitlePdf(),
+	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+	    title.setAlignment(Element.ALIGN_CENTER);
+	    pdfDoc.add(title);
+	    
+	    // Add the generation date
+	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+	    // Create a table
+	    PdfPTable pdfTable = new PdfPTable(10); 
+	    
+
+	    pdfTable.setWidthPercentage(100);
+	    pdfTable.setSpacingBefore(10f);
+	    pdfTable.setSpacingAfter(10f);
+	         
+	  
+	        pdfTable.addCell("Username");
+	        pdfTable.addCell("Nama");
+	        pdfTable.addCell("Alamat");
+	        pdfTable.addCell("Email");
+	        pdfTable.addCell("Telp");
+	        pdfTable.addCell("Program Name");
+	        pdfTable.addCell("Created Date");
+	        pdfTable.addCell("Created By");
+	        pdfTable.addCell("Updated Date");
+	        pdfTable.addCell("Updated By");  
+	        BaseColor color = new BaseColor(135,206,235);
+	    	for(int i=0;i<10;i++) {
+	    		pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+	    	}
+	    
+	    // Iterate through the data and add it to the table
+	    for (Users entity : data) {
+	    	pdfTable.addCell(String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-"));
+	    	pdfTable.addCell(String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
+	    	
+	    	SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	    	String createdDate = "-";
+	    	if (entity.getCreatedDate() != null) {
+	    		createdDate = formatter.format(entity.getCreatedDate());
+	    	}
+	    	pdfTable.addCell(createdDate);
+	    	pdfTable.addCell(String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
+	    	
+	    	String updatedDate = "-";
+	    	if (entity.getUpdatedDate() != null) {
+	    		updatedDate = formatter.format(entity.getUpdatedDate());
+		    	}
+	    	pdfTable.addCell(updatedDate);
+	    	pdfTable.addCell(String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
+	    	
+	    }
+	    
+	    // Add the table to the pdf document
+	    pdfDoc.add(pdfTable);
+
+	    pdfDoc.close();
+	    pdfWriter.close();
+	    byte[] bytes = baos.toByteArray();
+	    InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+	    SendEmailWithAttachment(attachmentSource, description);
+	    
+	}
+	
+	
 	public void ExportToPdf(HttpServletResponse response) throws Exception{
 		 // Call the findAll method to retrieve the data
 	    List<Users> data = usersRepository.findAll();
-	    
+		
+		
 	    // Now create a new iText PDF document
 	    Document pdfDoc = new Document(PageSize.A4.rotate());
 	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
