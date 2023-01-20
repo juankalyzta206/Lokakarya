@@ -95,6 +95,7 @@ public class UsersService {
 		ExportToPdfNotification(dailyData, description);
 	}
 	
+	
 //	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
 //	public void MonthlyNotification() throws Exception {
 //		Date date = new Date();
