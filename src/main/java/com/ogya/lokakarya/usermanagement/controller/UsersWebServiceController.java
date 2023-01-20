@@ -12,7 +12,6 @@ import com.ogya.lokakarya.usermanagement.wrapper.RolesWrapper;
 import com.ogya.lokakarya.usermanagement.wrapper.UsersAddWrapper;
 import com.ogya.lokakarya.util.DataResponseFeign;
 
-
 @RestController
 @RequestMapping(value = "/usersWebService")
 @CrossOrigin(origins = "*")
@@ -20,16 +19,14 @@ public class UsersWebServiceController {
 	@Autowired
 	UsersFeignServices usersFeignServices;
 
-	
 	@PostMapping(path = "/saveUsersFromWebService")
-	public DataResponseFeign<UsersAddWrapper> saveUsersFromWebService(@RequestBody UsersAddWrapper wrapper){
+	public DataResponseFeign<UsersAddWrapper> saveUsersFromWebService(@RequestBody UsersAddWrapper wrapper) {
 		return usersFeignServices.callUserRoleRecord(wrapper);
 	}
-	
+
 	@PostMapping(path = "/saveRolesFromWebService")
-	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@RequestBody RolesWrapper wrapper){
+	public DataResponseFeign<RolesWrapper> saveRolesFromWebService(@RequestBody RolesWrapper wrapper) {
 		return usersFeignServices.callUserRoleInquiry(wrapper);
 	}
-	
-	
+
 }

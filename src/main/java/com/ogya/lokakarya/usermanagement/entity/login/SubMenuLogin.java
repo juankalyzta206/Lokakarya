@@ -1,6 +1,5 @@
 package com.ogya.lokakarya.usermanagement.entity.login;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,41 +21,43 @@ public class SubMenuLogin {
 	private String url;
 	private MenuLogin menu;
 
-	
 	@Id
 	@GeneratedValue(generator = "SUB_MENU_GEN", strategy = GenerationType.SEQUENCE)
 	@SequenceGenerator(name = "SUB_MENU_GEN", sequenceName = "SUB_MENU_SEQ", initialValue = 1, allocationSize = 1)
 	public Long getSubMenuId() {
 		return subMenuId;
 	}
+
 	public void setSubMenuId(Long subMenuId) {
 		this.subMenuId = subMenuId;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "NAMA")
 	public String getNama() {
 		return nama;
 	}
+
 	public void setNama(String nama) {
 		this.nama = nama;
 	}
 
-	
-	//--------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "ICON")
 	public String getIcon() {
 		return icon;
 	}
+
 	public void setIcon(String icon) {
 		this.icon = icon;
 	}
 
-	//--------------------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "URL")
 	public String getUrl() {
 		return url;
 	}
+
 	public void setUrl(String url) {
 		this.url = url;
 	}
@@ -67,14 +68,9 @@ public class SubMenuLogin {
 	public MenuLogin getMenu() {
 		return menu;
 	}
+
 	public void setMenu(MenuLogin menu) {
 		this.menu = menu;
 	}
-	
-	
-	
+
 }
-
-
-
-

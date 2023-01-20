@@ -41,25 +41,26 @@ import com.ogya.lokakarya.util.PagingRequestWrapper;
 public class SubMenuService {
 	@Autowired
 	SubMenuRepository subMenuRepository;
-	
+
 	@Autowired
 	MenuRepository menuRepository;
-	
+
 	@Autowired
 	SubMenuCriteriaRepository subMenuCriteriaRepository;
 
-	public PaginationList<SubMenuWrapper, SubMenu> ListWithPaging(PagingRequestWrapper request) { 
+	public PaginationList<SubMenuWrapper, SubMenu> ListWithPaging(PagingRequestWrapper request) {
 		List<SubMenu> subMenuList = subMenuCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage())* request.getSize();
+		int fromIndex = (request.getPage()) * request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), subMenuList.size());
-		Page<SubMenu> subMenuPage = new PageImpl<>(subMenuList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),subMenuList.size());
+		Page<SubMenu> subMenuPage = new PageImpl<>(subMenuList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), subMenuList.size());
 		List<SubMenuWrapper> subMenuWrapperList = new ArrayList<>();
-		for(SubMenu entity : subMenuPage) {
-		    subMenuWrapperList.add(toWrapper(entity));
+		for (SubMenu entity : subMenuPage) {
+			subMenuWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<SubMenuWrapper, SubMenu>(subMenuWrapperList, subMenuPage);	
+		return new PaginationList<SubMenuWrapper, SubMenu>(subMenuWrapperList, subMenuPage);
 	}
-	
+
 	public PaginationList<SubMenuWrapper, SubMenu> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
 		Page<SubMenu> subMenuPage = subMenuRepository.findAll(paging);
@@ -67,8 +68,7 @@ public class SubMenuService {
 		List<SubMenuWrapper> subMenuWrapperList = toWrapperList(subMenuList);
 		return new PaginationList<SubMenuWrapper, SubMenu>(subMenuWrapperList, subMenuPage);
 	}
-	
-	
+
 	private SubMenuWrapper toWrapper(SubMenu entity) {
 		SubMenuWrapper wrapper = new SubMenuWrapper();
 		wrapper.setSubMenuId(entity.getSubMenuId());
@@ -129,77 +129,79 @@ public class SubMenuService {
 	public void delete(Long id) {
 		subMenuRepository.deleteById(id);
 	}
-	
-	public void ExportToPdf(HttpServletResponse response) throws Exception{
-		 // Call the findAll method to retrieve the data
-	    List<SubMenu> data = subMenuRepository.findAll();
-	    
-	    // Now create a new iText PDF document
-	    Document pdfDoc = new Document(PageSize.A4.rotate());
-	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-	    pdfDoc.open();
-	    
-	    Paragraph title = new Paragraph("List Users",
-	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-	    
-	    // Add the generation date
-	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(8); 
-	    
+	public void ExportToPdf(HttpServletResponse response) throws Exception {
+		// Call the findAll method to retrieve the data
+		List<SubMenu> data = subMenuRepository.findAll();
 
-	    pdfTable.setWidthPercentage(100);
-	    pdfTable.setSpacingBefore(10f);
-	    pdfTable.setSpacingAfter(10f);
-	         
-	  
-	        pdfTable.addCell("Menu");
-	        pdfTable.addCell("Nama");
-	        pdfTable.addCell("Url");
-	        pdfTable.addCell("Program Name");
-	        pdfTable.addCell("Created Date");
-	        pdfTable.addCell("Created By");
-	        pdfTable.addCell("Updated Date");
-	        pdfTable.addCell("Updated By");  
-	        BaseColor color = new BaseColor(135,206,235);
-	    	for(int i=0;i<8;i++) {
-	    		pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-	    	}
-	    
-	    // Iterate through the data and add it to the table
-	    for (SubMenu entity : data) {
-	    	pdfTable.addCell(String.valueOf(entity.getMenu().getNama() != null ? String.valueOf(entity.getMenu().getNama()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getUrl() != null ? String.valueOf(entity.getUrl()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
-	    	
-	    	SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-	    	String createdDate = "-";
-	    	if (entity.getCreatedDate() != null) {
-	    		createdDate = formatter.format(entity.getCreatedDate());
-	    	}
-	    	pdfTable.addCell(createdDate);
-	    	pdfTable.addCell(String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-	    	
-	    	String updatedDate = "-";
-	    	if (entity.getUpdatedDate() != null) {
-	    		updatedDate = formatter.format(entity.getUpdatedDate());
-		    	}
-	    	pdfTable.addCell(updatedDate);
-	    	pdfTable.addCell(String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
-	    	
-	    }
-	    
-	    // Add the table to the pdf document
-	    pdfDoc.add(pdfTable);
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		pdfDoc.open();
 
-	    pdfDoc.close();
-	    pdfWriter.close();
+		Paragraph title = new Paragraph("List Users", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
 
-	    response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(8);
+
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+
+		pdfTable.addCell("Menu");
+		pdfTable.addCell("Nama");
+		pdfTable.addCell("Url");
+		pdfTable.addCell("Program Name");
+		pdfTable.addCell("Created Date");
+		pdfTable.addCell("Created By");
+		pdfTable.addCell("Updated Date");
+		pdfTable.addCell("Updated By");
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < 8; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (SubMenu entity : data) {
+			pdfTable.addCell(String
+					.valueOf(entity.getMenu().getNama() != null ? String.valueOf(entity.getMenu().getNama()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+			pdfTable.addCell(String.valueOf(entity.getUrl() != null ? String.valueOf(entity.getUrl()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String createdDate = "-";
+			if (entity.getCreatedDate() != null) {
+				createdDate = formatter.format(entity.getCreatedDate());
+			}
+			pdfTable.addCell(createdDate);
+			pdfTable.addCell(
+					String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
+
+			String updatedDate = "-";
+			if (entity.getUpdatedDate() != null) {
+				updatedDate = formatter.format(entity.getUpdatedDate());
+			}
+			pdfTable.addCell(updatedDate);
+			pdfTable.addCell(
+					String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
+
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+		pdfWriter.close();
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 }

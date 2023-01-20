@@ -20,10 +20,9 @@ import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ogya.lokakarya.usermanagement.entity.login.HakAksesLogin;
 
-
 @Entity
 @Table(name = "USERS")
-public class Users  {
+public class Users {
 	private Long userId;
 	private String username;
 	private String password;
@@ -38,121 +37,130 @@ public class Users  {
 	private String updatedBy;
 	private Set<HakAksesLogin> hakAkses = new HashSet<HakAksesLogin>(0);
 
-	
 	@Id
 	@GeneratedValue(generator = "USER_GEN", strategy = GenerationType.SEQUENCE)
 	@SequenceGenerator(name = "USER_GEN", sequenceName = "USERS_SEQ", initialValue = 1, allocationSize = 1)
 	public Long getUserId() {
 		return userId;
 	}
+
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "USERNAME")
 	public String getUsername() {
 		return username;
 	}
+
 	public void setUsername(String user) {
 		this.username = user;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "PASSWORD")
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "NAMA")
 	public String getNama() {
 		return nama;
 	}
+
 	public void setNama(String nama) {
 		this.nama = nama;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "ALAMAT")
 	public String getAlamat() {
 		return alamat;
 	}
+
 	public void setAlamat(String alamat) {
 		this.alamat = alamat;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "EMAIL")
 	public String getEmail() {
 		return email;
 	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "TELP")
 	public Long getTelp() {
 		return telp;
 	}
+
 	public void setTelp(Long telp) {
 		this.telp = telp;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "PROGRAM_NAME")
 	public String getProgramName() {
 		return programName;
 	}
+
 	public void setProgramName(String programName) {
 		this.programName = programName;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "CREATED_DATE")
 	@Temporal(TemporalType.DATE)
 	public Date getCreatedDate() {
 		return createdDate;
 	}
+
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "CREATED_BY")
 	public String getCreatedBy() {
 		return createdBy;
 	}
+
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "UPDATED_DATE")
 	@Temporal(TemporalType.DATE)
 	public Date getUpdatedDate() {
 		return updatedDate;
 	}
+
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
 	}
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 	@Column(name = "UPDATED_BY")
 	public String getUpdatedBy() {
 		return updatedBy;
 	}
+
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
 	}
-	
-	
-	
-	//--------------------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------------------------------------------
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
 	@JsonIgnore
@@ -163,12 +171,10 @@ public class Users  {
 	public void setHakAkses(Set<HakAksesLogin> hakAkses) {
 		this.hakAkses = hakAkses;
 	}
-	
+
 	@PrePersist
 	private void onCreate() {
 		createdDate = new Date();
 	}
-	
 
 }
-

@@ -24,56 +24,54 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
 @RestController
 @RequestMapping(value = "/subMenu")
 @CrossOrigin(origins = "*")
 public class SubMenuController {
 	@Autowired
 	SubMenuService subMenuService;
-	
-	
+
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
-	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPagination(@RequestParam("page") int page,				@RequestParam("size") int size) {
+	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
 		return new DataResponsePagination<SubMenuWrapper, SubMenu>(subMenuService.findAllWithPagination(page, size));
 	}
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<SubMenuWrapper> findAllPlan() {
 		return subMenuService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<SubMenuWrapper> findAll() {
 		return new DataResponseList<SubMenuWrapper>(subMenuService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<SubMenuWrapper> save(@RequestBody SubMenuWrapper wrapper){
+	public DataResponse<SubMenuWrapper> save(@RequestBody SubMenuWrapper wrapper) {
 		return new DataResponse<SubMenuWrapper>(subMenuService.save(wrapper));
 	}
-	
+
 	@PutMapping(path = "/")
-	public DataResponse<SubMenuWrapper> update(@RequestBody SubMenuWrapper wrapper){
+	public DataResponse<SubMenuWrapper> update(@RequestBody SubMenuWrapper wrapper) {
 		return new DataResponse<SubMenuWrapper>(subMenuService.save(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long menuId) {
+	public void deleteId(@RequestParam("id") Long menuId) {
 		subMenuService.delete(menuId);
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		subMenuService.ExportToPdf(response);
 	}
-	
+
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<SubMenuWrapper, SubMenu> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<SubMenuWrapper, SubMenu>(subMenuService.ListWithPaging(request));
 	}
-	
-	
+
 }

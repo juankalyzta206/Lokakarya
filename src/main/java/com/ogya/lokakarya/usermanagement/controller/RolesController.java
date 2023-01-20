@@ -24,7 +24,6 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
 @RestController
 @RequestMapping(value = "/roles")
 @CrossOrigin(origins = "*")
@@ -32,50 +31,47 @@ public class RolesController {
 	@Autowired
 	RolesService rolesService;
 
-	
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
 	public DataResponsePagination<RolesWrapper, Roles> findAllWithPagination(@RequestParam("page") int page,
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<RolesWrapper, Roles>(rolesService.findAllWithPagination(page, size));
 	}
-			
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<RolesWrapper> findAllPlan() {
 		return rolesService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<RolesWrapper> findAll() {
 		return new DataResponseList<RolesWrapper>(rolesService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<RolesWrapper> save(@RequestBody RolesWrapper wrapper){
+	public DataResponse<RolesWrapper> save(@RequestBody RolesWrapper wrapper) {
 		return new DataResponse<RolesWrapper>(rolesService.save(wrapper));
 	}
-	
+
 	@PutMapping(path = "/")
-	public DataResponse<RolesWrapper> update(@RequestBody RolesWrapper wrapper){
+	public DataResponse<RolesWrapper> update(@RequestBody RolesWrapper wrapper) {
 		return new DataResponse<RolesWrapper>(rolesService.save(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long roleId) {
+	public void deleteId(@RequestParam("id") Long roleId) {
 		rolesService.delete(roleId);
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		rolesService.ExportToPdf(response);
 	}
 
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<RolesWrapper, Roles> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<RolesWrapper, Roles> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<RolesWrapper, Roles>(rolesService.ListWithPaging(request));
 	}
-	
-	
+
 }
