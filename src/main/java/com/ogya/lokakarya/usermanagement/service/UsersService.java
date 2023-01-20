@@ -68,6 +68,10 @@ public class UsersService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 	
+	private String[] receiver = {"maulanairzan5@gmail.com"};
+//	private String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+	private String[] cc = {};
+	
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 	
 	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
@@ -79,44 +83,71 @@ public class UsersService {
 		int year = calendar.get(Calendar.YEAR);
 		int month = calendar.get(Calendar.MONTH) + 1;
 		int day = calendar.get(Calendar.DAY_OF_MONTH);
-		SimpleDateFormat f = new SimpleDateFormat("EEEE");
+		Locale id = new Locale("in", "ID");
+		SimpleDateFormat f = new SimpleDateFormat("EEEE",id);
 		String dayName = f.format(date);
 		NotificationWrapper description = new NotificationWrapper();
-		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
-		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
 		description.setReceiver(receiver);
 		description.setCc(cc);
 		description.setSubject("Laporan Penambahan User");
 		description.setTopHeader("Laporan Penambahan User Harian");
 		description.setBotHeader("Hari : "+dayName+", "+day+"/"+month+"/"+year);
-		description.setTitlePdf("Laporan Penambahan User Harian("+day+" "+getMonthForInt(month)+" "+year+")");
+		description.setTitlePdf("Laporan Penambahan User Harian("+dayName+", "+day+" "+getMonthForInt(month)+" "+year+")");
 		description.setFileName("LaporanPenambahanUserHarian("+day+"/"+month+"/"+year+")");
-		List<Users> dailyData = usersRepository.newUsersDaily(year,month,day);
+		List<Users> dailyData = usersRepository.newUsersDaily();
 		ExportToPdfNotification(dailyData, description);
 	}
 	
+	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+	public void MonthlyNotification() throws Exception {
+		Date date = new Date();
+		date = FindPrevDay(date);
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		NotificationWrapper description = new NotificationWrapper();
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Laporan Penambahan User");
+		description.setTopHeader("Laporan Penambahan User Bulanan");
+		description.setBotHeader("Bulan "+getMonthForInt(month)+" tahun "+year);
+		description.setTitlePdf("Laporan Penambahan User Bulanan("+getMonthForInt(month)+" "+year+")");
+		description.setFileName("LaporanPenambahanUserBulanan("+month+"/"+year+")");
+		List<Users> monthlyData = usersRepository.newUsersMonthly();
+		ExportToPdfNotification(monthlyData, description);
+	}
 	
-//	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
-//	public void MonthlyNotification() throws Exception {
-//		Date date = new Date();
-//		date = FindPrevDay(date);
-//		Calendar calendar = new GregorianCalendar();
-//		calendar.setTime(date);
-//		int year = calendar.get(Calendar.YEAR);
-//		int month = calendar.get(Calendar.MONTH) + 1;
-//		NotificationWrapper description = new NotificationWrapper();
-//		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
-//		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
-//		description.setReceiver(receiver);
-//		description.setCc(cc);
-//		description.setSubject("Laporan Penambahan User");
-//		description.setTopHeader("Laporan Penambahan User Bulanan");
-//		description.setBotHeader("Bulan "+getMonthForInt(month)+" tahun "+year);
-//		description.setTitlePdf("Laporan Penambahan User Bulanan("+getMonthForInt(month)+" "+year+")");
-//		description.setFileName("LaporanPenambahanUserBulanan("+month+"/"+year+")");
-//		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
-//		ExportToPdfNotification(monthlyData, description);
-//	}
+	@Scheduled(cron = "0 0 7 * * SUN") // <-- second, minute, hour, day, month
+	public void WeeklyNotification() throws Exception {
+		Date date = new Date();
+		date = FindPrevDay(date);
+		Calendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		Calendar calendarStartWeek = new GregorianCalendar();
+		calendarStartWeek.setTime(date);
+		calendarStartWeek.add(Calendar.DATE, -6);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH) + 1;
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		int yearStartWeek = calendarStartWeek.get(Calendar.YEAR);
+		int monthStartWeek = calendarStartWeek.get(Calendar.MONTH) + 1;
+		int dayStartWeek = calendarStartWeek.get(Calendar.DAY_OF_MONTH);
+		Locale id = new Locale("in", "ID");
+		SimpleDateFormat f = new SimpleDateFormat("EEEE",id);
+		String dayName = f.format(date);
+		String dayNameStartWeek = f.format(FindStartWeek(date));
+		NotificationWrapper description = new NotificationWrapper();
+		description.setReceiver(receiver);
+		description.setCc(cc);
+		description.setSubject("Laporan Penambahan User");
+		description.setTopHeader("Laporan Penambahan User Mingguan");
+		description.setBotHeader("Hari : "+dayNameStartWeek+", "+dayStartWeek+"/"+monthStartWeek+"/"+yearStartWeek+"-"+dayName+", "+day+"/"+month+"/"+year);
+		description.setTitlePdf("Laporan Penambahan User Mingguan("+dayNameStartWeek+", "+dayStartWeek+"/"+monthStartWeek+"/"+yearStartWeek+"-"+dayName+", "+day+"/"+month+"/"+year+")");
+		description.setFileName("LaporanPenambahanUserMingguan("+dayNameStartWeek+", "+dayStartWeek+"/"+monthStartWeek+"/"+yearStartWeek+"-"+dayName+", "+day+"/"+month+"/"+year+")");
+		List<Users> weeklyData = usersRepository.newUsersWeekly();
+		ExportToPdfNotification(weeklyData, description);
+	}
 	
 	
 	String getMonthForInt(int num) {
@@ -135,6 +166,12 @@ public class UsersService {
 	{
 	  return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
+	
+	private static Date FindStartWeek(Date date)
+	{
+	  return new Date(date.getTime() - 6*MILLIS_IN_A_DAY);
+	}
+	
 	
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) { 
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
