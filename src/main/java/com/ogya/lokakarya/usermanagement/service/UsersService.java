@@ -1,7 +1,6 @@
 package com.ogya.lokakarya.usermanagement.service;
 
 import java.io.ByteArrayOutputStream;
-import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -75,102 +74,77 @@ public class UsersService {
 
 	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
 	public void DailyNotification() throws Exception {
-		Date date = new Date();
-		date = FindPrevDay(date);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
-		int day = calendar.get(Calendar.DAY_OF_MONTH);
-		Locale id = new Locale("in", "ID");
-		SimpleDateFormat f = new SimpleDateFormat("EEEE", id);
-		String dayName = f.format(date);
+		Date date = FindPrevDay(new Date());
+		
+		SimpleDateFormat format = new SimpleDateFormat("EEEE, dd/MM/yyyy", new Locale("in", "ID"));
+		String day = format.format(date);
+
 		NotificationWrapper description = new NotificationWrapper();
 		description.setReceiver(receiver);
 		description.setCc(cc);
-		description.setSubject("Laporan Penambahan User");
+		description.setSubject("Laporan Penambahan User Harian");
 		description.setTopHeader("Laporan Penambahan User Harian");
-		description.setBotHeader("Hari : " + dayName + ", " + day + "/" + month + "/" + year);
-		description.setTitlePdf("Laporan Penambahan User Harian(" + dayName + ", " + day + " " + getMonthForInt(month)
-				+ " " + year + ")");
-		description.setFileName("LaporanPenambahanUserHarian(" + day + "/" + month + "/" + year + ")");
+		description.setBotHeader("Hari : " + day);
+		description.setTitlePdf("Laporan Penambahan User Harian " + day);
+		description.setFileName("LaporanPenambahanUserHarian(" + day + ")");
+		
 		List<Users> dailyData = usersRepository.newUsersDaily();
 		ExportToPdfNotification(dailyData, description);
 	}
 
 	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
 	public void MonthlyNotification() throws Exception {
-		Date date = new Date();
-		date = FindPrevDay(date);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
+		Date date = FindPrevDay(new Date());
+		
+		SimpleDateFormat format = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
+		String month = format.format(date);
+		
 		NotificationWrapper description = new NotificationWrapper();
 		description.setReceiver(receiver);
 		description.setCc(cc);
-		description.setSubject("Laporan Penambahan User");
+		description.setSubject("Laporan Penambahan User Bulanan");
 		description.setTopHeader("Laporan Penambahan User Bulanan");
-		description.setBotHeader("Bulan " + getMonthForInt(month) + " tahun " + year);
-		description.setTitlePdf("Laporan Penambahan User Bulanan(" + getMonthForInt(month) + " " + year + ")");
-		description.setFileName("LaporanPenambahanUserBulanan(" + month + "/" + year + ")");
+		description.setBotHeader("Bulan : " + month);
+		description.setTitlePdf("Laporan Penambahan User Bulanan("+month+")");
+		description.setFileName("LaporanPenambahanUserBulanan(" + month+")");
+		
 		List<Users> monthlyData = usersRepository.newUsersMonthly();
 		ExportToPdfNotification(monthlyData, description);
 	}
 
 	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
 	public void WeeklyNotification() throws Exception {
-		Date date = new Date();
-		date = FindPrevDay(date);
+		Date date = FindPrevDay(new Date());
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(date);
-		Calendar calendarStartWeek = new GregorianCalendar();
-		calendarStartWeek.setTime(date);
-		calendarStartWeek.add(Calendar.DATE, -6);
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
-		int day = calendar.get(Calendar.DAY_OF_MONTH);
-		int yearStartWeek = calendarStartWeek.get(Calendar.YEAR);
-		int monthStartWeek = calendarStartWeek.get(Calendar.MONTH) + 1;
-		int dayStartWeek = calendarStartWeek.get(Calendar.DAY_OF_MONTH);
-		Locale id = new Locale("in", "ID");
-		SimpleDateFormat f = new SimpleDateFormat("EEEE", id);
-		String dayName = f.format(date);
-		String dayNameStartWeek = f.format(FindStartWeek(date));
+		
+		SimpleDateFormat format = new SimpleDateFormat("EEEE, dd/MM/yyyy", new Locale("in", "ID"));
+		String weekEnd = format.format(date);
+		
+		Calendar calendarWeekStart = new GregorianCalendar();
+		calendarWeekStart.setTime(date);
+		calendarWeekStart.add(Calendar.DATE, -6);
+		Date dateStart = calendarWeekStart.getTime();
+		String weekStart = format.format(dateStart);
+		
 		NotificationWrapper description = new NotificationWrapper();
 		description.setReceiver(receiver);
 		description.setCc(cc);
-		description.setSubject("Laporan Penambahan User");
+		description.setSubject("Laporan Penambahan User Mingguan");
 		description.setTopHeader("Laporan Penambahan User Mingguan");
-		description.setBotHeader("Hari : " + dayNameStartWeek + ", " + dayStartWeek + "/" + monthStartWeek + "/"
-				+ yearStartWeek + "-" + dayName + ", " + day + "/" + month + "/" + year);
-		description.setTitlePdf("Laporan Penambahan User Mingguan(" + dayNameStartWeek + ", " + dayStartWeek + "/"
-				+ monthStartWeek + "/" + yearStartWeek + "-" + dayName + ", " + day + "/" + month + "/" + year + ")");
-		description.setFileName("LaporanPenambahanUserMingguan(" + dayNameStartWeek + ", " + dayStartWeek + "/"
-				+ monthStartWeek + "/" + yearStartWeek + "-" + dayName + ", " + day + "/" + month + "/" + year + ")");
+		description.setBotHeader("Hari : "+weekStart+" - "+weekEnd);
+		description.setTitlePdf("Laporan Penambahan User Mingguan("+weekStart+" - "+weekEnd+ ")");
+		description.setFileName("LaporanPenambahanUserMingguan("+weekStart+" - "+weekEnd+")");
+
 		List<Users> weeklyData = usersRepository.newUsersWeekly();
 		ExportToPdfNotification(weeklyData, description);
 	}
 
-	String getMonthForInt(int num) {
-		num = num - 1;
-		String month = "wrong";
-		Locale id = new Locale("in", "ID");
-		DateFormatSymbols dfs = new DateFormatSymbols(id);
-		String[] months = dfs.getMonths();
-		if (num >= 0 && num <= 12) {
-			month = months[num];
-		}
-		return month;
-	}
-
+	
 	private static Date FindPrevDay(Date date) {
 		return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
 
-	private static Date FindStartWeek(Date date) {
-		return new Date(date.getTime() - 6 * MILLIS_IN_A_DAY);
-	}
 
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) {
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
