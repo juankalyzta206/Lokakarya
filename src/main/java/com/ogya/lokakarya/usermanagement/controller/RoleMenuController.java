@@ -24,57 +24,54 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
 @RestController
 @RequestMapping(value = "/roleMenu")
 @CrossOrigin(origins = "*")
 public class RoleMenuController {
 	@Autowired
 	RoleMenuService roleMenuService;
-	
+
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
 	public DataResponsePagination<RoleMenuWrapper, RoleMenu> findAllWithPagination(@RequestParam("page") int page,
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<RoleMenuWrapper, RoleMenu>(roleMenuService.findAllWithPagination(page, size));
 	}
-		
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<RoleMenuWrapper> findAllPlan() {
 		return roleMenuService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<RoleMenuWrapper> findAll() {
 		return new DataResponseList<RoleMenuWrapper>(roleMenuService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<RoleMenuWrapper> save(@RequestBody RoleMenuWrapper wrapper){
+	public DataResponse<RoleMenuWrapper> save(@RequestBody RoleMenuWrapper wrapper) {
 		return new DataResponse<RoleMenuWrapper>(roleMenuService.save(wrapper));
 	}
-	
+
 	@PutMapping(path = "/")
-	public DataResponse<RoleMenuWrapper> update(@RequestBody RoleMenuWrapper wrapper){
+	public DataResponse<RoleMenuWrapper> update(@RequestBody RoleMenuWrapper wrapper) {
 		return new DataResponse<RoleMenuWrapper>(roleMenuService.save(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long roleRoleMenuId) {
+	public void deleteId(@RequestParam("id") Long roleRoleMenuId) {
 		roleMenuService.delete(roleRoleMenuId);
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		roleMenuService.ExportToPdf(response);
 	}
 
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<RoleMenuWrapper, RoleMenu> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<RoleMenuWrapper, RoleMenu> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<RoleMenuWrapper, RoleMenu>(roleMenuService.ListWithPaging(request));
 	}
-	
-	
+
 }

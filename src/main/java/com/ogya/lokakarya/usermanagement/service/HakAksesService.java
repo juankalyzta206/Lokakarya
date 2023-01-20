@@ -43,28 +43,29 @@ import com.ogya.lokakarya.util.PagingRequestWrapper;
 public class HakAksesService {
 	@Autowired
 	HakAksesRepository hakAksesRepository;
-	
+
 	@Autowired
 	UsersRepository usersRepository;
-	
+
 	@Autowired
 	RolesRepository rolesRepository;
-	
+
 	@Autowired
 	HakAksesCriteriaRepository hakAksesCriteriaRepository;
 
-	public PaginationList<HakAksesWrapper, HakAkses> ListWithPaging(PagingRequestWrapper request) { 
+	public PaginationList<HakAksesWrapper, HakAkses> ListWithPaging(PagingRequestWrapper request) {
 		List<HakAkses> hakAksesList = hakAksesCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage())* request.getSize();
+		int fromIndex = (request.getPage()) * request.getSize();
 		int toIndex = Math.min(fromIndex + request.getSize(), hakAksesList.size());
-		Page<HakAkses> hakAksesPage = new PageImpl<>(hakAksesList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()),hakAksesList.size());
+		Page<HakAkses> hakAksesPage = new PageImpl<>(hakAksesList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), hakAksesList.size());
 		List<HakAksesWrapper> hakAksesWrapperList = new ArrayList<>();
-		for(HakAkses entity : hakAksesPage) {
-		    hakAksesWrapperList.add(toWrapper(entity));
+		for (HakAkses entity : hakAksesPage) {
+			hakAksesWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<HakAksesWrapper, HakAkses>(hakAksesWrapperList, hakAksesPage);	
+		return new PaginationList<HakAksesWrapper, HakAkses>(hakAksesWrapperList, hakAksesPage);
 	}
-	
+
 	public PaginationList<HakAksesWrapper, HakAkses> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
 		Page<HakAkses> hakAksesPage = hakAksesRepository.findAll(paging);
@@ -72,7 +73,7 @@ public class HakAksesService {
 		List<HakAksesWrapper> hakAksesWrapperList = toWrapperList(hakAksesList);
 		return new PaginationList<HakAksesWrapper, HakAkses>(hakAksesWrapperList, hakAksesPage);
 	}
-	
+
 	private HakAksesWrapper toWrapper(HakAkses entity) {
 		HakAksesWrapper wrapper = new HakAksesWrapper();
 		wrapper.setHakAksesId(entity.getHakAksesId());
@@ -122,7 +123,7 @@ public class HakAksesService {
 	}
 
 	public HakAksesWrapper save(HakAksesWrapper wrapper) {
-		if (hakAksesRepository.isExistHakAkses(wrapper.getUserId(),wrapper.getRoleId()) > 0) {
+		if (hakAksesRepository.isExistHakAkses(wrapper.getUserId(), wrapper.getRoleId()) > 0) {
 			throw new BusinessException("Cannot add hak akses, same User ID and Role ID already exist");
 		}
 		if (hakAksesRepository.isExistUser(wrapper.getUserId()) == 0) {
@@ -138,76 +139,79 @@ public class HakAksesService {
 	public void delete(Long id) {
 		hakAksesRepository.deleteById(id);
 	}
-	
-	public void ExportToPdf(HttpServletResponse response) throws Exception{
-		 // Call the findAll method to retrieve the data
-	    List<HakAkses> data = hakAksesRepository.findAll();
-	    
-	    // Now create a new iText PDF document
-	    Document pdfDoc = new Document(PageSize.A4.rotate());
-	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-	    pdfDoc.open();
-	    
-	    Paragraph title = new Paragraph("List Hak Akses",
-	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-	    
-	    // Add the generation date
-	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(7); 
-	    
+	public void ExportToPdf(HttpServletResponse response) throws Exception {
+		// Call the findAll method to retrieve the data
+		List<HakAkses> data = hakAksesRepository.findAll();
 
-	    pdfTable.setWidthPercentage(100);
-	    pdfTable.setSpacingBefore(10f);
-	    pdfTable.setSpacingAfter(10f);
-	         
-	  
-	        pdfTable.addCell("Username");
-	        pdfTable.addCell("Role");
-	        pdfTable.addCell("Program Name");
-	        pdfTable.addCell("Created Date");
-	        pdfTable.addCell("Created By");
-	        pdfTable.addCell("Updated Date");
-	        pdfTable.addCell("Updated By");  
-	        BaseColor color = new BaseColor(135,206,235);
-	    	for(int i=0;i<7;i++) {
-	    		pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-	    	}
-	    
-	    // Iterate through the data and add it to the table
-	    for (HakAkses entity : data) {
-	    	pdfTable.addCell(String.valueOf(entity.getUsers().getUsername() != null ? String.valueOf(entity.getUsers().getUsername()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getRoles().getNama() != null ? String.valueOf(entity.getRoles().getNama()) : "-"));
-	    	pdfTable.addCell(String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
-	    	
-	    	SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-	    	String createdDate = "-";
-	    	if (entity.getCreatedDate() != null) {
-	    		createdDate = formatter.format(entity.getCreatedDate());
-	    	}
-	    	pdfTable.addCell(createdDate);
-	    	pdfTable.addCell(String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-	    	
-	    	String updatedDate = "-";
-	    	if (entity.getUpdatedDate() != null) {
-	    		updatedDate = formatter.format(entity.getUpdatedDate());
-		    	}
-	    	pdfTable.addCell(updatedDate);
-	    	pdfTable.addCell(String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
-	    	
-	    }
-	    
-	    // Add the table to the pdf document
-	    pdfDoc.add(pdfTable);
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		pdfDoc.open();
 
-	    pdfDoc.close();
-	    pdfWriter.close();
+		Paragraph title = new Paragraph("List Hak Akses", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
 
-	    response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(7);
+
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+
+		pdfTable.addCell("Username");
+		pdfTable.addCell("Role");
+		pdfTable.addCell("Program Name");
+		pdfTable.addCell("Created Date");
+		pdfTable.addCell("Created By");
+		pdfTable.addCell("Updated Date");
+		pdfTable.addCell("Updated By");
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < 7; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (HakAkses entity : data) {
+			pdfTable.addCell(String.valueOf(
+					entity.getUsers().getUsername() != null ? String.valueOf(entity.getUsers().getUsername()) : "-"));
+			pdfTable.addCell(String
+					.valueOf(entity.getRoles().getNama() != null ? String.valueOf(entity.getRoles().getNama()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
+
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String createdDate = "-";
+			if (entity.getCreatedDate() != null) {
+				createdDate = formatter.format(entity.getCreatedDate());
+			}
+			pdfTable.addCell(createdDate);
+			pdfTable.addCell(
+					String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
+
+			String updatedDate = "-";
+			if (entity.getUpdatedDate() != null) {
+				updatedDate = formatter.format(entity.getUpdatedDate());
+			}
+			pdfTable.addCell(updatedDate);
+			pdfTable.addCell(
+					String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
+
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+		pdfWriter.close();
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
+
 }

@@ -24,58 +24,54 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
-
 @RestController
 @RequestMapping(value = "/hakAkses")
 @CrossOrigin(origins = "*")
 public class HakAksesController {
 	@Autowired
 	HakAksesService hakAksesService;
-	
+
 	// findAllPagination
 	@GetMapping(path = "/findAllWithPagination")
 	public DataResponsePagination<HakAksesWrapper, HakAkses> findAllWithPagination(@RequestParam("page") int page,
 			@RequestParam("size") int size) {
 		return new DataResponsePagination<HakAksesWrapper, HakAkses>(hakAksesService.findAllWithPagination(page, size));
 	}
-	
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<HakAksesWrapper> findAllPlan() {
 		return hakAksesService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<HakAksesWrapper> findAll() {
 		return new DataResponseList<HakAksesWrapper>(hakAksesService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-	public DataResponse<HakAksesWrapper> save(@RequestBody HakAksesWrapper wrapper){
+	public DataResponse<HakAksesWrapper> save(@RequestBody HakAksesWrapper wrapper) {
 		return new DataResponse<HakAksesWrapper>(hakAksesService.save(wrapper));
 	}
-	
+
 	@PutMapping(path = "/")
-	public DataResponse<HakAksesWrapper> update(@RequestBody HakAksesWrapper wrapper){
+	public DataResponse<HakAksesWrapper> update(@RequestBody HakAksesWrapper wrapper) {
 		return new DataResponse<HakAksesWrapper>(hakAksesService.save(wrapper));
 	}
-	
-	
+
 	@DeleteMapping(path = "/deleteById")
-	public void deleteId(@RequestParam("id")  Long hakAksesId) {
+	public void deleteId(@RequestParam("id") Long hakAksesId) {
 		hakAksesService.delete(hakAksesId);
 	}
-	
+
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-    public void exportToPdf(HttpServletResponse response) throws Exception {
+	public void exportToPdf(HttpServletResponse response) throws Exception {
 		hakAksesService.ExportToPdf(response);
 	}
-	
+
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
-	public DataResponsePagination<HakAksesWrapper, HakAkses> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<HakAksesWrapper, HakAkses> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<HakAksesWrapper, HakAkses>(hakAksesService.ListWithPaging(request));
 	}
-	
-	
-	
+
 }
