@@ -95,27 +95,27 @@ public class UsersService {
 		ExportToPdfNotification(dailyData, description);
 	}
 	
-	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
-	public void MonthlyNotification() throws Exception {
-		Date date = new Date();
-		date = FindPrevDay(date);
-		Calendar calendar = new GregorianCalendar();
-		calendar.setTime(date);
-		int year = calendar.get(Calendar.YEAR);
-		int month = calendar.get(Calendar.MONTH) + 1;
-		NotificationWrapper description = new NotificationWrapper();
-		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
-		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
-		description.setReceiver(receiver);
-		description.setCc(cc);
-		description.setSubject("Laporan Penambahan User");
-		description.setTopHeader("Laporan Penambahan User Bulanan");
-		description.setBotHeader("Bulan "+getMonthForInt(month)+" tahun "+year);
-		description.setTitlePdf("Laporan Penambahan User Bulanan("+getMonthForInt(month)+" "+year+")");
-		description.setFileName("LaporanPenambahanUserBulanan("+month+"/"+year+")");
-		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
-		ExportToPdfNotification(monthlyData, description);
-	}
+//	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+//	public void MonthlyNotification() throws Exception {
+//		Date date = new Date();
+//		date = FindPrevDay(date);
+//		Calendar calendar = new GregorianCalendar();
+//		calendar.setTime(date);
+//		int year = calendar.get(Calendar.YEAR);
+//		int month = calendar.get(Calendar.MONTH) + 1;
+//		NotificationWrapper description = new NotificationWrapper();
+//		String[] receiver = {"maulanairzan5@gmail.com", "maulanairzan4@gmail.com"};
+//		String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
+//		description.setReceiver(receiver);
+//		description.setCc(cc);
+//		description.setSubject("Laporan Penambahan User");
+//		description.setTopHeader("Laporan Penambahan User Bulanan");
+//		description.setBotHeader("Bulan "+getMonthForInt(month)+" tahun "+year);
+//		description.setTitlePdf("Laporan Penambahan User Bulanan("+getMonthForInt(month)+" "+year+")");
+//		description.setFileName("LaporanPenambahanUserBulanan("+month+"/"+year+")");
+//		List<Users> monthlyData = usersRepository.newUsersMonthly(year,month);
+//		ExportToPdfNotification(monthlyData, description);
+//	}
 	
 	
 	String getMonthForInt(int num) {
