@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:remove="all">History Setor Tunai</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<style type="text/css">
+body {
+	font-family: calibri, 'DejaVu Sans', Arial, Helvetica, sans-serif;
+}
+
+a.link {
+	border: solid 1px #000;
+	background-color: #000;
+	text-decoration: none;
+	color: #fff;
+	font-weight: bold;
+	display: block;
+	width: 360px;
+	text-align: center;
+	padding: 10px 0;
+}
+</style>
+</head>
+<body>
+	<h2>Notifikasi History Setor Tunai</h2>
+	<div>
+		Dear <b>Admin</b> !
+	</div>
+	<p>
+        Berikut ini adalah informasi history setor yang telah dilakukan selama periode bulan <b th:text="${bulan}">bulan</b> :
+        <table style="margin-left: 40px; margin: top 0;">
+            <tr>
+                <td>Periode</td>
+                <td>:</td>
+                <td th:text="${bulan}">bulan</td>
+            </tr>
+            <tr>
+                <td>Jenis Transaksi</td>
+                <td>:</td>
+                <td>Setor Tunai</td>
+            </tr>
+            <tr>
+                <td>Jumlah Setor</td>
+                <td>:</td>
+                <td th:text="${jumlah}"><b>jumlah</b></td>
+            </tr>
+            <tr>
+                <td>Total Setor</td>
+                <td>:</td>
+                <td th:text="${total}"><b>total</b></td>
+            </tr>
+        </table>
+		<br />
+        Terima kasih.
+		<br />
+						
+	</p>
+
+	<p>
+		Salam, <br /><em>Bank XYZ</em>
+	</p>
+</body>
+</html>
