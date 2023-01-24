@@ -50,15 +50,15 @@ public class BayarTelkomNotification {
 			String dateString = format.format(tanggal);
 			
 			List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(yesterday);
-			String title = "Laporan Transaksi Bank Bayar Telepon Hari " + dateString;
-						
+			String fileName = "Laporan Transaksi Bank Bayar Telepon Hari " + dateString;
 			helper.setTo("usernamemeeting@gmail.com");
 			helper.setCc("taerakim.21@gmail.com");
 			helper.setSubject("Laporan Bayar Telepon Hari " + dateString);
 			helper.setText("Laporan Bayar Hari "+ dateString, true);
 			
-			ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, title);
-			helper.addAttachment(title + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+			ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, fileName);
+			helper.addAttachment(fileName + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+			
 			javaMailSender.send(mailMessage);
 			System.out.println("Email send");
 	}
@@ -131,6 +131,10 @@ public class BayarTelkomNotification {
 			
 			ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, title);
 			helper.addAttachment(title + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+			
+			ByteArrayOutputStream xlsx = historyBankService.exportToXLSBayarTelpon(data, title);
+			helper.addAttachment(title + ".xlsx", new ByteArrayResource(xlsx.toByteArray()));
+			
 			javaMailSender.send(mailMessage);
 			System.out.println("Email send");
 	}
