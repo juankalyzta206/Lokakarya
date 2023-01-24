@@ -13,6 +13,9 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -524,9 +527,6 @@ public class HistoryBankService {
 	public ByteArrayOutputStream ExportToPdfBayarTeleponParam(List<HistoryBank> data, String judul) throws Exception {
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		// Call the findAll method to retrieve the data
-//		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(tanggal);
-		System.out.println(data);
 
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
@@ -592,6 +592,38 @@ public class HistoryBankService {
 		pdfDoc.close();
 //		pdfWriter.close();
 		return outputStream;
+	} 
+	
+	public ByteArrayOutputStream exportToXLSBayarTelpon(List<HistoryBank> data, String fileName) throws Exception{
+		XSSFWorkbook workbook = new XSSFWorkbook();		
+		XSSFSheet sheet = workbook.createSheet(fileName);
+		
+		XSSFRow headerRow =  sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("Nomor Rekening");
+		headerRow.createCell(1).setCellValue("Nama Nasabah");
+		headerRow.createCell(2).setCellValue("Tanggal Transaksi");
+		headerRow.createCell(3).setCellValue("Nominal");
+		headerRow.createCell(4).setCellValue("No. Telepon");
+		headerRow.createCell(5).setCellValue("Keterangan");
+		
+		for (int i = 0; i < data.size(); i++) {
+			XSSFRow dataRow = sheet.createRow(i + 1);
+			dataRow.createCell(0).setCellValue(data.get(i).getRekening().getNorek());
+			dataRow.createCell(1).setCellValue(data.get(i).getNama());
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (data.get(i).getTanggal() != null) {
+				formattedDate = formatter.format(data.get(i).getTanggal());
+			}
+			dataRow.createCell(2).setCellValue(formattedDate);
+			dataRow.createCell(3).setCellValue(data.get(i).getUang());
+			dataRow.createCell(4).setCellValue(data.get(i).getNoTlp());
+			dataRow.createCell(5).setCellValue(data.get(i).getStatusKet());
+		}
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		workbook.write(outputStream);
+		return outputStream;
+		
 	}
 
 }

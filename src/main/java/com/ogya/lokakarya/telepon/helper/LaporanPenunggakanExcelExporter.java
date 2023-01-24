@@ -1,5 +1,6 @@
 package com.ogya.lokakarya.telepon.helper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -13,18 +14,18 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
+import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 
 public class LaporanPenunggakanExcelExporter {
 	 private XSSFWorkbook workbook;
 	    private XSSFSheet sheet;
-	    private List<TransaksiTelkomWrapper> listUsers;
-	    public LaporanPenunggakanExcelExporter(List<TransaksiTelkomWrapper> listUsers) {
+	    private List<TransaksiTelkom> listUsers;
+	    public LaporanPenunggakanExcelExporter(List<TransaksiTelkom> listUsers) {
 	        this.listUsers = listUsers;
 	        workbook = new XSSFWorkbook();
 	    }
 	    private void writeHeaderLine() {
+	    	
 	        sheet = workbook.createSheet("Laporan Penunggakan");
 	         
 	        Row row = sheet.createRow(0);
@@ -71,12 +72,12 @@ public class LaporanPenunggakanExcelExporter {
 	        font.setFontHeight(14);
 	        style.setFont(font);
 	                 
-	        for (TransaksiTelkomWrapper entity : listUsers) {
+	        for (TransaksiTelkom entity : listUsers) {
 	            Row row = sheet.createRow(rowCount++);
 	            int columnCount = 0;
 	             
 	            createCell(row, columnCount++, entity.getIdTransaksi(), style);
-	            createCell(row, columnCount++, entity.getNama(), style);
+	            createCell(row, columnCount++, entity.getIdPelanggan().getNama(), style);
 	            createCell(row, columnCount++, entity.getBulanTagihan(), style);
 	            createCell(row, columnCount++, entity.getTahunTagihan(), style);
 	            createCell(row, columnCount++, entity.getUang(), style);
@@ -94,6 +95,17 @@ public class LaporanPenunggakanExcelExporter {
 	        workbook.close();
 	         
 	        outputStream.close();
+	         
+	    }
+	    public ByteArrayOutputStream export() throws IOException {
+	        writeHeaderLine();
+	        writeDataLines();
+	         
+	        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	        workbook.write(outputStream);
+	        workbook.close();
+	         
+	        return outputStream;
 	         
 	    }
 }
