@@ -34,56 +34,63 @@ public class MasterBankController {
 	MasterBankService masterBankService;
 	@Autowired
 	MasterBankRepository masterBankRepository;
-	
+
 	@GetMapping(path = "/getByIdPlan")
 	public MasterBankWrapper getByNorekPlan(@RequestParam("id") Long norek) {
 		return masterBankService.getByNoRek(norek);
 	}
-	
+
 	@GetMapping(path = "/getById")
 	public DataResponse<MasterBankWrapper> getByNorek(@RequestParam("id") Long norek) {
 		return new DataResponse<MasterBankWrapper>(masterBankService.getByNoRek(norek));
 	}
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<MasterBankWrapper> findAllPlan() {
 		return masterBankService.findAll();
 	}
-	
+
 	@GetMapping(path = "/findAllWithPagination")
-	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPagination(@RequestParam("page") 
-	int page, @RequestParam("size") int size) {
-		return new DataResponsePagination<MasterBankWrapper, MasterBank>(masterBankService.findAllWithPagination(page, size));
+	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPagination(@RequestParam("page") int page,
+			@RequestParam("size") int size) {
+		return new DataResponsePagination<MasterBankWrapper, MasterBank>(
+				masterBankService.findAllWithPagination(page, size));
 	}
-	
+
 	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
-	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<MasterBankWrapper, MasterBank> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<MasterBankWrapper, MasterBank>(masterBankService.ListWithPaging(request));
 	}
-	
+
 	@GetMapping(path = "/findAll")
 	public DataResponseList<MasterBankWrapper> findAll() {
 		return new DataResponseList<MasterBankWrapper>(masterBankService.findAll());
 	}
-	
+
 	@PostMapping(path = "/")
-    public DataResponseFeign<MasterBankWrapper> save(@RequestBody MasterBankWrapper wrapper){
-        return masterBankService.save(wrapper);
-    }
-	
-	@PutMapping(path = "/")
-	public DataResponseFeign<MasterBankWrapper> update(@RequestBody MasterBankWrapper wrapper){
-	    return masterBankService.save(wrapper);
+	public DataResponseFeign<MasterBankWrapper> save(@RequestBody MasterBankWrapper wrapper) {
+		return masterBankService.save(wrapper);
 	}
-	
-	@DeleteMapping(path = "/deleteById") 
-	public void deleteId(@RequestParam("id")  Long norek) {
+
+	@PutMapping(path = "/")
+	public DataResponseFeign<MasterBankWrapper> update(@RequestBody MasterBankWrapper wrapper) {
+		return masterBankService.save(wrapper);
+	}
+
+	@DeleteMapping(path = "/deleteById")
+	public void deleteId(@RequestParam("id") Long norek) {
 		masterBankService.delete(norek);
 	}
-	
-	  @RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
-	    public void exportToPdf(HttpServletResponse response) throws Exception {
-		  masterBankService.ExportToPdf(response);
-	       }
+
+	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
+	public void exportToPdf(HttpServletResponse response) throws Exception {
+		masterBankService.ExportToPdf(response);
+	}
+	@RequestMapping(value = "/exportToXlsALL", method = RequestMethod.GET)
+	public void exportToXls(HttpServletResponse response) throws Exception {
+		masterBankService.exportToXls(response);
+	}
+
 
 }

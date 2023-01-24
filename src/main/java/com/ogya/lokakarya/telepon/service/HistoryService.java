@@ -1,5 +1,6 @@
 package com.ogya.lokakarya.telepon.service;
 
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
@@ -217,6 +220,95 @@ public class HistoryService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 	
+	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory , String tittle) throws Exception {
+		// Call the findAll method to retrieve the data
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		List<HistoryWrapper> historyList = new ArrayList<HistoryWrapper>();
+
+		for (int i = 0; i < dataHistory.size(); i++) {
+			HistoryWrapper wrapper = new HistoryWrapper();
+			wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan().getIdPelanggan());
+			MasterPelanggan masterPelanggan = masterPelangganRepository
+					.findByIdPelanggan(wrapper.getIdPelanggan());
+			
+			wrapper.setNama(masterPelanggan.getNama());
+			wrapper.setBulanTagihan(dataHistory.get(i).getBulanTagihan());
+			wrapper.setTanggalBayar(dataHistory.get(i).getTanggalBayar());
+			wrapper.setTahunTagihan(dataHistory.get(i).getTahunTagihan());
+			wrapper.setUang(dataHistory.get(i).getUang());
+			historyList.add(wrapper);
+		}
+
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter.getInstance(pdfDoc, outputStream);
+		pdfDoc.open();
+
+		Paragraph title = new Paragraph("Laporan Pelunasan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
+
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(5);
+
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+		
+		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell1);
+		PdfPCell cell2 = new PdfPCell(new Phrase("Tanggal bayar"));
+		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell2);
+		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
+		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell3);
+		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
+		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell4);
+		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
+		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell5);
+		
+		BaseColor color = new BaseColor(135, 206, 235);
+
+		for (int i = 0; i < 5; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (HistoryWrapper entity : historyList) {
+			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String tanggalBayar = "-";
+			if (entity.getTanggalBayar() != null) {
+				tanggalBayar = formatter.format(entity.getTanggalBayar());
+			}
+			pdfTable.addCell(Align(tanggalBayar));
+			
+			pdfTable.addCell(Align(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+		return outputStream;
+	}
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
 	public PaginationList<HistoryWrapper, HistoryTelkom> ListWithPaging(PagingRequestWrapper request) { 
 		List<HistoryTelkom> historyTelkomList = historyTelkomCriteriaRepository.findByFilter(request);
 		

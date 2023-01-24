@@ -1,9 +1,12 @@
 package com.ogya.lokakarya.telepon.service;
 
+import java.io.ByteArrayOutputStream;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,6 +41,7 @@ import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.repository.criteria.TransaksiTelkomCriteriaRepository;
 import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
+import com.ogya.lokakarya.util.CurrencyData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 
@@ -121,13 +125,12 @@ public class TransaksiTelkomService {
 		TransaksiTelkom entity = new TransaksiTelkom();
 		if (wrapper.getIdTransaksi() != null) {
 			entity = transaksiTelkomRepository.getReferenceById(wrapper.getIdTransaksi());
-			//validasi untuk bulan dan tahun tidak boleh sama
+			// validasi untuk bulan dan tahun tidak boleh sama
 			if (entity.getIdPelanggan().getIdPelanggan().equals(wrapper.getIdPelanggan())
 					&& entity.getTahunTagihan().equals(wrapper.getTahunTagihan())
 					&& entity.getBulanTagihan().equals(wrapper.getBulanTagihan())) {
-				
-			}
-			else {
+
+			} else {
 				List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
 						.findByTagihanPelanggan(wrapper.getIdPelanggan());
 				for (TransaksiTelkom entity1 : transaksiTelkomList) {
@@ -215,9 +218,8 @@ public class TransaksiTelkomService {
 		for (int i = 0; i < dataTransaksi.size(); i++) {
 			TransaksiTelkomWrapper wrapper = new TransaksiTelkomWrapper();
 			wrapper.setIdPelanggan(dataTransaksi.get(i).getIdPelanggan().getIdPelanggan());
-			MasterPelanggan masterPelanggan = masterPelangganRepository
-					.findByIdPelanggan(wrapper.getIdPelanggan());
-			
+			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
+
 			wrapper.setNama(masterPelanggan.getNama());
 			wrapper.setBulanTagihan(dataTransaksi.get(i).getBulanTagihan());
 			wrapper.setTahunTagihan(dataTransaksi.get(i).getTahunTagihan());
@@ -264,12 +266,7 @@ public class TransaksiTelkomService {
 		PdfPCell cell6 = new PdfPCell(new Phrase("Status"));
 		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell6);
-//		pdfTable.addCell("Nama Pelanggan");
-//		pdfTable.addCell("Bulan Tagihan");
-//		pdfTable.addCell("Tahun Tagihan");
-//		pdfTable.addCell("Nominal");
-//		pdfTable.addCell("Status");
-		
+
 		BaseColor color = new BaseColor(135, 206, 235);
 
 		for (int i = 0; i < 6; i++) {
@@ -278,10 +275,13 @@ public class TransaksiTelkomService {
 
 		// Iterate through the data and add it to the table
 		for (TransaksiTelkomWrapper entity : wrapperList) {
-			pdfTable.addCell(String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-"));
 			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
 			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
 			pdfTable.addCell(String.valueOf(entity.getStatus() != null ? "Belum Lunas" : "-"));
 		}
@@ -295,18 +295,114 @@ public class TransaksiTelkomService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
-	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> ListWithPaging(PagingRequestWrapper request) { 
-		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomCriteriaRepository.findByFilter(request);
-		
-		int fromIndex = (request.getPage())* (request.getSize());
-		int toIndex = Math.min(fromIndex + request.getSize(), transaksiTelkomList.size());
-		Page<TransaksiTelkom> transaksiTelkomPage = new PageImpl<>(transaksiTelkomList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), transaksiTelkomList.size());
-		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = new ArrayList<TransaksiTelkomWrapper>();
-		for(TransaksiTelkom entity : transaksiTelkomPage) {
-			TransaksiTelkomWrapper wrapper = toWrapper(entity);
-		    transaksiTelkomWrapperList.add(wrapper);
+
+	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		List<TransaksiTelkomWrapper> wrapperList = new ArrayList<TransaksiTelkomWrapper>();
+
+		for (int i = 0; i < dataTransaksi.size(); i++) {
+			TransaksiTelkomWrapper wrapper = new TransaksiTelkomWrapper();
+			wrapper.setIdPelanggan(dataTransaksi.get(i).getIdPelanggan().getIdPelanggan());
+			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
+
+			wrapper.setNama(masterPelanggan.getNama());
+			wrapper.setBulanTagihan(dataTransaksi.get(i).getBulanTagihan());
+			wrapper.setTahunTagihan(dataTransaksi.get(i).getTahunTagihan());
+			wrapper.setUang(dataTransaksi.get(i).getUang());
+			wrapper.setStatus(dataTransaksi.get(i).getStatus());
+			wrapper.setIdTransaksi(dataTransaksi.get(i).getIdTransaksi());
+			wrapperList.add(wrapper);
 		}
-		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList, transaksiTelkomPage);	
+
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter.getInstance(pdfDoc, outputStream);
+		pdfDoc.open();
+		Paragraph title = new Paragraph("Laporan Penunggakan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
+
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(6);
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+
+		PdfPCell cell1 = new PdfPCell(new Phrase("ID Transaksi"));
+		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell1);
+		PdfPCell cell2 = new PdfPCell(new Phrase("Nama Pelanggan"));
+		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell2);
+		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
+		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell3);
+		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
+		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell4);
+		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
+		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell5);
+		PdfPCell cell6 = new PdfPCell(new Phrase("Status"));
+		cell6.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		pdfTable.addCell(cell6);
+
+		BaseColor color = new BaseColor(135, 206, 235);
+
+		for (int i = 0; i < 6; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (TransaksiTelkomWrapper entity : wrapperList) {
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
+			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
+			CurrencyData currencyNominal = new CurrencyData();
+			currencyNominal.setValue(entity.getUang());
+			pdfTable.addCell(Align(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
+					? String.valueOf(numberFormat.format(currencyNominal.getValue()))
+					: "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getStatus() != null ? "Belum Lunas" : "-")));
+		}
+
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+
+		return outputStream;
+	}
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
+
+	public PaginationList<TransaksiTelkomWrapper, TransaksiTelkom> ListWithPaging(PagingRequestWrapper request) {
+		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomCriteriaRepository.findByFilter(request);
+
+		int fromIndex = (request.getPage()) * (request.getSize());
+		int toIndex = Math.min(fromIndex + request.getSize(), transaksiTelkomList.size());
+		Page<TransaksiTelkom> transaksiTelkomPage = new PageImpl<>(transaksiTelkomList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), transaksiTelkomList.size());
+		List<TransaksiTelkomWrapper> transaksiTelkomWrapperList = new ArrayList<TransaksiTelkomWrapper>();
+		for (TransaksiTelkom entity : transaksiTelkomPage) {
+			TransaksiTelkomWrapper wrapper = toWrapper(entity);
+			transaksiTelkomWrapperList.add(wrapper);
+		}
+		return new PaginationList<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomWrapperList,
+				transaksiTelkomPage);
 	}
 }

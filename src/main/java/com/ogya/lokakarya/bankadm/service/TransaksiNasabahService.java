@@ -1306,7 +1306,6 @@ public class TransaksiNasabahService {
 			System.err.println("Failed send email");
 			e.printStackTrace();
 		}
-
 	}
 	
 //	==========================================DownloadPDF======================================================
