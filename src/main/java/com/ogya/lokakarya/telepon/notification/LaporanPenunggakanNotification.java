@@ -26,7 +26,6 @@ import com.ogya.lokakarya.telepon.helper.LaporanPenunggakanExcelExporter;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.service.TransaksiTelkomService;
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 
 
 @Service
@@ -78,7 +77,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Excel
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 12 * * * ?")
+	@Scheduled(cron = "0 0 7 1 * ?")
 	public void sendEmailDayExcel() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 

@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
+import com.ogya.lokakarya.telepon.helper.LaporanPelunasanExcelExporter;
 import com.ogya.lokakarya.telepon.repository.HistoryTelkomRepository;
 import com.ogya.lokakarya.telepon.service.HistoryService;
 
@@ -31,6 +32,7 @@ public class LaporanPelunasanNotification {
 	@Autowired
 	HistoryTelkomRepository historyTelkomRepository;
 	
+//PDF	
 //	Setiap hari jam 7
 	@Scheduled(cron = "0 0 7 * * *")
 	public void sendEmailDay() throws Exception{
@@ -127,6 +129,43 @@ public class LaporanPelunasanNotification {
 			
 			ByteArrayOutputStream pdf = historyService.ExportToPdfParam(data, title);
 			helper.addAttachment(title + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+			javaMailSender.send(mailMessage);
+			System.out.println("Email send");
+	}
+//EXCEL
+	//setiap tanggal 1 jam 7
+	@Scheduled(cron = "0 0 7 1 * *")
+	public void sendEmailMonthExcel() throws Exception{
+			MimeMessage mailMessage = javaMailSender.createMimeMessage();
+
+			MimeMessageHelper helper = new MimeMessageHelper(mailMessage, true);
+			
+			Date harini = new Date();
+			Calendar cal = Calendar.getInstance();
+	        cal.add(Calendar.MONTH, -1);
+	        
+	        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+	        String startDate = dateFormat.format(cal.getTime());
+	        String endDate = dateFormat.format(harini);
+	        String start = startDate + "-01";
+	        String end = endDate + "-01";
+			
+			SimpleDateFormat tanggal = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
+			String bulan = tanggal.format(cal.getTime());	
+			
+			List<HistoryTelkom> data = historyTelkomRepository.lunasRekap(start, end);
+			//List<HistoryTelkom> data = historyTelkomRepository.findAll();
+			String title = "Laporan Bayar Telepon Bulan " + bulan;
+			
+			helper.setTo("usernamemeeting@gmail.com");
+			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setSubject("Laporan Bayar Telepon Bulan " + bulan );
+			helper.setText("Laporan Bayar Telepon Bulan "+ bulan, true);
+			
+			//ByteArrayOutputStream pdf = historyService.ExportToPdfParam(data, title);
+			LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(data);
+			ByteArrayOutputStream excel = excelExporter.export();
+			helper.addAttachment(title + ".xlsx", new ByteArrayResource(excel.toByteArray()));
 			javaMailSender.send(mailMessage);
 			System.out.println("Email send");
 	}
