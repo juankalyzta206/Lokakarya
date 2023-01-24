@@ -197,6 +197,32 @@ public class BankAdminTarikNotification {
 	        e.printStackTrace();
 	    }
 	}
+	
+	public void SendEmailWithAttachment(InputStreamSource pdfData, InputStreamSource xlsData, NotificationWrapper description) {
+
+	    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+	    try {
+	        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+	        mimeMessageHelper.setTo(description.getReceiver());
+	        mimeMessageHelper.setCc(description.getCc());
+	        mimeMessageHelper.setSubject(description.getSubject());
+
+	        StringBuffer buffer = new StringBuffer();
+	        buffer.append("<h3>" + description.getTopHeader() + "</h3>");
+	        buffer.append("<h5>" + description.getBotHeader() + "</h5>");
+	        String body = buffer.toString();
+	        mimeMessageHelper.setText(body, true);
+
+	        mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", pdfData);
+	        mimeMessageHelper.addAttachment(description.getFileName() + ".xls", xlsData);
+	        javaMailSender.send(mimeMessage);
+	        System.out.println("Email sent");
+	    } catch (MessagingException e) {
+	        System.err.print("Failed send email");
+	        e.printStackTrace();
+	    }
+	}
+
 
 
 	public void ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
@@ -253,8 +279,8 @@ public class BankAdminTarikNotification {
 		pdfWriter.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-		SendEmailWithAttachmentPDF(attachmentSource, description);
-
+		//SendEmailWithAttachmentPDF(attachmentSource, description);
+		SendEmailWithAttachment(attachmentSource, attachmentSource, description);
 	}
 
 	public PdfPCell Align(String title) {
@@ -305,8 +331,9 @@ public class BankAdminTarikNotification {
 	    InputStreamSource attachmentSource = new ByteArrayResource(bytes);
 	    workbook.close();
 	    description.setFileName(description.getFileName()+".xlsx");
-	    SendEmailWithAttachmentXLS(attachmentSource, description);
-	
+	    //SendEmailWithAttachmentXLS(attachmentSource, description);
+	    SendEmailWithAttachment(attachmentSource, attachmentSource, description);
+
 	}
 
 }
