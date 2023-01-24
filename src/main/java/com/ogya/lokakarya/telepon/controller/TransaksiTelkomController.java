@@ -79,19 +79,19 @@ public class TransaksiTelkomController {
 	public DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<TransaksiTelkomWrapper, TransaksiTelkom>(transaksiTelkomService.ListWithPaging(request));
 	}
-    @GetMapping("/download")
-    public void exportToExcel(HttpServletResponse response) throws IOException {
-        response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-         
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-         
-        List<TransaksiTelkomWrapper> listUsers = transaksiTelkomService.findAllStatus1();
-        LaporanPenunggakanExcelExporter excelExporter = new LaporanPenunggakanExcelExporter(listUsers);
-         
-        excelExporter.export(response);    
-    }
+//    @GetMapping("/download")
+//    public void exportToExcel(HttpServletResponse response) throws IOException {
+//        response.setContentType("application/octet-stream");
+//        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+//        String currentDateTime = dateFormatter.format(new Date());
+//         
+//        String headerKey = "Content-Disposition";
+//        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+//        response.setHeader(headerKey, headerValue);
+//         
+//        List<TransaksiTelkomWrapper> listUsers = transaksiTelkomService.findAllStatus1();
+//        LaporanPenunggakanExcelExporter excelExporter = new LaporanPenunggakanExcelExporter(listUsers);
+//         
+//        excelExporter.export(response);    
+//    }
 }
