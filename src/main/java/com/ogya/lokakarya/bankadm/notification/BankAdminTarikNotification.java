@@ -175,56 +175,55 @@ public class BankAdminTarikNotification {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void SendEmailWithAttachmentXLS(InputStreamSource data, NotificationWrapper description) {
-	    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-	    try {
-	        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-	        mimeMessageHelper.setTo(description.getReceiver());
-	        mimeMessageHelper.setCc(description.getCc());
-	        mimeMessageHelper.setSubject(description.getSubject());
+		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+		try {
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+			mimeMessageHelper.setTo(description.getReceiver());
+			mimeMessageHelper.setCc(description.getCc());
+			mimeMessageHelper.setSubject(description.getSubject());
 
-	        StringBuffer buffer = new StringBuffer();
-	        buffer.append("<h3>" + description.getTopHeader() + "</h3>");
-	        buffer.append("<h5>" + description.getBotHeader() + "</h5>");
-	        String body = buffer.toString();
-	        mimeMessageHelper.setText(body, true);
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("<h3>" + description.getTopHeader() + "</h3>");
+			buffer.append("<h5>" + description.getBotHeader() + "</h5>");
+			String body = buffer.toString();
+			mimeMessageHelper.setText(body, true);
 
-	        mimeMessageHelper.addAttachment(description.getFileName() + ".xls", data);
-	        javaMailSender.send(mimeMessage);
-	        System.out.println("Email XLS sent");
-	    } catch (MessagingException e) {
-	        System.err.print("Failed to send email");
-	        e.printStackTrace();
-	    }
-	}
-	
-	public void SendEmailWithAttachment(InputStreamSource pdfData, InputStreamSource xlsData, NotificationWrapper description) {
-
-	    MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-	    try {
-	        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-	        mimeMessageHelper.setTo(description.getReceiver());
-	        mimeMessageHelper.setCc(description.getCc());
-	        mimeMessageHelper.setSubject(description.getSubject());
-
-	        StringBuffer buffer = new StringBuffer();
-	        buffer.append("<h3>" + description.getTopHeader() + "</h3>");
-	        buffer.append("<h5>" + description.getBotHeader() + "</h5>");
-	        String body = buffer.toString();
-	        mimeMessageHelper.setText(body, true);
-
-	        mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", pdfData);
-	        mimeMessageHelper.addAttachment(description.getFileName() + ".xls", xlsData);
-	        javaMailSender.send(mimeMessage);
-	        System.out.println("Email sent");
-	    } catch (MessagingException e) {
-	        System.err.print("Failed send email");
-	        e.printStackTrace();
-	    }
+			mimeMessageHelper.addAttachment(description.getFileName() + ".xls", data);
+			javaMailSender.send(mimeMessage);
+			System.out.println("Email XLS sent");
+		} catch (MessagingException e) {
+			System.err.print("Failed to send email");
+			e.printStackTrace();
+		}
 	}
 
+	public void SendEmailWithAttachment(InputStreamSource pdfData, InputStreamSource xlsData,
+			NotificationWrapper description) {
 
+		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+		try {
+			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+			mimeMessageHelper.setTo(description.getReceiver());
+			mimeMessageHelper.setCc(description.getCc());
+			mimeMessageHelper.setSubject(description.getSubject());
+
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("<h3>" + description.getTopHeader() + "</h3>");
+			buffer.append("<h5>" + description.getBotHeader() + "</h5>");
+			String body = buffer.toString();
+			mimeMessageHelper.setText(body, true);
+
+			mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", pdfData);
+			mimeMessageHelper.addAttachment(description.getFileName() + ".xls", xlsData);
+			javaMailSender.send(mimeMessage);
+			System.out.println("Email sent");
+		} catch (MessagingException e) {
+			System.err.print("Failed send email");
+			e.printStackTrace();
+		}
+	}
 
 	public void ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
 		// Now create a new iText PDF document
@@ -280,7 +279,7 @@ public class BankAdminTarikNotification {
 		pdfWriter.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-		//SendEmailWithAttachmentPDF(attachmentSource, description);
+		// SendEmailWithAttachmentPDF(attachmentSource, description);
 		SendEmailWithAttachment(attachmentSource, attachmentSource, description);
 	}
 
@@ -290,50 +289,50 @@ public class BankAdminTarikNotification {
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
 	}
-	
+
 	public void ExportToExcelNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
-	    XSSFWorkbook workbook = new XSSFWorkbook();
-	    XSSFSheet sheet = workbook.createSheet("Transactions");
+		XSSFWorkbook workbook = new XSSFWorkbook();
+		XSSFSheet sheet = workbook.createSheet("Transactions");
 
-	    // Create the header row
-	    XSSFRow headerRow = sheet.createRow(0);
-	    headerRow.createCell(0).setCellValue("Nomor Rekening");
-	    headerRow.createCell(1).setCellValue("Nama Nasabah");
-	    headerRow.createCell(2).setCellValue("Tanggal Transaksi");
-	    headerRow.createCell(3).setCellValue("Nominal");
-	    headerRow.createCell(4).setCellValue("Keterangan");
+		// Create the header row
+		XSSFRow headerRow = sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("Nomor Rekening");
+		headerRow.createCell(1).setCellValue("Nama Nasabah");
+		headerRow.createCell(2).setCellValue("Tanggal Transaksi");
+		headerRow.createCell(3).setCellValue("Nominal");
+		headerRow.createCell(4).setCellValue("Keterangan");
 
-	    // Iterate through the data and add it to the sheet
-	    for (int i = 0; i < data.size(); i++) {
-	        XSSFRow row = sheet.createRow(i + 1);
-	        HistoryBank entity = data.get(i);
-	        row.createCell(0).setCellValue(entity.getRekening().getNorek());
-	        row.createCell(1).setCellValue(entity.getNama());
+		// Iterate through the data and add it to the sheet
+		for (int i = 0; i < data.size(); i++) {
+			XSSFRow row = sheet.createRow(i + 1);
+			HistoryBank entity = data.get(i);
+			row.createCell(0).setCellValue(entity.getRekening().getNorek());
+			row.createCell(1).setCellValue(entity.getNama());
 
-	        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-	        String formattedDate = "-";
-	        if (entity.getTanggal() != null) {
-	            formattedDate = formatter.format(entity.getTanggal());
-	        }
-	        row.createCell(2).setCellValue(formattedDate);
-	        row.createCell(3).setCellValue(entity.getUang());
-	        row.createCell(4).setCellValue("Tarik Tunai");
-	    }
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (entity.getTanggal() != null) {
+				formattedDate = formatter.format(entity.getTanggal());
+			}
+			row.createCell(2).setCellValue(formattedDate);
+			row.createCell(3).setCellValue(entity.getUang());
+			row.createCell(4).setCellValue("Tarik Tunai");
+		}
 
-	    // Autosize the columns
-	    for (int i = 0; i < 5; i++) {
-	        sheet.autoSizeColumn(i);
-	    }
+		// Autosize the columns
+		for (int i = 0; i < 5; i++) {
+			sheet.autoSizeColumn(i);
+		}
 
-	    // Write the workbook to a file
-	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    workbook.write(baos);
-	    byte[] bytes = baos.toByteArray();
-	    InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-	    workbook.close();
-	    description.setFileName(description.getFileName()+".xlsx");
-	    //SendEmailWithAttachmentXLS(attachmentSource, description);
-	    SendEmailWithAttachment(attachmentSource, attachmentSource, description);
+		// Write the workbook to a file
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		workbook.write(baos);
+		byte[] bytes = baos.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+		workbook.close();
+		description.setFileName(description.getFileName() + ".xlsx");
+		// SendEmailWithAttachmentXLS(attachmentSource, description);
+		SendEmailWithAttachment(attachmentSource, attachmentSource, description);
 
 	}
 
