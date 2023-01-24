@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.bankadm.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -13,6 +14,10 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -592,6 +597,37 @@ public class HistoryBankService {
 		pdfDoc.close();
 //		pdfWriter.close();
 		return outputStream;
+	} 
+	
+	public void exportToXLSBayarTelpon(List<HistoryBank> data, String fileName) {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Laporan Bayar Telepon");
+		Row headerRow =  sheet.createRow(0);
+		headerRow.createCell(0).setCellValue("Nomor Rekening");
+		headerRow.createCell(1).setCellValue("Nama Nasabah");
+		headerRow.createCell(2).setCellValue("Tanggal Transaksi");
+		headerRow.createCell(3).setCellValue("Nominal");
+		headerRow.createCell(4).setCellValue("No. Telepon");
+		headerRow.createCell(5).setCellValue("Keterangan");
+		
+		for (int i = 0; i < data.size(); i++) {
+			Row dataRow = sheet.createRow(i);
+			dataRow.createCell(0).setCellValue(data.get(i).getRekening().getNorek());
+			dataRow.createCell(1).setCellValue(data.get(i).getNama());
+			dataRow.createCell(2).setCellValue(data.get(i).getTanggal());
+			dataRow.createCell(3).setCellValue(data.get(i).getUang());
+			dataRow.createCell(4).setCellValue(data.get(i).getNoTlp());
+			dataRow.createCell(5).setCellValue(data.get(i).getStatusKet());
+		}
+		
+		try {
+            FileOutputStream fileOut = new FileOutputStream(fileName);
+            workbook.write(fileOut);
+            fileOut.close();
+            System.out.println("Your excel file has been generated!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 
 }
