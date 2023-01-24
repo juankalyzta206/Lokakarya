@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.usermanagement.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,6 +15,11 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
@@ -71,11 +77,11 @@ public class UsersService {
 	private String[] cc = {};
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
-
+	
 	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
 	public void DailyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
-		
+
 		SimpleDateFormat format = new SimpleDateFormat("EEEE, dd/MM/yyyy", new Locale("in", "ID"));
 		String day = format.format(date);
 
@@ -87,29 +93,42 @@ public class UsersService {
 		description.setBotHeader("Hari : " + day);
 		description.setTitlePdf("Laporan Penambahan User Harian " + day);
 		description.setFileName("LaporanPenambahanUserHarian(" + day + ")");
-		
+
 		List<Users> dailyData = usersRepository.newUsersDaily();
-		ExportToPdfNotification(dailyData, description);
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(dailyData, description));
+		attachmentsName.add(description.getFileName()+".pdf");
+		attachments.add(WriteExcelToEmail(dailyData, description));
+		attachmentsName.add(description.getFileName()+".xls");
+		SendEmailWithAttachment(attachments,attachmentsName,description);
+		
 	}
 
 	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
 	public void MonthlyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
-		
+
 		SimpleDateFormat format = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
 		String month = format.format(date);
-		
+
 		NotificationWrapper description = new NotificationWrapper();
 		description.setReceiver(receiver);
 		description.setCc(cc);
 		description.setSubject("Laporan Penambahan User Bulanan");
 		description.setTopHeader("Laporan Penambahan User Bulanan");
 		description.setBotHeader("Bulan : " + month);
-		description.setTitlePdf("Laporan Penambahan User Bulanan("+month+")");
-		description.setFileName("LaporanPenambahanUserBulanan(" + month+")");
-		
+		description.setTitlePdf("Laporan Penambahan User Bulanan(" + month + ")");
+		description.setFileName("LaporanPenambahanUserBulanan(" + month + ")");
+
 		List<Users> monthlyData = usersRepository.newUsersMonthly();
-		ExportToPdfNotification(monthlyData, description);
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(monthlyData, description));
+		attachmentsName.add(description.getFileName()+".pdf");
+		attachments.add(WriteExcelToEmail(monthlyData, description));
+		attachmentsName.add(description.getFileName()+".xls");
+		SendEmailWithAttachment(attachments,attachmentsName,description);
 	}
 
 	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
@@ -117,34 +136,38 @@ public class UsersService {
 		Date date = FindPrevDay(new Date());
 		Calendar calendar = new GregorianCalendar();
 		calendar.setTime(date);
-		
+
 		SimpleDateFormat format = new SimpleDateFormat("EEEE, dd/MM/yyyy", new Locale("in", "ID"));
 		String weekEnd = format.format(date);
-		
+
 		Calendar calendarWeekStart = new GregorianCalendar();
 		calendarWeekStart.setTime(date);
 		calendarWeekStart.add(Calendar.DATE, -6);
 		Date dateStart = calendarWeekStart.getTime();
 		String weekStart = format.format(dateStart);
-		
+
 		NotificationWrapper description = new NotificationWrapper();
 		description.setReceiver(receiver);
 		description.setCc(cc);
 		description.setSubject("Laporan Penambahan User Mingguan");
 		description.setTopHeader("Laporan Penambahan User Mingguan");
-		description.setBotHeader("Hari : "+weekStart+" - "+weekEnd);
-		description.setTitlePdf("Laporan Penambahan User Mingguan("+weekStart+" - "+weekEnd+ ")");
-		description.setFileName("LaporanPenambahanUserMingguan("+weekStart+" - "+weekEnd+")");
+		description.setBotHeader("Hari : " + weekStart + " - " + weekEnd);
+		description.setTitlePdf("Laporan Penambahan User Mingguan(" + weekStart + " - " + weekEnd + ")");
+		description.setFileName("LaporanPenambahanUserMingguan(" + weekStart + " - " + weekEnd + ")");
 
 		List<Users> weeklyData = usersRepository.newUsersWeekly();
-		ExportToPdfNotification(weeklyData, description);
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(weeklyData, description));
+		attachmentsName.add(description.getFileName()+".pdf");
+		attachments.add(WriteExcelToEmail(weeklyData, description));
+		attachmentsName.add(description.getFileName()+".xls");
+		SendEmailWithAttachment(attachments,attachmentsName,description);
 	}
 
-	
 	private static Date FindPrevDay(Date date) {
 		return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
-
 
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) {
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
@@ -430,8 +453,9 @@ public class UsersService {
 		}
 
 	}
+	
 
-	public void SendEmailWithAttachment(InputStreamSource data, NotificationWrapper description) {
+	public void SendEmailWithAttachment(List<InputStreamSource> data, List<String> fileNames, NotificationWrapper description) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -445,7 +469,11 @@ public class UsersService {
 			String body = buffer.toString();
 			mimeMessageHelper.setText(body, true);
 
-			mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", data);
+//			mimeMessageHelper.addAttachment(description.getFileName() + dataType, data);
+			for (int i =0;i<data.size(); i++) {
+			    String fileName = fileNames.get(i);
+			    mimeMessageHelper.addAttachment(fileName, data.get(i));
+			}
 			javaMailSender.send(mimeMessage);
 			System.out.println("Email sent");
 		} catch (MessagingException e) {
@@ -454,7 +482,7 @@ public class UsersService {
 		}
 	}
 
-	public void ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception {
+	public InputStreamSource ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception {
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -527,9 +555,82 @@ public class UsersService {
 		pdfWriter.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-		SendEmailWithAttachment(attachmentSource, description);
+		return attachmentSource;
+//		SendEmailWithAttachment(attachmentSource, description, ".pdf");
 
 	}
+
+	public InputStreamSource WriteExcelToEmail(List<Users> data, NotificationWrapper description) throws IOException {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Users");
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		// Create the header row
+		Row headerRow = sheet.createRow(0);
+		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date", "Created By",
+				"Updated Date", "Updated By" };
+		for (int i = 0; i < headers.length; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(headers[i]);
+		}
+
+		// Write data to the sheet
+		int rowNum = 1;
+		for (Users user : data) {
+			Row row = sheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(user.getUsername());
+			row.createCell(1).setCellValue(user.getNama());
+			row.createCell(2).setCellValue(user.getAlamat());
+			row.createCell(3).setCellValue(user.getEmail());
+			row.createCell(4).setCellValue(user.getTelp());
+			if(user.getProgramName() == null) {
+				row.createCell(5).setCellValue("");
+			} else {
+				row.createCell(5).setCellValue(user.getProgramName());
+			}
+			
+			if(user.getCreatedDate() == null) {
+				row.createCell(6).setCellValue("");
+			} else {
+				row.createCell(6).setCellValue(user.getCreatedDate().toString());
+			}
+			
+			if(user.getCreatedBy() == null) {
+				row.createCell(7).setCellValue("");
+			} else {
+				row.createCell(7).setCellValue(user.getCreatedBy());
+			}
+			
+			if(user.getUpdatedDate() == null) {
+				row.createCell(8).setCellValue("");
+			} else {
+				row.createCell(8).setCellValue(user.getUpdatedDate().toString());
+			}
+			
+			
+			if(user.getUpdatedBy() == null) {
+				row.createCell(9).setCellValue("");
+			} else {
+				row.createCell(9).setCellValue(user.getUpdatedBy());
+			}
+		}
+
+		// Resize the columns to fit the contents
+		for (int i = 0; i < headers.length; i++) {
+			sheet.autoSizeColumn(i);
+		}
+
+		// Write the workbook to the output file
+		workbook.write(baos);
+		baos.flush();
+		baos.close();
+		byte[] bytes = baos.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+//		SendEmailWithAttachment(attachmentSource, description, ".xls");
+	    workbook.close();
+	    return attachmentSource;
+	}
+
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
 		// Call the findAll method to retrieve the data

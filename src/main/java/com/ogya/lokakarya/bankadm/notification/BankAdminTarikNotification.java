@@ -95,6 +95,7 @@ public class BankAdminTarikNotification {
 		description.setFileName("LaporanTarikTunaiBulanan(" + month + "/" + year + ")");
 		List<HistoryBank> monthlyData = historyBankRepo.newTarikMonthly();
 		ExportToPdfNotification(monthlyData, description);
+		ExportToExcelNotification(monthlyData, description);
 	}
 
 	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
@@ -129,6 +130,7 @@ public class BankAdminTarikNotification {
 				+ monthStartWeek + "/" + yearStartWeek + "-" + dayName + ", " + day + "/" + month + "/" + year + ")");
 		List<HistoryBank> weeklyData = historyBankRepo.newTarikWeekly();
 		ExportToPdfNotification(weeklyData, description);
+		ExportToExcelNotification(weeklyData, description);
 	}
 
 	String getMonthForInt(int num) {
