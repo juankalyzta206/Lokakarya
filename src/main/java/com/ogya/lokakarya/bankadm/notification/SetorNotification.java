@@ -12,6 +12,11 @@ import java.util.Locale;
 
 import javax.mail.MessagingException;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -61,7 +66,8 @@ public class SetorNotification {
 			currencyNominal.setValue(total);
 			
 			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+day);
-
+			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
+			
 			Context ctx = new Context();
 			ctx.setVariable("tanggal", day);
 			ctx.setVariable("jumlah", jumlah.toString());
@@ -69,6 +75,8 @@ public class SetorNotification {
 
 			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+day,
 					"History Setor " + day + ".pdf", "SetorHarian", ctx, historySetorPdf);
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+day,
+					"History Setor " + day + ".xls", "SetorHarian", ctx, historySetorXls);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -102,7 +110,8 @@ public class SetorNotification {
 			currencyNominal.setValue(total);
 			
 			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+startDay+" - "+endDay);
-
+			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
+			
 			Context ctx = new Context();
 			ctx.setVariable("hari", startDay+" - "+endDay);
 			ctx.setVariable("jumlah", jumlah.toString());
@@ -110,6 +119,8 @@ public class SetorNotification {
 
 			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+startDay+" - "+endDay, 
 					"History Setor " + startDay+" - "+endDay + ".pdf", "SetorMingguan", ctx, historySetorPdf);
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+startDay+" - "+endDay, 
+					"History Setor " + startDay+" - "+endDay + ".xls", "SetorMingguan", ctx, historySetorXls);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -118,7 +129,7 @@ public class SetorNotification {
 	}
 	
 	//	Setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * ?")
+	@Scheduled(cron = "* * * * * *")
 	public void historyNotificationMonthly() throws MessagingException, IOException, DocumentException {
 		try {
 			Date harini = new Date();
@@ -143,15 +154,18 @@ public class SetorNotification {
 			currencyNominal.setValue(total);
 			
 			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode Bulan "+bulan);
-
+			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
+			
 			Context ctx = new Context();
 			ctx.setVariable("bulan", bulan);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan, 
+			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan, 
 					"History Setor " + bulan + ".pdf", "SetorBulanan", ctx, historySetorPdf);
-
+			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan,
+					"History Setor " + bulan + ".xls", "SetorBulanan", ctx, historySetorXls);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -234,5 +248,76 @@ public class SetorNotification {
 		pdfWriter.close();
 
 		return outputStream;
+	}
+	
+public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IOException {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Users");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+		// Create the header row
+		Row headerRow = sheet.createRow(0);
+		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date", "Created By",
+				"Updated Date", "Updated By" };
+		for (int i = 0; i < headers.length; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(headers[i]);
+		}
+
+		// Write data to the sheet
+		int rowNum = 1;
+		for (HistoryBank historyBank : data) {
+			Row row = sheet.createRow(rowNum++);
+			if(historyBank.getTanggal() == null) {
+				row.createCell(0).setCellValue("");
+			} else {
+				row.createCell(0).setCellValue(historyBank.getTanggal().toString());
+			}
+			if(historyBank.getRekening().getNorek()== null) {
+				row.createCell(1).setCellValue("");
+			} else {
+				row.createCell(1).setCellValue(historyBank.getRekening().getNorek());
+			}
+			if(historyBank.getStatusKet()== null) {
+				row.createCell(2).setCellValue("");
+			} else {
+				row.createCell(2).setCellValue(historyBank.getStatusKet());
+			}
+			if(historyBank.getNama()== null) {
+				row.createCell(3).setCellValue("");
+			} else {
+				row.createCell(3).setCellValue(historyBank.getNama());
+			}
+			if(historyBank.getUang()== null) {
+				row.createCell(4).setCellValue("");
+			} else {
+				row.createCell(4).setCellValue(historyBank.getUang());
+			}
+			if(historyBank.getNoRekTujuan() == null) {
+				row.createCell(5).setCellValue("");
+			} else {
+				row.createCell(5).setCellValue(historyBank.getNoRekTujuan());
+			}
+			if(historyBank.getNoTlp() == null) {
+				row.createCell(6).setCellValue("");
+			} else {
+				row.createCell(6).setCellValue(historyBank.getNoTlp());
+			}
+			if(historyBank.getNamaTujuan() == null) {
+				row.createCell(7).setCellValue("");
+			} else {
+				row.createCell(7).setCellValue(historyBank.getNamaTujuan());
+			}
+		}
+
+		// Resize the columns to fit the contents
+		for (int i = 0; i < headers.length; i++) {
+			sheet.autoSizeColumn(i);
+		}
+
+		// Write the workbook to the output file
+		workbook.write(outputStream);
+	    workbook.close();
+	    return outputStream;
 	}
 }
