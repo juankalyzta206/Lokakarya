@@ -26,7 +26,6 @@ import com.ogya.lokakarya.telepon.helper.LaporanPenunggakanExcelExporter;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.service.TransaksiTelkomService;
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 
 
 @Service
