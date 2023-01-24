@@ -8,6 +8,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,7 +37,6 @@ import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
 import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
 import com.ogya.lokakarya.exercise.feign.bankadm.services.BankAdminFeignServices;
-
 import com.ogya.lokakarya.util.DataResponseFeign;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
@@ -178,7 +180,7 @@ public class MasterBankService {
 	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 	    pdfDoc.open();
 	    
-	    Paragraph title = new Paragraph("Laporan Transaksi Bank",
+	    Paragraph title = new Paragraph("Laporan Data Nasabah Bank",
 	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 	    title.setAlignment(Element.ALIGN_CENTER);
 	    pdfDoc.add(title);
@@ -226,5 +228,40 @@ public class MasterBankService {
 	    response.setContentType("application/pdf");
 	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
+	
+	 public void exportToXls(HttpServletResponse response) throws Exception {
+	        // Call the findAll method to retrieve the data
+	        List<MasterBank> data = masterBankRepository.findAll();
+
+	        // Create a new Apache POI workbook
+	        try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+	            HSSFSheet sheet = workbook.createSheet("Laporan Transaksi Bank");
+
+	            // Create the header row
+	            HSSFRow headerRow = sheet.createRow(0);
+	            headerRow.createCell(0).setCellValue("Nomor Rekening");
+	            headerRow.createCell(1).setCellValue("Nama");
+	            headerRow.createCell(2).setCellValue("Alamat");
+	            headerRow.createCell(3).setCellValue("No Telepon");
+	            headerRow.createCell(4).setCellValue("Saldo");
+
+	            // Iterate through the data and add it to the sheet
+	            int rowNum = 1;
+	            for (MasterBank entity : data) {
+	                HSSFRow row = sheet.createRow(rowNum++);
+	                row.createCell(0).setCellValue(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
+	                row.createCell(1).setCellValue(entity.getNama() != null ? entity.getNama() : "-");
+	                row.createCell(2).setCellValue(entity.getAlamat() != null ? entity.getAlamat() : "-");
+	                row.createCell(0).setCellValue(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
+	                row.createCell(0).setCellValue(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
+	            }
+
+	            // Write the workbook to the response output stream
+	            response.setContentType("application/vnd.ms-excel");
+	            response.setHeader("Content-Disposition", "attachment; filename=exportedXls.xls");
+	            workbook.write(response.getOutputStream());
+	            response.flushBuffer();
+	        }
+	    }
 }
 
