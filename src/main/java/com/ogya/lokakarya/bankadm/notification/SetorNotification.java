@@ -129,7 +129,7 @@ public class SetorNotification {
 	}
 	
 	//	Setiap tanggal 1 jam 7
-	@Scheduled(cron = "* * * * * *")
+	@Scheduled(cron = "0 0 7 1 * *")
 	public void historyNotificationMonthly() throws MessagingException, IOException, DocumentException {
 		try {
 			Date harini = new Date();
