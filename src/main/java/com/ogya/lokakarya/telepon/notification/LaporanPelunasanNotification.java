@@ -133,7 +133,8 @@ public class LaporanPelunasanNotification {
 			System.out.println("Email send");
 	}
 //EXCEL
-	@Scheduled(cron = "0 42 * * * *")
+	//setiap tanggal 1 jam 7
+	@Scheduled(cron = "0 0 7 1 * *")
 	public void sendEmailMonthExcel() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -152,8 +153,8 @@ public class LaporanPelunasanNotification {
 			SimpleDateFormat tanggal = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
 			String bulan = tanggal.format(cal.getTime());	
 			
-			//List<HistoryTelkom> data = historyTelkomRepository.lunasRekap(start, end);
-			List<HistoryTelkom> data = historyTelkomRepository.findAll();
+			List<HistoryTelkom> data = historyTelkomRepository.lunasRekap(start, end);
+			//List<HistoryTelkom> data = historyTelkomRepository.findAll();
 			String title = "Laporan Bayar Telepon Bulan " + bulan;
 			
 			helper.setTo("usernamemeeting@gmail.com");
