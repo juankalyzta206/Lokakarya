@@ -4,14 +4,14 @@ package com.ogya.lokakarya.exercise.feign.services.laporanpenunggakan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
+import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.exercise.feign.repository.laporanpenunggakan.LaporanPenunggakanRepository;
 import com.ogya.lokakarya.exercise.feign.request.laporanpenunggakan.LaporanPenunggakanRequest;
 import com.ogya.lokakarya.exercise.feign.response.laporanpenunggakan.LaporanPenunggakanResponse;
-import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
-import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
-import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
-import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
+import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
+import com.ogya.lokakarya.repository.telepon.TransaksiTelkomRepository;
 
 @Service
 public class LaporanPenunggakanService {

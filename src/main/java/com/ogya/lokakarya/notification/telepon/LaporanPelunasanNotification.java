@@ -17,10 +17,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.ogya.lokakarya.telepon.entity.HistoryTelkom;
-import com.ogya.lokakarya.telepon.helper.LaporanPelunasanExcelExporter;
-import com.ogya.lokakarya.telepon.repository.HistoryTelkomRepository;
-import com.ogya.lokakarya.telepon.service.HistoryService;
+import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
+import com.ogya.lokakarya.helper.telepon.LaporanPelunasanExcelExporter;
+import com.ogya.lokakarya.repository.telepon.HistoryTelkomRepository;
+import com.ogya.lokakarya.service.telepon.HistoryService;
 
 @Service
 @Transactional

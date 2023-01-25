@@ -3,10 +3,10 @@ package com.ogya.lokakarya.exercise.feign.services.telkom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ogya.lokakarya.exercise.feign.repository.telkom.TelkomRepository;
 import com.ogya.lokakarya.exercise.feign.request.telkom.BayarRequest;
 import com.ogya.lokakarya.exercise.feign.response.telkom.BayarResponse;
 import com.ogya.lokakarya.exercise.feign.response.telkom.ValidateResponse;
-import com.ogya.lokakarya.exercise.feign.telkom.repository.TelkomRepository;
 
 @Service
 public class TelkomFeignServices {
