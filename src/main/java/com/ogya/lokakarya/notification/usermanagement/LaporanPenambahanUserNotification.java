@@ -262,43 +262,18 @@ public class LaporanPenambahanUserNotification {
 
 		// Write data to the sheet
 		int rowNum = 1;
-		for (Users user : data) {
+		for (Users entity : data) {
 			Row row = sheet.createRow(rowNum++);
-			row.createCell(0).setCellValue(user.getUsername());
-			row.createCell(1).setCellValue(user.getNama());
-			row.createCell(2).setCellValue(user.getAlamat());
-			row.createCell(3).setCellValue(user.getEmail());
-			row.createCell(4).setCellValue(user.getTelp());
-			if(user.getProgramName() == null) {
-				row.createCell(5).setCellValue("");
-			} else {
-				row.createCell(5).setCellValue(user.getProgramName());
-			}
-			
-			if(user.getCreatedDate() == null) {
-				row.createCell(6).setCellValue("");
-			} else {
-				row.createCell(6).setCellValue(user.getCreatedDate().toString());
-			}
-			
-			if(user.getCreatedBy() == null) {
-				row.createCell(7).setCellValue("");
-			} else {
-				row.createCell(7).setCellValue(user.getCreatedBy());
-			}
-			
-			if(user.getUpdatedDate() == null) {
-				row.createCell(8).setCellValue("");
-			} else {
-				row.createCell(8).setCellValue(user.getUpdatedDate().toString());
-			}
-			
-			
-			if(user.getUpdatedBy() == null) {
-				row.createCell(9).setCellValue("");
-			} else {
-				row.createCell(9).setCellValue(user.getUpdatedBy());
-			}
+			row.createCell(0).setCellValue(String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-"));
+			row.createCell(1).setCellValue(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
+			row.createCell(2).setCellValue(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
+			row.createCell(3).setCellValue(String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-"));
+			row.createCell(4).setCellValue(String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-"));
+			row.createCell(5).setCellValue(String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
+			row.createCell(6).setCellValue(String.valueOf(entity.getCreatedDate() != null ? String.valueOf(entity.getCreatedDate()) : "-"));
+			row.createCell(7).setCellValue(String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
+			row.createCell(8).setCellValue(String.valueOf(entity.getUpdatedDate() != null ? String.valueOf(entity.getUpdatedDate()) : "-"));
+			row.createCell(9).setCellValue(String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
 		}
 
 		// Resize the columns to fit the contents
@@ -312,7 +287,6 @@ public class LaporanPenambahanUserNotification {
 		baos.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-//		SendEmailWithAttachment(attachmentSource, description, ".xls");
 	    workbook.close();
 	    return attachmentSource;
 	}

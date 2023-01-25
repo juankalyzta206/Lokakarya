@@ -12,7 +12,10 @@ import java.util.Locale;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
+import org.apache.poi.sl.usermodel.ObjectMetaData.Application;
+import org.bouncycastle.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -37,7 +40,7 @@ public class LaporanPenunggakanNotification {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	TransaksiTelkomService transaksiTelkomService;
-
+	
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
