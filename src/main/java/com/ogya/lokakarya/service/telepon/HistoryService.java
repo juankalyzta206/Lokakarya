@@ -1,11 +1,13 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -258,26 +260,33 @@ public class HistoryService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		
-		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
-		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell1);
-		PdfPCell cell2 = new PdfPCell(new Phrase("Tanggal bayar"));
-		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell2);
-		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
-		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell3);
-		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
-		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell4);
-		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
-		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell5);
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
+		Properties properties = new Properties();
+		properties.load(inputStream);
+		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		int columnLength = columnNames.size();
+		for (String columnName : columnNames) {
+	        pdfTable.addCell(Align(properties.getProperty(columnName)));
+	    }
+//		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
+//		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell1);
+//		PdfPCell cell2 = new PdfPCell(new Phrase("Tanggal bayar"));
+//		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell2);
+//		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
+//		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell3);
+//		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
+//		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell4);
+//		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
+//		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell5);
 		
 		BaseColor color = new BaseColor(135, 206, 235);
 
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < columnLength; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 

@@ -51,7 +51,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 50 * * * ?")
+	@Scheduled(cron = "0 9 * * * ?")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -122,6 +122,10 @@ public class LaporanPenunggakanNotification {
 	
 	//@Scheduled(cron = "* * * * * ?")
 	public void tester() {
-		System.out.println(laporanPenunggakanConfigurationProperties.getNama());
+		List<String> a = laporanPenunggakanConfigurationProperties.getColumn();
+		for (String b : a) {
+			System.out.println(b);
+		}
+		
 	}
 }

@@ -1,5 +1,9 @@
 package com.ogya.lokakarya.configuration.telepon;
 
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -8,14 +12,18 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "column")
-@PropertySource("classpath:columnLaporanPenunggakan.properties")
+@PropertySource("classpath:column/columnLaporanPenunggakan.properties")
 public class LaporanPenunggakanConfigurationProperties {
 	private String idTransaksi;
 	private String nama;
 	private String bulanTagihan;
 	private String tahunTagihan;
 	private String nominal;
-	private String status;	
+	private String status;
+	@Value("#{'${column.column}'.split(',')}")
+	private List<String> column;
+	
+
 	public String getIdTransaksi() {
 		return idTransaksi;
 	}
@@ -51,5 +59,11 @@ public class LaporanPenunggakanConfigurationProperties {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public List<String> getColumn() {
+		return column;
+	}
+	public void setColumn(List<String> column) {
+		this.column = column;
 	}
 }
