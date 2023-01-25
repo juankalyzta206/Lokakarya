@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.telepon.LaporanPenunggakanConfigurationProperties;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
 import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
@@ -57,6 +59,7 @@ public class TransaksiTelkomService {
 	HistoryRepository historyRepository;
 	@Autowired
 	TransaksiTelkomCriteriaRepository transaksiTelkomCriteriaRepository;
+
 
 	public Long sumAll() {
 		Long sumAll = transaksiTelkomRepository.sumAll();
@@ -333,7 +336,7 @@ public class TransaksiTelkomService {
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		PdfPCell cell1 = new PdfPCell(new Phrase("ID Transaksi"));
+		PdfPCell cell1 = new PdfPCell(new Phrase("Id Transaksi"));
 		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell1);
 		PdfPCell cell2 = new PdfPCell(new Phrase("Nama Pelanggan"));

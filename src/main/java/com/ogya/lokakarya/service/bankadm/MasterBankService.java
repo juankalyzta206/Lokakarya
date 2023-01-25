@@ -226,14 +226,16 @@ public class MasterBankService {
 	            } else if (columnName.equals("Saldo")) {
 	                value = String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
 	            }
-	            pdfTable.addCell(Align(value));
+	            pdfTable.addCell(new PdfPCell(new Phrase(value)));
 	        }
 	    }
+
 
 	    // Add the table to the pdf document
 	    pdfDoc.add(pdfTable);
 
 	    pdfDoc.close();
+	    pdfWriter.flush();
 	    pdfWriter.close();
 
 	    response.setContentType("application/pdf");
