@@ -212,10 +212,10 @@ public class SetorNotification {
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
+		pdfTable.addCell(Align("Tanggal Transaksi"));
 		pdfTable.addCell(Align("ID History Transaksi"));
 		pdfTable.addCell(Align("Nomor Rekening"));
 		pdfTable.addCell(Align("Nama Nasabah"));
-		pdfTable.addCell(Align("Tanggal Transaksi"));
 		pdfTable.addCell(Align("Nominal"));
 		for (int i = 0; i < 5; i++) {
 			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
@@ -223,18 +223,18 @@ public class SetorNotification {
 
 		// Iterate through the data and add it to the table
 		for (HistoryBank entity : data) {
-			pdfTable.addCell(Align(String
-					.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(
-					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
-
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			String formattedDate = "-";
 			if (entity.getTanggal() != null) {
 				formattedDate = formatter.format(entity.getTanggal());
 			}
 			pdfTable.addCell(Align(formattedDate));
+
+			pdfTable.addCell(Align(String
+					.valueOf(entity.getIdHistoryBank() != null ? String.valueOf(entity.getIdHistoryBank()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(
+					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
+			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
 
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyNominal = new CurrencyData();
@@ -258,13 +258,12 @@ public class SetorNotification {
 
 	public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
-		Sheet sheet = workbook.createSheet("Users");
+		Sheet sheet = workbook.createSheet("Setor");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date",
-				"Created By", "Updated Date", "Updated By" };
+		String[] headers = { "Tanggal Transaksi", "ID History Transaksi", "Nomor Rekening", "Nama Nasabah", "Nominal" };
 		for (int i = 0; i < headers.length; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(headers[i]);
@@ -282,12 +281,12 @@ public class SetorNotification {
 			if (historyBank.getRekening().getNorek() == null) {
 				row.createCell(1).setCellValue("");
 			} else {
-				row.createCell(1).setCellValue(historyBank.getRekening().getNorek());
+				row.createCell(1).setCellValue(historyBank.getIdHistoryBank());
 			}
 			if (historyBank.getStatusKet() == null) {
 				row.createCell(2).setCellValue("");
 			} else {
-				row.createCell(2).setCellValue(historyBank.getStatusKet());
+				row.createCell(2).setCellValue(historyBank.getRekening().getNorek());
 			}
 			if (historyBank.getNama() == null) {
 				row.createCell(3).setCellValue("");
@@ -298,21 +297,6 @@ public class SetorNotification {
 				row.createCell(4).setCellValue("");
 			} else {
 				row.createCell(4).setCellValue(historyBank.getUang());
-			}
-			if (historyBank.getNoRekTujuan() == null) {
-				row.createCell(5).setCellValue("");
-			} else {
-				row.createCell(5).setCellValue(historyBank.getNoRekTujuan());
-			}
-			if (historyBank.getNoTlp() == null) {
-				row.createCell(6).setCellValue("");
-			} else {
-				row.createCell(6).setCellValue(historyBank.getNoTlp());
-			}
-			if (historyBank.getNamaTujuan() == null) {
-				row.createCell(7).setCellValue("");
-			} else {
-				row.createCell(7).setCellValue(historyBank.getNamaTujuan());
 			}
 		}
 
