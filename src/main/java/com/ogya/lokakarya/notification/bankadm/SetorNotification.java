@@ -43,39 +43,40 @@ public class SetorNotification {
 	private HistoryBankRepository historyBankRepo;
 	@Autowired
 	private TransaksiNasabahService transaksiNasabahService;
-	
-	//	Setiap hari jam 7
+
+	// Setiap hari jam 7
 	@Scheduled(cron = "0 0 7 * * *")
 	public void historyNotificationDaily() throws MessagingException, IOException, DocumentException {
 		try {
 			Calendar cal = Calendar.getInstance();
-	        cal.add(Calendar.DATE, -1);
-	        
-	        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-	        String hari = date.format(cal.getTime());
-			
+			cal.add(Calendar.DATE, -1);
+
+			SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+			String hari = date.format(cal.getTime());
+
 			SimpleDateFormat tanggal = new SimpleDateFormat("EEEE dd/MM/yyyy", new Locale("in", "ID"));
 			String day = tanggal.format(cal.getTime());
 
 			List<HistoryBank> data = historyBankRepo.setorDaily(hari);
 			Long jumlah = historyBankRepo.jumlahSetorHarian(hari);
-			
+
 			Long total = historyBankRepo.totalSetorHarian(hari);
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyNominal = new CurrencyData();
 			currencyNominal.setValue(total);
-			
-			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+day);
+
+			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah,
+					numberFormat.format(currencyNominal.getValue()).toString(), "Periode " + day);
 			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
-			
+
 			Context ctx = new Context();
 			ctx.setVariable("tanggal", day);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+day,
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai " + day,
 					"History Setor " + day + ".pdf", "SetorHarian", ctx, historySetorPdf);
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+day,
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai " + day,
 					"History Setor " + day + ".xls", "SetorHarian", ctx, historySetorXls);
 
 		} catch (Exception e) {
@@ -83,95 +84,98 @@ public class SetorNotification {
 			e.printStackTrace();
 		}
 	}
-	
-	//	Setiap hari Senin jam 7
+
+	// Setiap hari Senin jam 7
 	@Scheduled(cron = "0 0 7 * * MON")
 	public void historyNotificationWeekly() throws MessagingException, IOException, DocumentException {
-		try {		
+		try {
 			Calendar calStart = Calendar.getInstance();
-	        calStart.add(Calendar.DATE, -7);
-	        Calendar calEnd = Calendar.getInstance();
-	        calEnd.add(Calendar.DATE, -1);
-	        
-	        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-	        String startDate = date.format(calStart.getTime());
-	        String endDate = date.format(calEnd.getTime());
-			
+			calStart.add(Calendar.DATE, -7);
+			Calendar calEnd = Calendar.getInstance();
+			calEnd.add(Calendar.DATE, -1);
+
+			SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+			String startDate = date.format(calStart.getTime());
+			String endDate = date.format(calEnd.getTime());
+
 			SimpleDateFormat tanggal = new SimpleDateFormat("EEEE dd/MM/yyyy", new Locale("in", "ID"));
 			String startDay = tanggal.format(calStart.getTime());
 			String endDay = tanggal.format(calEnd.getTime());
 
 			List<HistoryBank> data = historyBankRepo.setorRekap(startDate, endDate);
 			Long jumlah = historyBankRepo.jumlahSetorRekap(startDate, endDate);
-			
+
 			Long total = historyBankRepo.totalSetorRekap(startDate, endDate);
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyNominal = new CurrencyData();
 			currencyNominal.setValue(total);
-			
-			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode "+startDay+" - "+endDay);
+
+			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah,
+					numberFormat.format(currencyNominal.getValue()).toString(), "Periode " + startDay + " - " + endDay);
 			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
-			
+
 			Context ctx = new Context();
-			ctx.setVariable("hari", startDay+" - "+endDay);
+			ctx.setVariable("hari", startDay + " - " + endDay);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+startDay+" - "+endDay, 
-					"History Setor " + startDay+" - "+endDay + ".pdf", "SetorMingguan", ctx, historySetorPdf);
-			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com", "Laporan Transaksi Setor Tunai "+startDay+" - "+endDay, 
-					"History Setor " + startDay+" - "+endDay + ".xls", "SetorMingguan", ctx, historySetorXls);
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com",
+					"Laporan Transaksi Setor Tunai " + startDay + " - " + endDay,
+					"History Setor " + startDay + " - " + endDay + ".pdf", "SetorMingguan", ctx, historySetorPdf);
+			transaksiNasabahService.sendEmail("usernamemeeting@gmail.com",
+					"Laporan Transaksi Setor Tunai " + startDay + " - " + endDay,
+					"History Setor " + startDay + " - " + endDay + ".xls", "SetorMingguan", ctx, historySetorXls);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	//	Setiap tanggal 1 jam 7
+
+	// Setiap tanggal 1 jam 7
 	@Scheduled(cron = "0 0 7 1 * *")
 	public void historyNotificationMonthly() throws MessagingException, IOException, DocumentException {
 		try {
 			Date harini = new Date();
 			Calendar cal = Calendar.getInstance();
-	        cal.add(Calendar.MONTH, -1);
-	        
-	        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM");
-	        String startDate = date.format(cal.getTime());
-	        String endDate = date.format(harini);
-	        String start = startDate+"-01";
-	        String end = endDate+"-01";
-			
+			cal.add(Calendar.MONTH, -1);
+
+			SimpleDateFormat date = new SimpleDateFormat("yyyy-MM");
+			String startDate = date.format(cal.getTime());
+			String endDate = date.format(harini);
+			String start = startDate + "-01";
+			String end = endDate + "-01";
+
 			SimpleDateFormat tanggal = new SimpleDateFormat("MMMM yyyy", new Locale("in", "ID"));
 			String bulan = tanggal.format(cal.getTime());
 
 			List<HistoryBank> data = historyBankRepo.setorRekap(start, end);
 			Long jumlah = historyBankRepo.jumlahSetorRekap(start, end);
-			
+
 			Long total = historyBankRepo.totalSetorRekap(start, end);
 			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
 			CurrencyData currencyNominal = new CurrencyData();
 			currencyNominal.setValue(total);
-			
-			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah, numberFormat.format(currencyNominal.getValue()).toString(), "Periode Bulan "+bulan);
+
+			ByteArrayOutputStream historySetorPdf = ExportToPdfSetor(data, jumlah,
+					numberFormat.format(currencyNominal.getValue()).toString(), "Periode Bulan " + bulan);
 			ByteArrayOutputStream historySetorXls = WriteExcelToEmail(data);
-			
+
 			Context ctx = new Context();
 			ctx.setVariable("bulan", bulan);
 			ctx.setVariable("jumlah", jumlah.toString());
 			ctx.setVariable("total", numberFormat.format(currencyNominal.getValue()).toString());
 
-			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan, 
+			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan " + bulan,
 					"History Setor " + bulan + ".pdf", "SetorBulanan", ctx, historySetorPdf);
-			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan "+bulan,
+			transaksiNasabahService.sendEmail("maulanairzan5@gmail.com", "Laporan Transaksi Setor Tunai Bulan " + bulan,
 					"History Setor " + bulan + ".xls", "SetorBulanan", ctx, historySetorXls);
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
 
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
@@ -180,7 +184,8 @@ public class SetorNotification {
 		return cell;
 	}
 
-	public ByteArrayOutputStream ExportToPdfSetor(List<HistoryBank> data, Long jumlah, String total, String subJudul) throws Exception {
+	public ByteArrayOutputStream ExportToPdfSetor(List<HistoryBank> data, Long jumlah, String total, String subJudul)
+			throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		Document pdfDoc = new Document(PageSize.A4.rotate());
@@ -242,23 +247,24 @@ public class SetorNotification {
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
 		pdfDoc.add(new Paragraph(""));
-		pdfDoc.add(new Paragraph("Jumlah transaksi setor tunai selama "+ subJudul +" sebanyak " + jumlah+", dengan total uang masuk sebesar "+total+"."));
+		pdfDoc.add(new Paragraph("Jumlah transaksi setor tunai selama " + subJudul + " sebanyak " + jumlah
+				+ ", dengan total uang masuk sebesar " + total + "."));
 
 		pdfDoc.close();
 		pdfWriter.close();
 
 		return outputStream;
 	}
-	
-public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IOException {
+
+	public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Users");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date", "Created By",
-				"Updated Date", "Updated By" };
+		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date",
+				"Created By", "Updated Date", "Updated By" };
 		for (int i = 0; i < headers.length; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(headers[i]);
@@ -268,42 +274,42 @@ public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IO
 		int rowNum = 1;
 		for (HistoryBank historyBank : data) {
 			Row row = sheet.createRow(rowNum++);
-			if(historyBank.getTanggal() == null) {
+			if (historyBank.getTanggal() == null) {
 				row.createCell(0).setCellValue("");
 			} else {
 				row.createCell(0).setCellValue(historyBank.getTanggal().toString());
 			}
-			if(historyBank.getRekening().getNorek()== null) {
+			if (historyBank.getRekening().getNorek() == null) {
 				row.createCell(1).setCellValue("");
 			} else {
 				row.createCell(1).setCellValue(historyBank.getRekening().getNorek());
 			}
-			if(historyBank.getStatusKet()== null) {
+			if (historyBank.getStatusKet() == null) {
 				row.createCell(2).setCellValue("");
 			} else {
 				row.createCell(2).setCellValue(historyBank.getStatusKet());
 			}
-			if(historyBank.getNama()== null) {
+			if (historyBank.getNama() == null) {
 				row.createCell(3).setCellValue("");
 			} else {
 				row.createCell(3).setCellValue(historyBank.getNama());
 			}
-			if(historyBank.getUang()== null) {
+			if (historyBank.getUang() == null) {
 				row.createCell(4).setCellValue("");
 			} else {
 				row.createCell(4).setCellValue(historyBank.getUang());
 			}
-			if(historyBank.getNoRekTujuan() == null) {
+			if (historyBank.getNoRekTujuan() == null) {
 				row.createCell(5).setCellValue("");
 			} else {
 				row.createCell(5).setCellValue(historyBank.getNoRekTujuan());
 			}
-			if(historyBank.getNoTlp() == null) {
+			if (historyBank.getNoTlp() == null) {
 				row.createCell(6).setCellValue("");
 			} else {
 				row.createCell(6).setCellValue(historyBank.getNoTlp());
 			}
-			if(historyBank.getNamaTujuan() == null) {
+			if (historyBank.getNamaTujuan() == null) {
 				row.createCell(7).setCellValue("");
 			} else {
 				row.createCell(7).setCellValue(historyBank.getNamaTujuan());
@@ -317,7 +323,7 @@ public ByteArrayOutputStream WriteExcelToEmail(List<HistoryBank> data) throws IO
 
 		// Write the workbook to the output file
 		workbook.write(outputStream);
-	    workbook.close();
-	    return outputStream;
+		workbook.close();
+		return outputStream;
 	}
 }
