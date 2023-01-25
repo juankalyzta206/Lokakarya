@@ -153,52 +153,6 @@ public class BankAdminTarikNotification {
 		return new Date(date.getTime() - 6 * MILLIS_IN_A_DAY);
 	}
 
-	public void SendEmailWithAttachmentPDF(InputStreamSource data, NotificationWrapper description) {
-		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-		try {
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-			mimeMessageHelper.setTo(description.getReceiver());
-			mimeMessageHelper.setCc(description.getCc());
-			mimeMessageHelper.setSubject(description.getSubject());
-
-			StringBuffer buffer = new StringBuffer();
-			buffer.append("<h3>" + description.getTopHeader() + "</h3>");
-			buffer.append("<h5>" + description.getBotHeader() + "</h5>");
-			String body = buffer.toString();
-			mimeMessageHelper.setText(body, true);
-
-			mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", data);
-			javaMailSender.send(mimeMessage);
-			System.out.println("Email PDF sent");
-		} catch (MessagingException e) {
-			System.err.print("Failed send email");
-			e.printStackTrace();
-		}
-	}
-
-	public void SendEmailWithAttachmentXLS(InputStreamSource data, NotificationWrapper description) {
-		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-		try {
-			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-			mimeMessageHelper.setTo(description.getReceiver());
-			mimeMessageHelper.setCc(description.getCc());
-			mimeMessageHelper.setSubject(description.getSubject());
-
-			StringBuffer buffer = new StringBuffer();
-			buffer.append("<h3>" + description.getTopHeader() + "</h3>");
-			buffer.append("<h5>" + description.getBotHeader() + "</h5>");
-			String body = buffer.toString();
-			mimeMessageHelper.setText(body, true);
-
-			mimeMessageHelper.addAttachment(description.getFileName() + ".xls", data);
-			javaMailSender.send(mimeMessage);
-			System.out.println("Email XLS sent");
-		} catch (MessagingException e) {
-			System.err.print("Failed to send email");
-			e.printStackTrace();
-		}
-	}
-
 	public void SendEmailWithAttachment(InputStreamSource pdfData, InputStreamSource xlsData,
 			NotificationWrapper description) {
 
