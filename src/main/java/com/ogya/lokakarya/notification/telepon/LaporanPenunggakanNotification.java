@@ -51,7 +51,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 9 * * * ?")
+	@Scheduled(cron = "0 14 * * * ?")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 

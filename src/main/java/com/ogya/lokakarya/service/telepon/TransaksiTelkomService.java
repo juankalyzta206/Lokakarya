@@ -341,11 +341,11 @@ public class TransaksiTelkomService {
 		
 		List<String> column1 = laporanPenunggakanConfigurationProperties.getColumn();
  		
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPenunggakan.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
-		int columnLength = columnNames.size();
+//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPenunggakan.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		int columnLength = columnNames.size();
 		for (String columnName : column1) {
 	        pdfTable.addCell(Align(columnName));
 	    }
