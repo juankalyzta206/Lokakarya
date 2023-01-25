@@ -59,7 +59,8 @@ public class TransaksiTelkomService {
 	HistoryRepository historyRepository;
 	@Autowired
 	TransaksiTelkomCriteriaRepository transaksiTelkomCriteriaRepository;
-
+	@Autowired
+	private LaporanPenunggakanConfigurationProperties laporanPenunggakanConfigurationProperties;
 
 	public Long sumAll() {
 		Long sumAll = transaksiTelkomRepository.sumAll();
@@ -336,22 +337,22 @@ public class TransaksiTelkomService {
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		PdfPCell cell1 = new PdfPCell(new Phrase("Id Transaksi"));
+		PdfPCell cell1 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getIdTransaksi()));
 		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell1);
-		PdfPCell cell2 = new PdfPCell(new Phrase("Nama Pelanggan"));
+		PdfPCell cell2 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNama()));
 		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell2);
-		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
+		PdfPCell cell3 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getBulanTagihan()));
 		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell3);
-		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
+		PdfPCell cell4 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getTahunTagihan()));
 		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell4);
-		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
+		PdfPCell cell5 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNominal()));
 		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell5);
-		PdfPCell cell6 = new PdfPCell(new Phrase("Status"));
+		PdfPCell cell6 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getStatus()));
 		cell6.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		pdfTable.addCell(cell6);
 
