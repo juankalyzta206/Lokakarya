@@ -16,12 +16,15 @@ import org.apache.poi.sl.usermodel.ObjectMetaData.Application;
 import org.bouncycastle.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.ogya.lokakarya.configuration.telepon.LaporanPenunggakanConfigurationProperties;
 import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.helper.telepon.LaporanPenunggakanExcelExporter;
 import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
@@ -40,11 +43,15 @@ public class LaporanPenunggakanNotification {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	TransaksiTelkomService transaksiTelkomService;
+	@Autowired
+	private LaporanPenunggakanConfigurationProperties laporanPenunggakanConfigurationProperties;
 	
+	@Value("${app.idtransaksi}")
+	private String idTransaksi;
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * ?")
+	@Scheduled(cron = "0 10 * * * ?")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -113,4 +120,9 @@ public class LaporanPenunggakanNotification {
 			System.out.println("Email send");
 	}
 	
+	//@Scheduled(cron = "* * * * * ?")
+	public void tester() {
+		
+		System.out.println(laporanPenunggakanConfigurationProperties.getIdTransaksi());
+	}
 }
