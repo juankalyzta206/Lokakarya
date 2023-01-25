@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
+import com.ogya.lokakarya.notification.bankadm.BayarTelkomNotification;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
 import com.ogya.lokakarya.service.bankadm.HistoryBankService;
 import com.ogya.lokakarya.util.DataResponse;
@@ -33,6 +34,8 @@ public class HistoryBankController {
 	HistoryBankRepository historyBankRepository;
 	@Autowired
 	HistoryBankService historyBankService;
+	@Autowired
+	BayarTelkomNotification bayarTelkomNotification;
 
 	
 	@GetMapping(path = "/getByIdPlan")
@@ -140,6 +143,11 @@ public class HistoryBankController {
     @RequestMapping(value = "/exportToPdfALLBayarTelepon", method = RequestMethod.GET)
     public void exportToPdfbayartelepon(HttpServletResponse response) throws Exception {
         historyBankService.ExportToPdfBayarTelepon(response);
-       }  
+       } 
+    
+    @GetMapping(path = "/dynamicColumnBayarTelpon")
+    public void dynamicColumnBayarTelpon(HttpServletResponse response) throws Exception {
+    	bayarTelkomNotification.downloadXlsBayarTelpon(response);
+    }
 
 }

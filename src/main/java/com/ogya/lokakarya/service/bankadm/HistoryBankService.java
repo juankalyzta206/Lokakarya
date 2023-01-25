@@ -618,7 +618,7 @@ public class HistoryBankService {
 			dataRow.createCell(2).setCellValue(formattedDate);
 			dataRow.createCell(3).setCellValue(data.get(i).getUang());
 			dataRow.createCell(4).setCellValue(data.get(i).getNoTlp());
-			dataRow.createCell(5).setCellValue(data.get(i).getStatusKet());
+			dataRow.createCell(5).setCellValue("Bayar Telepon");
 		}
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		workbook.write(outputStream);
