@@ -1,13 +1,14 @@
 package com.ogya.lokakarya.configuration.telepon;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "app")
+@ConfigurationProperties(prefix = "column")
+@PropertySource("classpath:columnLaporanPenunggakan.properties")
 public class LaporanPenunggakanConfigurationProperties {
 	private String idTransaksi;
 	private String nama;
@@ -21,11 +22,11 @@ public class LaporanPenunggakanConfigurationProperties {
 	public void setIdTransaksi(String idTransaksi) {
 		this.idTransaksi = idTransaksi;
 	}
-	public String getNamaPelanggan() {
+	public String getNama() {
 		return nama;
 	}
-	public void setNamaPelanggan(String namaPelanggan) {
-		this.nama = namaPelanggan;
+	public void setNama(String nama) {
+		this.nama = nama;
 	}
 	public String getBulanTagihan() {
 		return bulanTagihan;

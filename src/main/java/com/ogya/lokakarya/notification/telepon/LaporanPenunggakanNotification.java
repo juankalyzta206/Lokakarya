@@ -46,12 +46,12 @@ public class LaporanPenunggakanNotification {
 	@Autowired
 	private LaporanPenunggakanConfigurationProperties laporanPenunggakanConfigurationProperties;
 	
-	@Value("${app.idtransaksi}")
-	private String idTransaksi;
+//	@Value("${app.idtransaksi}")
+//	private String idTransaksi;
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 10 * * * ?")
+	@Scheduled(cron = "0 50 * * * ?")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -122,7 +122,6 @@ public class LaporanPenunggakanNotification {
 	
 	//@Scheduled(cron = "* * * * * ?")
 	public void tester() {
-		
-		System.out.println(laporanPenunggakanConfigurationProperties.getIdTransaksi());
+		System.out.println(laporanPenunggakanConfigurationProperties.getNama());
 	}
 }
