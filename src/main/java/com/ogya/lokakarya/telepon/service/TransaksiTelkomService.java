@@ -39,11 +39,11 @@ import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.TransaksiTelkomRepository;
 import com.ogya.lokakarya.telepon.repository.criteria.TransaksiTelkomCriteriaRepository;
-import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.CurrencyData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
+import com.ogya.lokakarya.wrapper.telepon.TransaksiTelkomWrapper;
 
 @Service
 @Transactional

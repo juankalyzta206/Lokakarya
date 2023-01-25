@@ -13,9 +13,9 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 @Repository

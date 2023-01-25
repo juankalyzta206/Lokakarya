@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.ogya.lokakarya.exercise.feign.bankadm.request.BankAdminFeignRequest;
-import com.ogya.lokakarya.exercise.feign.bankadm.response.BankAdminFeignResponse;
+import com.ogya.lokakarya.exercise.feign.request.bankadm.BankAdminFeignRequest;
+import com.ogya.lokakarya.exercise.feign.response.bankadm.BankAdminFeignResponse;
 
 @FeignClient(value = "MasterBank", url = "https://simple-rest-production.up.railway.app/")
 

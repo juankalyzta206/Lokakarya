@@ -34,9 +34,9 @@ import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.repository.HistoryRepository;
 import com.ogya.lokakarya.telepon.repository.MasterPelangganRepository;
 import com.ogya.lokakarya.telepon.repository.criteria.HistoryTelkomCriteriaRepository;
-import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
 
 @Service
 @Transactional

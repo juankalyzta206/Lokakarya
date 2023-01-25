@@ -12,7 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
+import com.ogya.lokakarya.wrapper.telepon.MasterPelangganWrapper;
 
 public class MasterPelangganExcelExporter {
     private XSSFWorkbook workbook;

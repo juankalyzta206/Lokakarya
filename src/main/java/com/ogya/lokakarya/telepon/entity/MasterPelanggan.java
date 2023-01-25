@@ -11,7 +11,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ogya.lokakarya.usermanagement.entity.Users;
+import com.ogya.lokakarya.entity.usermanagement.Users;
 
 @Entity
 @Table(name = "MASTER_PELANGGAN")

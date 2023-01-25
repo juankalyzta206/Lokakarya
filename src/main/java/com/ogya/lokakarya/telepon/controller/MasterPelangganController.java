@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.MasterPelangganService;
-import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
-import com.ogya.lokakarya.telepon.wrapper.TeleponPagingRequestWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.wrapper.telepon.MasterPelangganWrapper;
+import com.ogya.lokakarya.wrapper.telepon.TeleponPagingRequestWrapper;
 
 @RestController
 @RequestMapping(value = "/masterpelanggan")

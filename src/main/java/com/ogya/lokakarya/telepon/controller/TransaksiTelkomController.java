@@ -24,11 +24,11 @@ import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
 import com.ogya.lokakarya.telepon.helper.LaporanPenunggakanExcelExporter;
 import com.ogya.lokakarya.telepon.helper.MasterPelangganExcelExporter;
 import com.ogya.lokakarya.telepon.service.TransaksiTelkomService;
-import com.ogya.lokakarya.telepon.wrapper.MasterPelangganWrapper;
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.wrapper.telepon.MasterPelangganWrapper;
+import com.ogya.lokakarya.wrapper.telepon.TransaksiTelkomWrapper;
 
 @RestController
 @RequestMapping(value = "/transaksitelkom")

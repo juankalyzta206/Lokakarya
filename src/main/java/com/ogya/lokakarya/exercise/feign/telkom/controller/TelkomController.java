@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ogya.lokakarya.exercise.feign.telkom.request.BayarRequest;
-import com.ogya.lokakarya.exercise.feign.telkom.response.BayarResponse;
-import com.ogya.lokakarya.exercise.feign.telkom.services.TelkomFeignServices;
+import com.ogya.lokakarya.exercise.feign.request.telkom.BayarRequest;
+import com.ogya.lokakarya.exercise.feign.response.telkom.BayarResponse;
+import com.ogya.lokakarya.exercise.feign.services.telkom.TelkomFeignServices;
 
 @RestController
 @RequestMapping(value = "/telkom")

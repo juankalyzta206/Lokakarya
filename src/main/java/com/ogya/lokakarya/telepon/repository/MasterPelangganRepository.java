@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.telepon.entity.MasterPelanggan;
-import com.ogya.lokakarya.usermanagement.entity.Users;
 
 
 public interface MasterPelangganRepository extends JpaRepository<MasterPelanggan, Long> {

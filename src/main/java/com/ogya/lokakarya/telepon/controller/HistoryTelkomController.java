@@ -25,12 +25,12 @@ import com.ogya.lokakarya.telepon.helper.LaporanPelunasanExcelExporter;
 import com.ogya.lokakarya.telepon.helper.LaporanPenunggakanExcelExporter;
 import com.ogya.lokakarya.telepon.repository.HistoryTelkomRepository;
 import com.ogya.lokakarya.telepon.service.HistoryService;
-import com.ogya.lokakarya.telepon.wrapper.HistoryWrapper;
-import com.ogya.lokakarya.telepon.wrapper.TransaksiTelkomWrapper;
 import com.ogya.lokakarya.util.DataResponse;
 import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
+import com.ogya.lokakarya.wrapper.telepon.TransaksiTelkomWrapper;
 
 @RestController
 @RequestMapping(value = "/historytelkom")
