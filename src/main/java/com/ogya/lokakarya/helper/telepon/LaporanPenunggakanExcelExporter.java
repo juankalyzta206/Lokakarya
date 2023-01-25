@@ -2,12 +2,16 @@ package com.ogya.lokakarya.helper.telepon;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -15,11 +19,23 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import com.ogya.lokakarya.configuration.telepon.LaporanPenunggakanConfigurationProperties;
 import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.util.CurrencyData;
 
+
+
 public class LaporanPenunggakanExcelExporter {
+	@Autowired
+	LaporanPenunggakanConfigurationProperties laporanPenunggakanConfigurationProperties;
 	 private XSSFWorkbook workbook;
 	    private XSSFSheet sheet;
 	    private List<TransaksiTelkom> listUsers;
@@ -27,7 +43,7 @@ public class LaporanPenunggakanExcelExporter {
 	        this.listUsers = listUsers;
 	        workbook = new XSSFWorkbook();
 	    }
-	    private void writeHeaderLine() {
+	    private void writeHeaderLine() throws IOException {
 	    	
 	        sheet = workbook.createSheet("Laporan Penunggakan");
 	         
@@ -38,13 +54,23 @@ public class LaporanPenunggakanExcelExporter {
 	        font.setBold(true);
 	        font.setFontHeight(16);
 	        style.setFont(font);
-	         
-	        createCell(row, 0, "ID Transaksi", style);      
-	        createCell(row, 1, "Nama", style);       
-	        createCell(row, 2, "Bulan Tagihan", style);    
-	        createCell(row, 3, "Tahun Tagihan", style);
-	        createCell(row, 4, "Nominal", style);
-	        createCell(row, 5, "Status", style);
+	       // System.out.println(laporanPenunggakanConfigurationProperties.getColumn());
+	        
+	        List<String> column2 = laporanPenunggakanConfigurationProperties.getColumn();
+	        int i = 0;
+	        for (String columnName : column2) {
+	        	i++;
+	        	
+	        	createCell(row, i, columnName, style);
+		    }
+	        
+	        
+//	        createCell(row, 0, "ID Transaksi", style);      
+//	        createCell(row, 1, "Nama", style);       
+//	        createCell(row, 2, "Bulan Tagihan", style);    
+//	        createCell(row, 3, "Tahun Tagihan", style);
+//	        createCell(row, 4, "Nominal", style);
+//	        createCell(row, 5, "Status", style);
 	         
 	    }
 	     

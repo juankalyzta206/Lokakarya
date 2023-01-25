@@ -34,7 +34,7 @@ public class LaporanPelunasanNotification {
 	
 //PDF	
 //	Setiap hari jam 7
-	@Scheduled(cron = "0 0 7 * * *")
+	@Scheduled(cron = "0 15 * * * *")
 	public void sendEmailDay() throws Exception{
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -52,8 +52,8 @@ public class LaporanPelunasanNotification {
 		List<HistoryTelkom> data = historyTelkomRepository.lunasDaily(yesterday);
 		String title = "Laporan Pelunasan Telepon Hari " + dateString;
 					
-		helper.setTo("usernamemeeting@gmail.com");
-		helper.setCc("haha1hihi2huhu3@gmail.com");
+		helper.setTo("haha1hihi2huhu3@gmail.com");
+		//helper.setCc("haha1hihi2huhu3@gmail.com");
 		helper.setSubject("Laporan Bayar Telepon Hari " + dateString);
 		helper.setText("Laporan Bayar Hari "+ dateString, true);
 		

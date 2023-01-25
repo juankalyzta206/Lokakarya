@@ -31,6 +31,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.telepon.LaporanPelunasanConfiguration;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
 import com.ogya.lokakarya.repository.telepon.HistoryRepository;
@@ -49,6 +50,8 @@ public class HistoryService {
 	MasterPelangganRepository masterPelangganRepository;
 	@Autowired
 	HistoryTelkomCriteriaRepository historyTelkomCriteriaRepository;
+	@Autowired
+	private LaporanPelunasanConfiguration laporanPelunasanConfiguration;
 
 	public Long sumAll() {
 		Long sumAll = historyRepository.sumAll();
@@ -260,13 +263,16 @@ public class HistoryService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
-		int columnLength = columnNames.size();
-		for (String columnName : columnNames) {
-	        pdfTable.addCell(Align(properties.getProperty(columnName)));
+		
+		List<String> column1 = laporanPelunasanConfiguration.getColumn();
+		
+//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		int columnLength = columnNames.size();
+		for (String columnName : column1) {
+	        pdfTable.addCell(Align(columnName));
 	    }
 //		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
 //		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
@@ -286,7 +292,7 @@ public class HistoryService {
 		
 		BaseColor color = new BaseColor(135, 206, 235);
 
-		for (int i = 0; i < columnLength; i++) {
+		for (int i = 0; i < 5; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 

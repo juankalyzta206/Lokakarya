@@ -72,8 +72,8 @@ public class LaporanPenunggakanNotification {
 			List<TransaksiTelkom> data = transaksiTelkomRepository.laporanPenunggakanMonthly(bulan,tahun);
 			String title = "Laporan Penunggakan bulan  " + dateString;
 						
-			helper.setTo("usernamemeeting@gmail.com");
-			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setTo("haha1hihi2huhu3@gmail.com");
+			//helper.setCc("haha1hihi2huhu3@gmail.com");
 			helper.setSubject("Laporan Penunggakan bulan " + dateString);
 			helper.setText("Laporan penunggakan "+ dateString, true);
 			
@@ -85,7 +85,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Excel
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * ?")
+	@Scheduled(cron = "0 35 * * * ?")
 	public void sendEmailDayExcel() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -106,12 +106,13 @@ public class LaporanPenunggakanNotification {
 			List<TransaksiTelkom> data = transaksiTelkomRepository.laporanPenunggakanMonthly(bulan,tahun);
 			String title = "Laporan Penunggakan bulan  " + dateString;
 			//List<TransaksiTelkomWrapper> listUsers = transaksiTelkomService.findAllStatus1();			
-			helper.setTo("usernamemeeting@gmail.com");
-			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setTo("haha1hihi2huhu3@gmail.com");
+			//helper.setCc("haha1hihi2huhu3@gmail.com");
 			helper.setSubject("Laporan Penunggakan bulan " + dateString);
 			helper.setText("Laporan penunggakan "+ dateString, true);
-			
+			System.out.println("waiting...");
 			//ByteArrayOutputStream pdf = transaksiTelkomService.ExportToPdfParam(data, title);
+			
 			LaporanPenunggakanExcelExporter excelExporter = new LaporanPenunggakanExcelExporter(data);
 			ByteArrayOutputStream excel = excelExporter.export();
 			
