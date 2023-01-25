@@ -2,7 +2,9 @@ package com.ogya.lokakarya.telepon.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.ogya.lokakarya.telepon.entity.TransaksiTelkom;
+import com.ogya.lokakarya.util.CurrencyData;
 
 public class LaporanPenunggakanExcelExporter {
 	 private XSSFWorkbook workbook;
@@ -80,7 +83,10 @@ public class LaporanPenunggakanExcelExporter {
 	            createCell(row, columnCount++, entity.getIdPelanggan().getNama(), style);
 	            createCell(row, columnCount++, entity.getBulanTagihan(), style);
 	            createCell(row, columnCount++, entity.getTahunTagihan(), style);
-	            createCell(row, columnCount++, entity.getUang(), style);
+	            NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
+				CurrencyData currencyNominal = new CurrencyData();
+				currencyNominal.setValue(entity.getUang());
+	            createCell(row, columnCount++, String.valueOf(numberFormat.format(currencyNominal.getValue())), style);
 	            createCell(row, columnCount++, "Belum lunas", style);
 	             
 	        }
