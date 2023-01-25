@@ -34,6 +34,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.usermanagement.Users;
+import com.ogya.lokakarya.notification.usermanagement.column.UsersNotificationColumn;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
@@ -43,6 +44,7 @@ public class LaporanPenambahanUserNotification {
 	
 	@Autowired
 	private JavaMailSender javaMailSender;
+	
 
 	private String[] receiver = { "maulanairzan5@gmail.com" };
 //	private String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
@@ -184,24 +186,21 @@ public class LaporanPenambahanUserNotification {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		PdfPTable pdfTable = new PdfPTable(10);
+		String[] headers = UsersNotificationColumn.getHeaders();
+		int columnSize = headers.length;
+		PdfPTable pdfTable = new PdfPTable(columnSize);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-
-		pdfTable.addCell("Username");
-		pdfTable.addCell("Nama");
-		pdfTable.addCell("Alamat");
-		pdfTable.addCell("Email");
-		pdfTable.addCell("Telp");
-		pdfTable.addCell("Program Name");
-		pdfTable.addCell("Created Date");
-		pdfTable.addCell("Created By");
-		pdfTable.addCell("Updated Date");
-		pdfTable.addCell("Updated By");
+		
+		
+		for (int i = 0; i < columnSize; i++) {
+			pdfTable.addCell(headers[i]);
+		}
+	
 		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < columnSize; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
@@ -253,8 +252,7 @@ public class LaporanPenambahanUserNotification {
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		String[] headers = { "Username", "Nama", "Alamat", "Email", "Telp", "Program Name", "Created Date", "Created By",
-				"Updated Date", "Updated By" };
+		String[] headers = UsersNotificationColumn.getHeaders();
 		for (int i = 0; i < headers.length; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(headers[i]);

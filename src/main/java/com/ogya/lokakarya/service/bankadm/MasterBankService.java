@@ -1,9 +1,11 @@
 package com.ogya.lokakarya.service.bankadm;
 
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -163,6 +165,9 @@ public class MasterBankService {
 		List<MasterBankWrapper> bookWrapperList = toWrapperList(bankList);
 		return new PaginationList<MasterBankWrapper, MasterBank>(bookWrapperList, bankPage);
 	}
+	
+	
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
@@ -170,65 +175,125 @@ public class MasterBankService {
 		return cell;
 	}
 	
-	
-	public void ExportToPdf(HttpServletResponse response) throws Exception{
-		 // Call the findAll method to retrieve the data
+	public void exportToPdf(HttpServletResponse response) throws Exception {
+	    // Call the findAll method to retrieve the data
 	    List<MasterBank> data = masterBankRepository.findAll();
-	    
+
+	    // Read the properties file to get the column names
+	    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnBankAdm.properties");
+	    Properties properties = new Properties();
+	    properties.load(inputStream);
+	    List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+
 	    // Now create a new iText PDF document
 	    Document pdfDoc = new Document(PageSize.A4.rotate());
 	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 	    pdfDoc.open();
-	    
-	    Paragraph title = new Paragraph("Laporan Data Nasabah Bank",
-	            new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+
+	    Paragraph title = new Paragraph("Laporan Data Nasabah Bank", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 	    title.setAlignment(Element.ALIGN_CENTER);
 	    pdfDoc.add(title);
-	    //
 	    // Add the generation date
 	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(5); 
-	    
-
+	    PdfPTable pdfTable = new PdfPTable(columnNames.size());
 	    pdfTable.setWidthPercentage(100);
 	    pdfTable.setSpacingBefore(10f);
 	    pdfTable.setSpacingAfter(10f);
-	         
-	  
-	        pdfTable.addCell(Align("Nomor Rekening"));
-	        pdfTable.addCell(Align("Nama"));
-	        pdfTable.addCell(Align("Alamat"));
-	        pdfTable.addCell(Align("No Telepon"));
-	        pdfTable.addCell(Align("Saldo"));
-	          
-	    	for(int i=0;i<5;i++) {
-	    		pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
-	    	}
-	    
+
+	    // Add column names to the table
+	    for (String columnName : columnNames) {
+	        pdfTable.addCell(Align(properties.getProperty(columnName)));
+	    }
+	    // set the first row to gray
+	    for (int i = 0; i < columnNames.size(); i++) {
+	        pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
+	    }
+
 	    // Iterate through the data and add it to the table
 	    for (MasterBank entity : data) {
-	    	pdfTable.addCell(Align(String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-")));
-	    	pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
-	    	pdfTable.addCell(Align(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-")));
-	    	pdfTable.addCell(Align(String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-")));  
-	    	pdfTable.addCell(Align(String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-")));
-	    	  	
-	//
-
+	        for (String columnName : columnNames) {
+	            String value = "";
+	            if (columnName.equals("Nomor Rekening")) {
+	                value = String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
+	            } else if (columnName.equals("Nama")) {
+	                value = String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-");
+	            } else if (columnName.equals("Alamat")) {
+	                value = String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-");
+	            } else if (columnName.equals("No Telepon")) {
+	                value = String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
+	            } else if (columnName.equals("Saldo")) {
+	                value = String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
+	            }
+	            pdfTable.addCell(new PdfPCell(new Phrase(value)));
+	        }
 	    }
-	    
+
+
 	    // Add the table to the pdf document
 	    pdfDoc.add(pdfTable);
 
 	    pdfDoc.close();
+	    pdfWriter.flush();
 	    pdfWriter.close();
 
 	    response.setContentType("application/pdf");
 	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 	
+	/*
+	 * public void ExportToPdf(HttpServletResponse response) throws Exception{ //
+	 * Call the findAll method to retrieve the data List<MasterBank> data =
+	 * masterBankRepository.findAll();
+	 * 
+	 * // Now create a new iText PDF document Document pdfDoc = new
+	 * Document(PageSize.A4.rotate()); PdfWriter pdfWriter =
+	 * PdfWriter.getInstance(pdfDoc, response.getOutputStream()); pdfDoc.open();
+	 * 
+	 * Paragraph title = new Paragraph("Laporan Data Nasabah Bank", new
+	 * Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+	 * title.setAlignment(Element.ALIGN_CENTER); pdfDoc.add(title); // // Add the
+	 * generation date pdfDoc.add(new Paragraph("Report generated on: " + new
+	 * SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+	 * 
+	 * // Create a table PdfPTable pdfTable = new PdfPTable(5);
+	 * 
+	 * 
+	 * pdfTable.setWidthPercentage(100); pdfTable.setSpacingBefore(10f);
+	 * pdfTable.setSpacingAfter(10f);
+	 * 
+	 * 
+	 * pdfTable.addCell(Align("Nomor Rekening")); pdfTable.addCell(Align("Nama"));
+	 * pdfTable.addCell(Align("Alamat")); pdfTable.addCell(Align("No Telepon"));
+	 * pdfTable.addCell(Align("Saldo"));
+	 * 
+	 * for(int i=0;i<5;i++) { pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f); }
+	 * 
+	 * // Iterate through the data and add it to the table for (MasterBank entity :
+	 * data) { pdfTable.addCell(Align(String.valueOf(entity.getNorek() != null ?
+	 * String.valueOf(entity.getNorek()) : "-")));
+	 * pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ?
+	 * String.valueOf(entity.getNama()) : "-")));
+	 * pdfTable.addCell(Align(String.valueOf(entity.getAlamat() != null ?
+	 * String.valueOf(entity.getAlamat()) : "-")));
+	 * pdfTable.addCell(Align(String.valueOf(entity.getNotlp() != null ?
+	 * String.valueOf(entity.getNotlp()) : "-")));
+	 * pdfTable.addCell(Align(String.valueOf(entity.getSaldo() != null ?
+	 * String.valueOf(entity.getSaldo()) : "-")));
+	 * 
+	 * //
+	 * 
+	 * }
+	 * 
+	 * // Add the table to the pdf document pdfDoc.add(pdfTable);
+	 * 
+	 * pdfDoc.close(); pdfWriter.close();
+	 * 
+	 * response.setContentType("application/pdf");
+	 * response.setHeader("Content-Disposition",
+	 * "attachment; filename=exportedPdf.pdf"); }
+	 */
 	 public void exportToXls(HttpServletResponse response) throws Exception {
 	        // Call the findAll method to retrieve the data
 	        List<MasterBank> data = masterBankRepository.findAll();
