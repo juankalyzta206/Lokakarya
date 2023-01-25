@@ -2,6 +2,7 @@ package com.ogya.lokakarya.notification.usermanagement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,6 +10,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -31,6 +33,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.usermanagement.Users;
@@ -170,7 +174,20 @@ public class LaporanPenambahanUserNotification {
 		}
 	}
 	
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
+	
 	public InputStreamSource ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception {
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnUsermanagement.properties");
+		Properties properties = new Properties();
+		properties.load(inputStream);
+		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		int columnLength = columnNames.size();
+		
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -186,52 +203,48 @@ public class LaporanPenambahanUserNotification {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		String[] headers = UsersNotificationColumn.getHeaders();
-		int columnSize = headers.length;
-		PdfPTable pdfTable = new PdfPTable(columnSize);
+				PdfPTable pdfTable = new PdfPTable(columnLength);
 
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-		
-		
-		for (int i = 0; i < columnSize; i++) {
-			pdfTable.addCell(headers[i]);
-		}
-	
-		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < columnSize; i++) {
-			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-		}
+				pdfTable.setWidthPercentage(100);
+				pdfTable.setSpacingBefore(10f);
+				pdfTable.setSpacingAfter(10f);
 
-		// Iterate through the data and add it to the table
-		for (Users entity : data) {
-			pdfTable.addCell(String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-"));
-			pdfTable.addCell(
-					String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
+				 for (String columnName : columnNames) {
+				        pdfTable.addCell(Align(properties.getProperty(columnName)));
+				    }
+				BaseColor color = new BaseColor(135, 206, 235);
+				for (int i = 0; i < columnLength; i++) {
+					pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+				}
 
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String createdDate = "-";
-			if (entity.getCreatedDate() != null) {
-				createdDate = formatter.format(entity.getCreatedDate());
-			}
-			pdfTable.addCell(createdDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-
-			String updatedDate = "-";
-			if (entity.getUpdatedDate() != null) {
-				updatedDate = formatter.format(entity.getUpdatedDate());
-			}
-			pdfTable.addCell(updatedDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
-
-		}
+				// Iterate through the data and add it to the table
+				 for (Users entity : data) {
+				        for (String columnName : columnNames) {
+				            String value = "";
+				            if (columnName.equals("username")) {
+				                value = String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-");
+				            } else if (columnName.equals("nama")) {
+				                value = String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-");
+				            } else if (columnName.equals("alamat")) {
+				                value = String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-");
+				            } else if (columnName.equals("telp")) {
+				                value = String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-");
+				            } else if (columnName.equals("email")) {
+				                value = String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-");
+				            } else if (columnName.equals("programName")) {
+				                value = String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-");
+				            } else if (columnName.equals("createdDate")) {
+				                value = String.valueOf(entity.getCreatedDate() != null ? String.valueOf(entity.getCreatedDate()) : "-");
+				            } else if (columnName.equals("createdBy")) {
+				                value = String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-");
+				            } else if (columnName.equals("updatedDate")) {
+				                value = String.valueOf(entity.getUpdatedDate() != null ? String.valueOf(entity.getUpdatedDate()) : "-");
+				            } else if (columnName.equals("updatedBy")) {
+				                value = String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-");
+				            }
+				            pdfTable.addCell(Align(value));
+				        }
+				    }
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
