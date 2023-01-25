@@ -215,15 +215,15 @@ public class MasterBankService {
 	    for (MasterBank entity : data) {
 	        for (String columnName : columnNames) {
 	            String value = "";
-	            if (columnName.equals("Nomor Rekening")) {
+	            if (columnName.equals("norek")) {
 	                value = String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
-	            } else if (columnName.equals("Nama")) {
+	            } else if (columnName.equals("nama")) {
 	                value = String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-");
-	            } else if (columnName.equals("Alamat")) {
+	            } else if (columnName.equals("alamat")) {
 	                value = String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-");
-	            } else if (columnName.equals("No Telepon")) {
+	            } else if (columnName.equals("notlp")) {
 	                value = String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
-	            } else if (columnName.equals("Saldo")) {
+	            } else if (columnName.equals("saldo")) {
 	                value = String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
 	            }
 	            pdfTable.addCell(new PdfPCell(new Phrase(value)));
