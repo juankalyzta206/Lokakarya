@@ -41,6 +41,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.usermanagement.LaporanPenambahanUserConfigurationProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
@@ -53,6 +54,10 @@ public class LaporanPenambahanUserNotification {
 
 	@Autowired
 	private JavaMailSender javaMailSender;
+	
+	@Autowired
+	LaporanPenambahanUserConfigurationProperties laporanPenambahanUserConfigurationProperties;
+
 
 	private String[] receiver = { "maulanairzan5@gmail.com" };
 //	private String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
@@ -188,13 +193,9 @@ public class LaporanPenambahanUserNotification {
 
 	public InputStreamSource ExportToPdfNotification(List<Users> data, NotificationWrapper description)
 			throws Exception {
-		InputStream inputStream = getClass().getClassLoader()
-				.getResourceAsStream("column/columnUsermanagement.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
-
+		
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -217,7 +218,7 @@ public class LaporanPenambahanUserNotification {
 		pdfTable.setSpacingAfter(10f);
 
 		for (String columnName : columnNames) {
-			pdfTable.addCell(Align(properties.getProperty(columnName)));
+			pdfTable.addCell(Align(columnName));
 		}
 		BaseColor color = new BaseColor(135, 206, 235);
 		for (int i = 0; i < columnLength; i++) {
@@ -229,9 +230,9 @@ public class LaporanPenambahanUserNotification {
 			for (String columnName : columnNames) {
 				String value = "-";
 				try {
-					Method method = Users.class
-							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-					Object result = method.invoke(entity);
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");;
+		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+		           Object result = method.invoke(entity);
 					value = result != null ? result.toString() : "-";
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					// Handle the exception if the method is not found or cannot be invoked
@@ -257,11 +258,7 @@ public class LaporanPenambahanUserNotification {
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		InputStream inputStream = getClass().getClassLoader()
-				.getResourceAsStream("column/columnUsermanagement.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
 		
 		for (int i = 0; i < columnLength; i++) {
@@ -278,9 +275,9 @@ public class LaporanPenambahanUserNotification {
 			for (String columnName : columnNames) {
 				String value = "-";
 				try {
-					Method method = Users.class
-							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-					Object result = method.invoke(entity);
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");;
+		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+		            Object result = method.invoke(entity);
 					value = result != null ? result.toString() : "-";
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					// Handle the exception if the method is not found or cannot be invoked

@@ -1,15 +1,11 @@
 package com.ogya.lokakarya.service.usermanagement;
 
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -34,6 +30,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.usermanagement.LaporanPenambahanUserConfigurationProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.repository.usermanagement.HakAksesRepository;
@@ -58,6 +55,9 @@ public class UsersService {
 
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
+	
+	@Autowired
+	LaporanPenambahanUserConfigurationProperties laporanPenambahanUserConfigurationProperties;
 
 	
 
@@ -357,13 +357,8 @@ public class UsersService {
 		// Call the findAll method to retrieve the data
 		List<Users> data = usersRepository.findAll();
 		
-
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnUsermanagement.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
-		
 		
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
@@ -386,7 +381,7 @@ public class UsersService {
 		pdfTable.setSpacingAfter(10f);
 
 		 for (String columnName : columnNames) {
-		        pdfTable.addCell(Align(properties.getProperty(columnName)));
+		        pdfTable.addCell(Align(columnName));
 		    }
 		BaseColor color = new BaseColor(135, 206, 235);
 		for (int i = 0; i < columnLength; i++) {
@@ -399,7 +394,8 @@ public class UsersService {
 		    for (String columnName : columnNames) {
 		        String value = "-";
 		        try {
-		            Method method = Users.class.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+		        	String columnNameNoSpace = columnName.replaceAll("\\s", "");;
+		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
 		            Object result = method.invoke(entity);
 		            value = result != null ? result.toString() : "-";
 		        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

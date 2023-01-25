@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -336,25 +338,35 @@ public class TransaksiTelkomService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-
-		PdfPCell cell1 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getIdTransaksi()));
-		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell1);
-		PdfPCell cell2 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNama()));
-		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell2);
-		PdfPCell cell3 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getBulanTagihan()));
-		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell3);
-		PdfPCell cell4 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getTahunTagihan()));
-		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell4);
-		PdfPCell cell5 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNominal()));
-		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell5);
-		PdfPCell cell6 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getStatus()));
-		cell6.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		pdfTable.addCell(cell6);
+		
+		List<String> column1 = laporanPenunggakanConfigurationProperties.getColumn();
+ 		
+//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPenunggakan.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		int columnLength = columnNames.size();
+		for (String columnName : column1) {
+	        pdfTable.addCell(Align(columnName));
+	    }
+//		PdfPCell cell1 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getIdTransaksi()));
+//		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell1);
+//		PdfPCell cell2 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNama()));
+//		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell2);
+//		PdfPCell cell3 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getBulanTagihan()));
+//		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell3);
+//		PdfPCell cell4 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getTahunTagihan()));
+//		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell4);
+//		PdfPCell cell5 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNominal()));
+//		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell5);
+//		PdfPCell cell6 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getStatus()));
+//		cell6.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+//		pdfTable.addCell(cell6);
 
 		BaseColor color = new BaseColor(135, 206, 235);
 
