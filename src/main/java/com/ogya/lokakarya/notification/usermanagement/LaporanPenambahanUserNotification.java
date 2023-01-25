@@ -3,6 +3,8 @@ package com.ogya.lokakarya.notification.usermanagement;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -14,6 +16,7 @@ import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.transaction.Transactional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,6 +29,7 @@ import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -38,24 +42,24 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.usermanagement.Users;
-import com.ogya.lokakarya.notification.usermanagement.column.UsersNotificationColumn;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
+@Service
+@Transactional
 public class LaporanPenambahanUserNotification {
 	@Autowired
 	UsersRepository usersRepository;
-	
+
 	@Autowired
 	private JavaMailSender javaMailSender;
-	
 
 	private String[] receiver = { "maulanairzan5@gmail.com" };
 //	private String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
 	private String[] cc = {};
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
-	
+
 	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
 	public void DailyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -76,11 +80,11 @@ public class LaporanPenambahanUserNotification {
 		List<InputStreamSource> attachments = new ArrayList<>();
 		List<String> attachmentsName = new ArrayList<>();
 		attachments.add(ExportToPdfNotification(dailyData, description));
-		attachmentsName.add(description.getFileName()+".pdf");
+		attachmentsName.add(description.getFileName() + ".pdf");
 		attachments.add(WriteExcelToEmail(dailyData, description));
-		attachmentsName.add(description.getFileName()+".xls");
-		SendEmailWithAttachment(attachments,attachmentsName,description);
-		
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
+
 	}
 
 	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
@@ -103,10 +107,10 @@ public class LaporanPenambahanUserNotification {
 		List<InputStreamSource> attachments = new ArrayList<>();
 		List<String> attachmentsName = new ArrayList<>();
 		attachments.add(ExportToPdfNotification(monthlyData, description));
-		attachmentsName.add(description.getFileName()+".pdf");
+		attachmentsName.add(description.getFileName() + ".pdf");
 		attachments.add(WriteExcelToEmail(monthlyData, description));
-		attachmentsName.add(description.getFileName()+".xls");
-		SendEmailWithAttachment(attachments,attachmentsName,description);
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
 	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
@@ -137,17 +141,18 @@ public class LaporanPenambahanUserNotification {
 		List<InputStreamSource> attachments = new ArrayList<>();
 		List<String> attachmentsName = new ArrayList<>();
 		attachments.add(ExportToPdfNotification(weeklyData, description));
-		attachmentsName.add(description.getFileName()+".pdf");
+		attachmentsName.add(description.getFileName() + ".pdf");
 		attachments.add(WriteExcelToEmail(weeklyData, description));
-		attachmentsName.add(description.getFileName()+".xls");
-		SendEmailWithAttachment(attachments,attachmentsName,description);
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
 	private static Date FindPrevDay(Date date) {
 		return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
-	
-	public void SendEmailWithAttachment(List<InputStreamSource> data, List<String> fileNames, NotificationWrapper description) {
+
+	public void SendEmailWithAttachment(List<InputStreamSource> data, List<String> fileNames,
+			NotificationWrapper description) {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -162,9 +167,9 @@ public class LaporanPenambahanUserNotification {
 			mimeMessageHelper.setText(body, true);
 
 //			mimeMessageHelper.addAttachment(description.getFileName() + dataType, data);
-			for (int i =0;i<data.size(); i++) {
-			    String fileName = fileNames.get(i);
-			    mimeMessageHelper.addAttachment(fileName, data.get(i));
+			for (int i = 0; i < data.size(); i++) {
+				String fileName = fileNames.get(i);
+				mimeMessageHelper.addAttachment(fileName, data.get(i));
 			}
 			javaMailSender.send(mimeMessage);
 			System.out.println("Email sent");
@@ -173,21 +178,23 @@ public class LaporanPenambahanUserNotification {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
 	}
-	
-	public InputStreamSource ExportToPdfNotification(List<Users> data, NotificationWrapper description) throws Exception {
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnUsermanagement.properties");
+
+	public InputStreamSource ExportToPdfNotification(List<Users> data, NotificationWrapper description)
+			throws Exception {
+		InputStream inputStream = getClass().getClassLoader()
+				.getResourceAsStream("column/columnUsermanagement.properties");
 		Properties properties = new Properties();
 		properties.load(inputStream);
 		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 		int columnLength = columnNames.size();
-		
+
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -203,48 +210,35 @@ public class LaporanPenambahanUserNotification {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-				PdfPTable pdfTable = new PdfPTable(columnLength);
+		PdfPTable pdfTable = new PdfPTable(columnLength);
 
-				pdfTable.setWidthPercentage(100);
-				pdfTable.setSpacingBefore(10f);
-				pdfTable.setSpacingAfter(10f);
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
 
-				 for (String columnName : columnNames) {
-				        pdfTable.addCell(Align(properties.getProperty(columnName)));
-				    }
-				BaseColor color = new BaseColor(135, 206, 235);
-				for (int i = 0; i < columnLength; i++) {
-					pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		for (String columnName : columnNames) {
+			pdfTable.addCell(Align(properties.getProperty(columnName)));
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < columnLength; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		for (Users entity : data) {
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					Method method = Users.class
+							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+					Object result = method.invoke(entity);
+					value = result != null ? result.toString() : "-";
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					// Handle the exception if the method is not found or cannot be invoked
 				}
-
-				// Iterate through the data and add it to the table
-				 for (Users entity : data) {
-				        for (String columnName : columnNames) {
-				            String value = "";
-				            if (columnName.equals("username")) {
-				                value = String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-");
-				            } else if (columnName.equals("nama")) {
-				                value = String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-");
-				            } else if (columnName.equals("alamat")) {
-				                value = String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-");
-				            } else if (columnName.equals("telp")) {
-				                value = String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-");
-				            } else if (columnName.equals("email")) {
-				                value = String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-");
-				            } else if (columnName.equals("programName")) {
-				                value = String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-");
-				            } else if (columnName.equals("createdDate")) {
-				                value = String.valueOf(entity.getCreatedDate() != null ? String.valueOf(entity.getCreatedDate()) : "-");
-				            } else if (columnName.equals("createdBy")) {
-				                value = String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-");
-				            } else if (columnName.equals("updatedDate")) {
-				                value = String.valueOf(entity.getUpdatedDate() != null ? String.valueOf(entity.getUpdatedDate()) : "-");
-				            } else if (columnName.equals("updatedBy")) {
-				                value = String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-");
-				            }
-				            pdfTable.addCell(Align(value));
-				        }
-				    }
+				pdfTable.addCell(Align(value));
+			}
+		}
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -254,10 +248,8 @@ public class LaporanPenambahanUserNotification {
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
 		return attachmentSource;
-//		SendEmailWithAttachment(attachmentSource, description, ".pdf");
-
 	}
-	
+
 	public InputStreamSource WriteExcelToEmail(List<Users> data, NotificationWrapper description) throws IOException {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Users");
@@ -265,30 +257,41 @@ public class LaporanPenambahanUserNotification {
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		String[] headers = UsersNotificationColumn.getHeaders();
-		for (int i = 0; i < headers.length; i++) {
+		InputStream inputStream = getClass().getClassLoader()
+				.getResourceAsStream("column/columnUsermanagement.properties");
+		Properties properties = new Properties();
+		properties.load(inputStream);
+		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		int columnLength = columnNames.size();
+		
+		for (int i = 0; i < columnLength; i++) {
 			Cell cell = headerRow.createCell(i);
-			cell.setCellValue(headers[i]);
+			cell.setCellValue(columnNames.get(i));
 		}
 
 		// Write data to the sheet
 		int rowNum = 1;
+		int columnNum = 0;
 		for (Users entity : data) {
 			Row row = sheet.createRow(rowNum++);
-			row.createCell(0).setCellValue(String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-"));
-			row.createCell(1).setCellValue(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			row.createCell(2).setCellValue(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
-			row.createCell(3).setCellValue(String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-"));
-			row.createCell(4).setCellValue(String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-"));
-			row.createCell(5).setCellValue(String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
-			row.createCell(6).setCellValue(String.valueOf(entity.getCreatedDate() != null ? String.valueOf(entity.getCreatedDate()) : "-"));
-			row.createCell(7).setCellValue(String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-			row.createCell(8).setCellValue(String.valueOf(entity.getUpdatedDate() != null ? String.valueOf(entity.getUpdatedDate()) : "-"));
-			row.createCell(9).setCellValue(String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
+			columnNum = 0;
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					Method method = Users.class
+							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+					Object result = method.invoke(entity);
+					value = result != null ? result.toString() : "-";
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					// Handle the exception if the method is not found or cannot be invoked
+				}
+				row.createCell(columnNum).setCellValue(value);
+				columnNum++;
+			}
 		}
 
 		// Resize the columns to fit the contents
-		for (int i = 0; i < headers.length; i++) {
+		for (int i = 0; i < columnLength; i++) {
 			sheet.autoSizeColumn(i);
 		}
 
@@ -298,7 +301,7 @@ public class LaporanPenambahanUserNotification {
 		baos.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-	    workbook.close();
-	    return attachmentSource;
+		workbook.close();
+		return attachmentSource;
 	}
 }
