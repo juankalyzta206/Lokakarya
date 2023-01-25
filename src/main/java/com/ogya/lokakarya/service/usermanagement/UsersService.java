@@ -1,9 +1,15 @@
 package com.ogya.lokakarya.service.usermanagement;
 
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -24,6 +30,8 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.usermanagement.Users;
@@ -338,11 +346,25 @@ public class UsersService {
 
 	}
 
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
 		// Call the findAll method to retrieve the data
 		List<Users> data = usersRepository.findAll();
+		
 
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnUsermanagement.properties");
+		Properties properties = new Properties();
+		properties.load(inputStream);
+		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		int columnLength = columnNames.size();
+		
+		
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
@@ -357,55 +379,36 @@ public class UsersService {
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		PdfPTable pdfTable = new PdfPTable(10);
+		PdfPTable pdfTable = new PdfPTable(columnLength);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		pdfTable.addCell("Username");
-		pdfTable.addCell("Nama");
-		pdfTable.addCell("Alamat");
-		pdfTable.addCell("Email");
-		pdfTable.addCell("Telp");
-		pdfTable.addCell("Program Name");
-		pdfTable.addCell("Created Date");
-		pdfTable.addCell("Created By");
-		pdfTable.addCell("Updated Date");
-		pdfTable.addCell("Updated By");
+		 for (String columnName : columnNames) {
+		        pdfTable.addCell(Align(properties.getProperty(columnName)));
+		    }
 		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < columnLength; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
+		
 
 		// Iterate through the data and add it to the table
 		for (Users entity : data) {
-			pdfTable.addCell(String.valueOf(entity.getUsername() != null ? String.valueOf(entity.getUsername()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getEmail() != null ? String.valueOf(entity.getEmail()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getTelp() != null ? String.valueOf(entity.getTelp()) : "-"));
-			pdfTable.addCell(
-					String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String createdDate = "-";
-			if (entity.getCreatedDate() != null) {
-				createdDate = formatter.format(entity.getCreatedDate());
-			}
-			pdfTable.addCell(createdDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-
-			String updatedDate = "-";
-			if (entity.getUpdatedDate() != null) {
-				updatedDate = formatter.format(entity.getUpdatedDate());
-			}
-			pdfTable.addCell(updatedDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
-
+		    for (String columnName : columnNames) {
+		        String value = "-";
+		        try {
+		            Method method = Users.class.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+		            Object result = method.invoke(entity);
+		            value = result != null ? result.toString() : "-";
+		        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+		            // Handle the exception if the method is not found or cannot be invoked
+		        }
+		        pdfTable.addCell(Align(value));
+		    }
 		}
+
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -416,4 +419,6 @@ public class UsersService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
+	
 }
+
