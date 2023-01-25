@@ -21,6 +21,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -42,6 +43,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.nasabah.LaporanSetorConfigurationProperties;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
@@ -56,6 +58,8 @@ public class SetorNotification {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	private TemplateEngine templateEngine;
+	@Autowired
+	private LaporanSetorConfigurationProperties setorConfig;
 
 	// Setiap hari jam 7
 	@Scheduled(cron = "0 0 7 * * *")
@@ -238,10 +242,11 @@ public class SetorNotification {
 
 	public InputStreamSource ExportToPdfSetor(List<HistoryBank> data, Long jumlah, String total, String subJudul)
 			throws Exception {
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnSetor.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnSetor.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		List<String> columnNames = setorConfig.getColumn();
 		int columnLength = columnNames.size();
 		
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -271,7 +276,8 @@ public class SetorNotification {
 		pdfTable.setSpacingAfter(10f);
 
 		for (String columnName : columnNames) {
-			pdfTable.addCell(Align(properties.getProperty(columnName)));
+//			pdfTable.addCell(Align(properties.getProperty(columnName)));
+			pdfTable.addCell(Align(columnName));
 		}
 		for (int i = 0; i < 5; i++) {
 			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
@@ -321,11 +327,13 @@ public class SetorNotification {
 
 		// Create the header row
 		Row headerRow = sheet.createRow(0);
-		InputStream inputStream = getClass().getClassLoader()
-				.getResourceAsStream("column/columnSetor.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		InputStream inputStream = getClass().getClassLoader()
+//				.getResourceAsStream("column/columnSetor.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+		List<String> columnNames = setorConfig.getColumn();
+ 		
 		int columnLength = columnNames.size();
 		
 		for (int i = 0; i < columnLength; i++) {
@@ -334,25 +342,39 @@ public class SetorNotification {
 		}
 
 		// Write data to the sheet
-		int rowNum = 1;
-		int columnNum = 0;
-		for (HistoryBank historyBank : data) {
-			Row row = sheet.createRow(rowNum++);
-			columnNum = 0;
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					Method method = HistoryBank.class
-							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
-					Object result = method.invoke(historyBank);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
-				}
-				row.createCell(columnNum).setCellValue(value);
-				columnNum++;
+//		int rowNum = 1;
+//		int columnNum = 0;
+//		for (HistoryBank historyBank : data) {
+//			Row row = sheet.createRow(rowNum++);
+//			columnNum = 0;
+//			for (String columnName : columnNames) {
+//				String value = "-";
+//				try {
+//					Method method = HistoryBank.class
+//							.getMethod("get" + columnName.substring(0, 1).toUpperCase() + columnName.substring(1));
+//					Object result = method.invoke(historyBank);
+//					value = result != null ? result.toString() : "-";
+//				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+//					// Handle the exception if the method is not found or cannot be invoked
+//				}
+//				row.createCell(columnNum).setCellValue(value);
+//				columnNum++;
+//			}
+//			
+//		}
+		for (int i = 0; i < data.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (data.get(i).getTanggal() != null) {
+				formattedDate = formatter.format(data.get(i).getTanggal());
 			}
+			dataRow.createCell(0).setCellValue(formattedDate);
+			dataRow.createCell(1).setCellValue(data.get(i).getIdHistoryBank());
+			dataRow.createCell(2).setCellValue(data.get(i).getRekening().getNorek());
 			
+			dataRow.createCell(3).setCellValue(data.get(i).getNama());
+			dataRow.createCell(4).setCellValue(data.get(i).getUang());
 		}
 
 		// Resize the columns to fit the contents
