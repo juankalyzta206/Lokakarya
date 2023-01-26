@@ -1,7 +1,5 @@
 package com.ogya.lokakarya.service.usermanagement;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +29,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.RoleMenuColumnProperties;
+import com.ogya.lokakarya.entity.usermanagement.HakAkses;
 import com.ogya.lokakarya.entity.usermanagement.Menu;
 import com.ogya.lokakarya.entity.usermanagement.RoleMenu;
 import com.ogya.lokakarya.entity.usermanagement.Roles;
@@ -200,43 +199,10 @@ public class RoleMenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (RoleMenu entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					Boolean isForeignKey = containsChar(columnNameNoSpace,':');
-					String[] foreignClass = columnNameNoSpace.split(":", 2);
-					if (!isForeignKey) {
-						Method method = RoleMenu.class.getMethod(
-								"get" + columnNameNoSpace);
-						Object result = method.invoke(entity);
-						value = result != null ? result.toString() : "-";
-					} else {
-						Method method = RoleMenu.class.getMethod(
-								"get" + foreignClass[0]);
-						if (foreignClass[0].equals("Roles")) {
-							Method rolesMethod = Roles.class.getMethod(
-		                            "get" + foreignClass[1]);
-							Object result = rolesMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						} else if (foreignClass[0].equals("Menu")) {
-							Method menuMethod = Menu.class.getMethod(
-		                            "get" + foreignClass[1]);
-							Object result = menuMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						}	
-						
-					}
-					
-					
-					
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+    	String path = "com.ogya.lokakarya.entity.usermanagement.";
+		ParsingColumn<RoleMenu> parsing = new ParsingColumn<RoleMenu>();
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);

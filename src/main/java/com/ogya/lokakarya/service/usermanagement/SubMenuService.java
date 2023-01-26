@@ -9,8 +9,6 @@
 */
 package com.ogya.lokakarya.service.usermanagement;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -197,37 +195,9 @@ public class SubMenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (SubMenu entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					Boolean isForeignKey = containsChar(columnNameNoSpace,':');
-					String[] foreignClass = columnNameNoSpace.split(":", 2);
-					if (!isForeignKey) {
-						Method method = SubMenu.class.getMethod(
-								"get" + columnNameNoSpace);
-						Object result = method.invoke(entity);
-						value = result != null ? result.toString() : "-";
-					} else {
-						Method method = SubMenu.class.getMethod(
-								"get" + foreignClass[0]);
-						if (foreignClass[0].equals("Menu")) {
-							Method rolesMethod = Menu.class.getMethod(
-		                            "get" + foreignClass[1]);
-							Object result = rolesMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						} 	
-					}
-					
-					
-					
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+    	String path = "com.ogya.lokakarya.entity.usermanagement.";
+		ParsingColumn<SubMenu> parsing = new ParsingColumn<SubMenu>();
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);

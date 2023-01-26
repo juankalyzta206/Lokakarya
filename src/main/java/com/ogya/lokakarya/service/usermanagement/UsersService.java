@@ -10,8 +10,6 @@
 
 package com.ogya.lokakarya.service.usermanagement;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -412,21 +410,9 @@ public class UsersService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (Users entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					Method method = Users.class.getMethod(
-							"get" + columnNameNoSpace);
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+    	String path = "com.ogya.lokakarya.entity.usermanagement.";
+		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
