@@ -12,7 +12,14 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +41,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.telepon.LaporanPelunasanConfiguration;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
+import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.repository.telepon.HistoryRepository;
 import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
 import com.ogya.lokakarya.repository.telepon.criteria.HistoryTelkomCriteriaRepository;
@@ -223,6 +231,43 @@ public class HistoryService {
 
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+	}
+	
+	public InputStreamSource ExportToExcelParam (List<HistoryTelkom> listUsers) throws Exception{
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		Row headerRow = sheet.createRow(0);
+		
+		List<String> columnNames = laporanPelunasanConfiguration.getColumn();
+		
+		for (int i = 0; i < 5; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (listUsers.get(i).getTanggalBayar() != null) {
+				formattedDate = formatter.format(listUsers.get(i).getTanggalBayar());
+			}
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(1).setCellValue(formattedDate);
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			
+		}
+		for (int i = 0; i < 5; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		workbook.write(outputStream);
+		workbook.close();
+		byte[] bytes = outputStream.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+		workbook.close();
+		return attachmentSource;
 	}
 	
 	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory , String tittle) throws Exception {

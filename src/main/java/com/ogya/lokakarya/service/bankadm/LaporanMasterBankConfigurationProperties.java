@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.configuration.usermanagement;
+package com.ogya.lokakarya.service.bankadm;
 
 import java.util.List;
 
@@ -7,12 +7,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
-
 @Component
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "column")
-@PropertySource("classpath:column/columnUsermanagement.properties")
-public class LaporanPenambahanUserConfigurationProperties {
+@PropertySource("classpath:column/columnBankAdm.properties")
+public class LaporanMasterBankConfigurationProperties {
 	@Value("#{'${column.column}'.split(',')}")
 	private List<String> column;
 	
@@ -22,8 +21,4 @@ public class LaporanPenambahanUserConfigurationProperties {
 	public void setColumn(List<String> column) {
 		this.column = column;
 	}
-	
-	
-	
-	
 }

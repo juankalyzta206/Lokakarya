@@ -1,3 +1,11 @@
+/*
+* UsersFeignToWebServiceRequest.java
+*	This class is request to web service
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.exercise.feign.request.usermanagement;
 
 public class UsersFeignToWebServiceRequest {

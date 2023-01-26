@@ -1,3 +1,11 @@
+/*
+* RolesLogin.java
+*	This class is roles entity/table but only for login, getter and setter for each column
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.entity.usermanagement.login;
 
 import java.util.HashSet;

@@ -1,3 +1,13 @@
+/*
+* UsersService.java
+*	This class is provide service relate to users table such as
+*	CRUD, login, register, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
+
 package com.ogya.lokakarya.service.usermanagement;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +40,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.ogya.lokakarya.configuration.usermanagement.LaporanPenambahanUserConfigurationProperties;
+import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.repository.usermanagement.HakAksesRepository;
@@ -55,13 +65,12 @@ public class UsersService {
 
 	@Autowired
 	UsersCriteriaRepository usersCriteriaRepository;
-	
-	@Autowired
-	LaporanPenambahanUserConfigurationProperties laporanPenambahanUserConfigurationProperties;
 
-	
+	@Autowired
+	UsersColumnProperties usersColumnProperties;
 
 	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) {
+		/* query users table with pagination */
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
 		int fromIndex = (request.getPage()) * (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), usersList.size());
@@ -75,14 +84,17 @@ public class UsersService {
 	}
 
 	private String hashPassword(String plainPassword) {
+		/* hashing password with BCrypt */
 		return new BCryptPasswordEncoder().encode(plainPassword);
 	}
 
 	private Boolean matchPassword(String plainPassword, String databasePassword) {
+		/* matching password for login with database hashed password */
 		return new BCryptPasswordEncoder().matches(plainPassword, databasePassword);
 	}
 
 	public List<UsersLoginWrapper> findByEmailOrUsernameAndPassword(String identity, String password) {
+		/* login service, matching by username/email with password */
 		if (usersRepository.isRegisteredEmail(identity) == 0) {
 			if (usersRepository.isRegisteredUsername(identity) == 0) {
 				throw new BusinessException("Email or Username is not Registered");
@@ -107,6 +119,7 @@ public class UsersService {
 	}
 
 	public PaginationList<UsersWrapper, Users> findAllWithPagination(int page, int size) {
+		/* query all users table with pagination */
 		Pageable paging = PageRequest.of(page, size, Sort.by("userId").ascending());
 		Page<Users> usersPage = usersRepository.findAll(paging);
 		List<Users> usersList = usersPage.getContent();
@@ -114,12 +127,8 @@ public class UsersService {
 		return new PaginationList<UsersWrapper, Users>(usersWrapperList, usersPage);
 	}
 
-	public List<UsersWrapper> findByEmailAndPassword(String email, String password) {
-		List<Users> loginList = usersRepository.findByEmailAndPassword(email, password);
-		return toWrapperList(loginList);
-	}
-
 	private UsersWrapper toWrapper(Users entity) {
+		/* set value wrapper/response based other service result */
 		UsersWrapper wrapper = new UsersWrapper();
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
@@ -136,6 +145,7 @@ public class UsersService {
 	}
 
 	private UsersRegisterWrapper toWrapperRegister(Users entity) {
+		/* set value wrapper/response register based other service result */
 		UsersRegisterWrapper wrapper = new UsersRegisterWrapper();
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
@@ -153,6 +163,7 @@ public class UsersService {
 	}
 
 	private UsersAddWrapper toWrapperAdd(Users entity) {
+		/* set value wrapper/response add users based other service result */
 		UsersAddWrapper wrapper = new UsersAddWrapper();
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
@@ -170,6 +181,7 @@ public class UsersService {
 	}
 
 	private UsersLoginWrapper toWrapperLogin(Users entity) {
+		/* set value wrapper/response login based other service result */
 		UsersLoginWrapper wrapper = new UsersLoginWrapper();
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setHakAkses(entity.getHakAkses());
@@ -196,21 +208,19 @@ public class UsersService {
 	}
 
 	public List<UsersWrapper> findAll() {
+		/* find all users service */
 		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
 		return toWrapperList(userList);
 	}
 
-	public List<Users> findListUser() {
-		List<Users> userList = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
-		return userList;
-	}
-
 	public List<UsersWrapper> findByUserId(Long userId) {
+		/* find user by user ID */
 		List<Users> userList = usersRepository.findByUserId(userId);
 		return toWrapperList(userList);
 	}
 
 	private Users toEntityUpdate(UsersUpdateWrapper wrapper) {
+		/* update users data to users table */
 		Users entity = new Users();
 		if (wrapper.getUserId() != null) {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
@@ -229,6 +239,7 @@ public class UsersService {
 	}
 
 	private Users toEntityRegister(UsersRegisterWrapper wrapper) {
+		/* register users data to users table */
 		Users entity = new Users();
 		if (wrapper.getUserId() != null) {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
@@ -248,6 +259,7 @@ public class UsersService {
 	}
 
 	private Users toEntityAdd(UsersAddWrapper wrapper) {
+		/* add users data to users table */
 		Users entity = new Users();
 		if (wrapper.getUserId() != null) {
 			entity = usersRepository.getReferenceById(wrapper.getUserId());
@@ -267,6 +279,7 @@ public class UsersService {
 	}
 
 	public UsersRegisterWrapper register(UsersRegisterWrapper wrapper) {
+		/* register service, check if already exist username/email */
 		if (usersRepository.checkUsername(wrapper.getUsername()) == 0) {
 			if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
 				wrapper.setPassword(hashPassword(wrapper.getPassword()));
@@ -281,6 +294,7 @@ public class UsersService {
 	}
 
 	public UsersAddWrapper save(UsersAddWrapper wrapper) {
+		/* add service, check if already exist username/email */
 		if (usersRepository.checkUsername(wrapper.getUsername()) == 0) {
 			if (usersRepository.checkEmail(wrapper.getEmail()) == 0) {
 				wrapper.setPassword(hashPassword(wrapper.getPassword()));
@@ -295,6 +309,10 @@ public class UsersService {
 	}
 
 	public UsersWrapper update(UsersUpdateWrapper wrapper) {
+		/*
+		 * for update user, check if input username or email same as old data, and check
+		 * if username or email already exist at database or not
+		 */
 		if (wrapper.getSameUsername() == 0) {
 			if (wrapper.getSameEmail() == 0) {
 				if (usersRepository.checkUsername(wrapper.getUsername()) == 0) {
@@ -338,7 +356,12 @@ public class UsersService {
 	}
 
 	public void delete(Long id) {
+		/*
+		 * delete users based user ID check if user exist at HakAkses table, if not
+		 * existed then delete
+		 */
 		if (usersRepository.isExistHakAkses(id) == 0) {
+
 			usersRepository.deleteById(id);
 		} else {
 			throw new BusinessException("User ID cannot deleted. User ID is still used in the HAK_AKSES table");
@@ -354,13 +377,13 @@ public class UsersService {
 	}
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
-		// Call the findAll method to retrieve the data
-		List<Users> data = usersRepository.findAll();
-		
-		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
+		/* Call the findAll method to retrieve the data */
+		List<Users> data = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
+
+		List<String> columnNames = usersColumnProperties.getColumn();
 		int columnLength = columnNames.size();
-		
-		// Now create a new iText PDF document
+
+		/* Create a new iText PDF document */
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
@@ -369,44 +392,43 @@ public class UsersService {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		// Add the generation date
+		/* Add the generation date */
 		pdfDoc.add(new Paragraph(
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-		// Create a table
+		/* Create a pdf table */
 		PdfPTable pdfTable = new PdfPTable(columnLength);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		 for (String columnName : columnNames) {
-		        pdfTable.addCell(Align(columnName));
-		    }
+		for (String columnName : columnNames) {
+			pdfTable.addCell(Align(columnName));
+		}
 		BaseColor color = new BaseColor(135, 206, 235);
 		for (int i = 0; i < columnLength; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
-		
 
-		// Iterate through the data and add it to the table
+		/* Iterate through the data and add it to the table */
 		for (Users entity : data) {
-		    for (String columnName : columnNames) {
-		        String value = "-";
-		        try {
-		        	String columnNameNoSpace = columnName.replaceAll("\\s", "");;
-		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-		            Object result = method.invoke(entity);
-		            value = result != null ? result.toString() : "-";
-		        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-		            // Handle the exception if the method is not found or cannot be invoked
-		        }
-		        pdfTable.addCell(Align(value));
-		    }
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					Method method = Users.class.getMethod(
+							"get" + columnNameNoSpace);
+					Object result = method.invoke(entity);
+					value = result != null ? result.toString() : "-";
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					/* Handle the exception if the method is not found or cannot be invoked */
+				}
+				pdfTable.addCell(Align(value));
+			}
 		}
 
-
-		// Add the table to the pdf document
+		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
@@ -415,6 +437,5 @@ public class UsersService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
-}
 
+}

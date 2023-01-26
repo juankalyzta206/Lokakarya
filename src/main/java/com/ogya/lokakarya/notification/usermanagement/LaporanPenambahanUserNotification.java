@@ -1,8 +1,17 @@
+/*
+* LaporanPenambahanUserNotification.java
+*	This class provide service for daily, weekly and monthly notification
+*	for users table
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
+
 package com.ogya.lokakarya.notification.usermanagement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -12,7 +21,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Properties;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -41,7 +49,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.ogya.lokakarya.configuration.usermanagement.LaporanPenambahanUserConfigurationProperties;
+import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
@@ -54,18 +62,18 @@ public class LaporanPenambahanUserNotification {
 
 	@Autowired
 	private JavaMailSender javaMailSender;
-	
+
 	@Autowired
-	LaporanPenambahanUserConfigurationProperties laporanPenambahanUserConfigurationProperties;
+	UsersColumnProperties laporanPenambahanUserConfigurationProperties;
 
-
+	/* array receiver and cc email for notification service */
 	private String[] receiver = { "maulanairzan5@gmail.com" };
-//	private String[] cc = {"taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com"};
-	private String[] cc = {};
+	private String[] cc = { "taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com" };
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
-	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "0 0 7 * * *")
+	/* run daily notification everyday at 7 am */
 	public void DailyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
 
@@ -92,7 +100,8 @@ public class LaporanPenambahanUserNotification {
 
 	}
 
-	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "0 0 7 1 * ?") 
+	/* run monthly notification every date 1 of the month at 7 am */
 	public void MonthlyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
 
@@ -118,7 +127,8 @@ public class LaporanPenambahanUserNotification {
 		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "0 0 7 * * MON")
+	/* run weekly notification every monday 7 am */
 	public void WeeklyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
 		Calendar calendar = new GregorianCalendar();
@@ -153,11 +163,13 @@ public class LaporanPenambahanUserNotification {
 	}
 
 	private static Date FindPrevDay(Date date) {
+		
 		return new Date(date.getTime() - MILLIS_IN_A_DAY);
 	}
 
 	public void SendEmailWithAttachment(List<InputStreamSource> data, List<String> fileNames,
 			NotificationWrapper description) {
+		/* service for send email with attachment */
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -171,7 +183,6 @@ public class LaporanPenambahanUserNotification {
 			String body = buffer.toString();
 			mimeMessageHelper.setText(body, true);
 
-//			mimeMessageHelper.addAttachment(description.getFileName() + dataType, data);
 			for (int i = 0; i < data.size(); i++) {
 				String fileName = fileNames.get(i);
 				mimeMessageHelper.addAttachment(fileName, data.get(i));
@@ -195,8 +206,8 @@ public class LaporanPenambahanUserNotification {
 			throws Exception {
 		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
-		
-		// Now create a new iText PDF document
+
+		/* Create a new iText PDF document */
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, baos);
@@ -206,11 +217,11 @@ public class LaporanPenambahanUserNotification {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		// Add the generation date
+		/* Add the generation date */
 		pdfDoc.add(new Paragraph(
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-		// Create a table
+		/* Create a table */
 		PdfPTable pdfTable = new PdfPTable(columnLength);
 
 		pdfTable.setWidthPercentage(100);
@@ -225,23 +236,25 @@ public class LaporanPenambahanUserNotification {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
-		// Iterate through the data and add it to the table
+		/* Iterate through the data and add it to the table */
 		for (Users entity : data) {
 			for (String columnName : columnNames) {
 				String value = "-";
 				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");;
-		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-		           Object result = method.invoke(entity);
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					;
+					Method method = Users.class.getMethod(
+							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+					Object result = method.invoke(entity);
 					value = result != null ? result.toString() : "-";
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
+					/* Handle the exception if the method is not found or cannot be invoked */
 				}
 				pdfTable.addCell(Align(value));
 			}
 		}
 
-		// Add the table to the pdf document
+		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
@@ -256,17 +269,17 @@ public class LaporanPenambahanUserNotification {
 		Sheet sheet = workbook.createSheet("Users");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		// Create the header row
+		/* Create the header row */
 		Row headerRow = sheet.createRow(0);
 		List<String> columnNames = laporanPenambahanUserConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
-		
+
 		for (int i = 0; i < columnLength; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
 
-		// Write data to the sheet
+		/* Write data to the sheet */
 		int rowNum = 1;
 		int columnNum = 0;
 		for (Users entity : data) {
@@ -275,9 +288,11 @@ public class LaporanPenambahanUserNotification {
 			for (String columnName : columnNames) {
 				String value = "-";
 				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");;
-		            Method method = Users.class.getMethod("get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-		            Object result = method.invoke(entity);
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					;
+					Method method = Users.class.getMethod(
+							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+					Object result = method.invoke(entity);
 					value = result != null ? result.toString() : "-";
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					// Handle the exception if the method is not found or cannot be invoked
@@ -287,12 +302,12 @@ public class LaporanPenambahanUserNotification {
 			}
 		}
 
-		// Resize the columns to fit the contents
+		/* Resize the columns to fit the contents */
 		for (int i = 0; i < columnLength; i++) {
 			sheet.autoSizeColumn(i);
 		}
 
-		// Write the workbook to the output file
+		/* Write the workbook to the output file */
 		workbook.write(baos);
 		baos.flush();
 		baos.close();
