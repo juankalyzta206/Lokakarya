@@ -85,7 +85,7 @@ public class MasterBankController {
 
 	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
 	public void exportToPdf(HttpServletResponse response) throws Exception {
-		masterBankService.exportToPdf(response);
+		masterBankService.ExportToPdf(response);
 	}
 	@RequestMapping(value = "/exportToXlsALL", method = RequestMethod.GET)
 	public void exportToXls(HttpServletResponse response) throws Exception {

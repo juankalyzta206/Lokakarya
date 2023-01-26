@@ -1,6 +1,8 @@
 package com.ogya.lokakarya.notification.bankadm;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -24,6 +26,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -44,6 +47,8 @@ public class BankAdminTarikNotification {
 	private JavaMailSender javaMailSender;
 	@Autowired
 	HistoryBankRepository historyBankRepo;
+	@Autowired
+	LaporanHistoryBankConfigurationProperties laporanHistoryBankConfigurationProperties;
 
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
 	private String[] cc = { "taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
@@ -178,8 +183,10 @@ public class BankAdminTarikNotification {
 			e.printStackTrace();
 		}
 	}
-
+	
 	public void ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
+		List<String> columnNames = laporanHistoryBankConfigurationProperties.getColumn();
+		int columnLength = columnNames.size();
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -201,16 +208,14 @@ public class BankAdminTarikNotification {
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		pdfTable.addCell(Align("Nomor Rekening"));
-		pdfTable.addCell(Align("Nama Nasabah"));
-		pdfTable.addCell(Align("Tanggal Transaksi"));
-		pdfTable.addCell(Align("Nominal"));
-		pdfTable.addCell(Align("Keterangan"));
-		for (int i = 0; i < 5; i++) {
-			pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
+		for (String columnName : columnNames) {
+			pdfTable.addCell(Align(columnName));
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < columnLength; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
-		// Iterate through the data and add it to the table
 		for (HistoryBank entity : data) {
 			pdfTable.addCell(Align(String.valueOf(
 					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
