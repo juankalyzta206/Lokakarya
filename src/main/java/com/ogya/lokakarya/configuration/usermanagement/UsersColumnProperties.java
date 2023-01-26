@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "column")
-@PropertySource("classpath:column/columnUsermanagement.properties")
-public class LaporanPenambahanUserConfigurationProperties {
-	@Value("#{'${column.column}'.split(',')}")
+@ConfigurationProperties(prefix = "users")
+@PropertySource("classpath:column/usermanagement/columnUsers.properties")
+public class UsersColumnProperties {
+	@Value("#{'${column.users}'.split(',')}")
 	private List<String> column;
 	
 	public List<String> getColumn() {
@@ -22,8 +22,4 @@ public class LaporanPenambahanUserConfigurationProperties {
 	public void setColumn(List<String> column) {
 		this.column = column;
 	}
-	
-	
-	
-	
 }

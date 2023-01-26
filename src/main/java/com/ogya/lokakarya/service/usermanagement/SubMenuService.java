@@ -1,3 +1,12 @@
+/*
+* SubMenuService.java
+*	This class is provide service relate to sub menu table such as
+*	CRUD, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.service.usermanagement;
 
 import java.text.SimpleDateFormat;
