@@ -1,11 +1,11 @@
 package com.ogya.lokakarya.service.bankadm;
 
-import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -43,7 +44,6 @@ import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 import com.ogya.lokakarya.wrapper.bankadm.MasterBankWrapper;
 
-
 @Service
 @Transactional
 public class MasterBankService {
@@ -51,27 +51,29 @@ public class MasterBankService {
 	MasterBankRepository masterBankRepository;
 	@Autowired
 	MasterBankCriteriaRepository masterBankCriteriaRepository;
+	@Autowired
+	LaporanMasterBankConfigurationProperties laporanMasterBankConfigurationProperties;
+	@Autowired
+	BankAdminFeignServices bankAdminFeignServices;
 
-    @Autowired
-    BankAdminFeignServices bankAdminFeignServices;
-
-	public PaginationList<MasterBankWrapper, MasterBank> ListWithPaging(PagingRequestWrapper request) { 
+	public PaginationList<MasterBankWrapper, MasterBank> ListWithPaging(PagingRequestWrapper request) {
 		List<MasterBank> masterBankList = masterBankCriteriaRepository.findByFilter(request);
-		int fromIndex = (request.getPage())* (request.getSize());
+		int fromIndex = (request.getPage()) * (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), masterBankList.size());
-		Page<MasterBank> masterBankPage = new PageImpl<>(masterBankList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), masterBankList.size());
+		Page<MasterBank> masterBankPage = new PageImpl<>(masterBankList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), masterBankList.size());
 		List<MasterBankWrapper> masterBankWrapperList = new ArrayList<>();
-		for(MasterBank entity : masterBankPage) {
-		    masterBankWrapperList.add(toWrapper(entity));
+		for (MasterBank entity : masterBankPage) {
+			masterBankWrapperList.add(toWrapper(entity));
 		}
-		return new PaginationList<MasterBankWrapper, MasterBank>(masterBankWrapperList, masterBankPage);	
+		return new PaginationList<MasterBankWrapper, MasterBank>(masterBankWrapperList, masterBankPage);
 	}
-	
+
 	public MasterBankWrapper getByNoRek(Long norek) {
 		MasterBank masterbank = masterBankRepository.getReferenceById(norek);
 		return toWrapper(masterbank);
 	}
-	
+
 	private MasterBankWrapper toWrapper(MasterBank entity) {
 		MasterBankWrapper wrapper = new MasterBankWrapper();
 		wrapper.setNorek(entity.getNorek());
@@ -82,21 +84,21 @@ public class MasterBankService {
 		wrapper.setUserId(entity.getUserId());
 		return wrapper;
 	}
-	
-	private List<MasterBankWrapper> toWrapperList(List<MasterBank> entityList){
+
+	private List<MasterBankWrapper> toWrapperList(List<MasterBank> entityList) {
 		List<MasterBankWrapper> wrapperList = new ArrayList<MasterBankWrapper>();
-		for(MasterBank entity : entityList) {
+		for (MasterBank entity : entityList) {
 			MasterBankWrapper wrapper = toWrapper(entity);
 			wrapperList.add(wrapper);
 		}
 		return wrapperList;
 	}
-	
+
 	public List<MasterBankWrapper> findAll() {
 		List<MasterBank> employeeList = masterBankRepository.findAll(Sort.by(Order.by("norek")).descending());
 		return toWrapperList(employeeList);
 	}
-	
+
 	private MasterBank toEntity(MasterBankWrapper wrapper) {
 		MasterBank entity = new MasterBank();
 		if (wrapper.getNorek() != null) {
@@ -110,33 +112,31 @@ public class MasterBankService {
 		entity.setUserId(wrapper.getUserId());
 		return entity;
 	}
-	
+
 	public DataResponseFeign<MasterBankWrapper> save(MasterBankWrapper wrapper) {
-	    DataResponseFeign<MasterBankWrapper> dataResponse = new DataResponseFeign<MasterBankWrapper>();
-	    try {
-	        BankAdminFeignRequest request = new BankAdminFeignRequest();
-	        request.setAlamat(wrapper.getAlamat());
-	        request.setNama(wrapper.getNama());
-	        request.setNominalSaldo(wrapper.getSaldo());
-	        request.setTelpon(wrapper.getNotlp().toString());
-	        BankAdminFeignResponse response = bankAdminFeignServices.bankPost(request);
-	        if (response.getSuccess()) {
-	            MasterBank employee = masterBankRepository.save(toEntity(wrapper));
-	            dataResponse.setSuccess(true);
-	            dataResponse.setReferenceNumber(response.getReferenceNumber());
-	            dataResponse.setData(toWrapper(employee));
-	        } else {
-	            throw new Exception("Failed to save employee");
-	        }
-	        return dataResponse;
-	    } catch (Exception e) {
-	        //log the exception here
-	        //You can also return a custom message for user 
-	        return new DataResponseFeign<MasterBankWrapper>(false, e.getMessage(), null);
-	    }
+		DataResponseFeign<MasterBankWrapper> dataResponse = new DataResponseFeign<MasterBankWrapper>();
+		try {
+			BankAdminFeignRequest request = new BankAdminFeignRequest();
+			request.setAlamat(wrapper.getAlamat());
+			request.setNama(wrapper.getNama());
+			request.setNominalSaldo(wrapper.getSaldo());
+			request.setTelpon(wrapper.getNotlp().toString());
+			BankAdminFeignResponse response = bankAdminFeignServices.bankPost(request);
+			if (response.getSuccess()) {
+				MasterBank employee = masterBankRepository.save(toEntity(wrapper));
+				dataResponse.setSuccess(true);
+				dataResponse.setReferenceNumber(response.getReferenceNumber());
+				dataResponse.setData(toWrapper(employee));
+			} else {
+				throw new Exception("Failed to save employee");
+			}
+			return dataResponse;
+		} catch (Exception e) {
+			// log the exception here
+			// You can also return a custom message for user
+			return new DataResponseFeign<MasterBankWrapper>(false, e.getMessage(), null);
+		}
 	}
-
-
 
 	/*
 	 * public MasterBankWrapper save(MasterBankWrapper wrapper) { MasterBank
@@ -145,28 +145,27 @@ public class MasterBankService {
 	 * properties of request object BankAdminFeignResponse response =
 	 * bankAdminFeignServices.bankPost(request); return toWrapper(employee); }
 	 */
-	
+
 	public void delete(Long norek) {
-		if(masterBankRepository.isExistMasterBank(norek) != 0)
-				if (masterBankRepository.isExistHistoyBank(norek) == 0) {
-					masterBankRepository.deleteById(norek);
-				} else {
-					throw new BusinessException("NASABAH cannot deleted. REK. NUMBER is still used in the HISTORY table");
-				}else {
-					throw new BusinessException("NASABAH with REK. NUMBER inputed is not Exist!");
-				}
-	
-}
-	
-	public PaginationList<MasterBankWrapper, MasterBank> findAllWithPagination(int page, int size){
+		if (masterBankRepository.isExistMasterBank(norek) != 0)
+			if (masterBankRepository.isExistHistoyBank(norek) == 0) {
+				masterBankRepository.deleteById(norek);
+			} else {
+				throw new BusinessException("NASABAH cannot deleted. REK. NUMBER is still used in the HISTORY table");
+			}
+		else {
+			throw new BusinessException("NASABAH with REK. NUMBER inputed is not Exist!");
+		}
+
+	}
+
+	public PaginationList<MasterBankWrapper, MasterBank> findAllWithPagination(int page, int size) {
 		Pageable paging = PageRequest.of(page, size);
 		Page<MasterBank> bankPage = masterBankRepository.findAll(paging);
-		List<MasterBank> bankList =  bankPage.getContent();
+		List<MasterBank> bankList = bankPage.getContent();
 		List<MasterBankWrapper> bookWrapperList = toWrapperList(bankList);
 		return new PaginationList<MasterBankWrapper, MasterBank>(bookWrapperList, bankPage);
 	}
-	
-	
 
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
@@ -174,74 +173,70 @@ public class MasterBankService {
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
 	}
-	
-	public void exportToPdf(HttpServletResponse response) throws Exception {
-	    // Call the findAll method to retrieve the data
-	    List<MasterBank> data = masterBankRepository.findAll();
 
-	    // Read the properties file to get the column names
-	    InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnBankAdm.properties");
-	    Properties properties = new Properties();
-	    properties.load(inputStream);
-	    List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+	public void ExportToPdf(HttpServletResponse response) throws Exception {
+		// Call the findAll method to retrieve the data
+		List<MasterBank> data = masterBankRepository.findAll();
 
-	    // Now create a new iText PDF document
-	    Document pdfDoc = new Document(PageSize.A4.rotate());
-	    PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
-	    pdfDoc.open();
+		List<String> columnNames = laporanMasterBankConfigurationProperties.getColumn();
+		int columnLength = columnNames.size();
 
-	    Paragraph title = new Paragraph("Laporan Data Nasabah Bank", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
-	    title.setAlignment(Element.ALIGN_CENTER);
-	    pdfDoc.add(title);
-	    // Add the generation date
-	    pdfDoc.add(new Paragraph("Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+		// Now create a new iText PDF document
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
+		pdfDoc.open();
 
-	    // Create a table
-	    PdfPTable pdfTable = new PdfPTable(columnNames.size());
-	    pdfTable.setWidthPercentage(100);
-	    pdfTable.setSpacingBefore(10f);
-	    pdfTable.setSpacingAfter(10f);
+		Paragraph title = new Paragraph("List Users", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
 
-	    // Add column names to the table
-	    for (String columnName : columnNames) {
-	        pdfTable.addCell(Align(properties.getProperty(columnName)));
-	    }
-	    // set the first row to gray
-	    for (int i = 0; i < columnNames.size(); i++) {
-	        pdfTable.getRow(0).getCells()[i].setGrayFill(0.5f);
-	    }
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-	    // Iterate through the data and add it to the table
-	    for (MasterBank entity : data) {
-	        for (String columnName : columnNames) {
-	            String value = "";
-	            if (columnName.equals("norek")) {
-	                value = String.valueOf(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
-	            } else if (columnName.equals("nama")) {
-	                value = String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-");
-	            } else if (columnName.equals("alamat")) {
-	                value = String.valueOf(entity.getAlamat() != null ? String.valueOf(entity.getAlamat()) : "-");
-	            } else if (columnName.equals("notlp")) {
-	                value = String.valueOf(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
-	            } else if (columnName.equals("saldo")) {
-	                value = String.valueOf(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
-	            }
-	            pdfTable.addCell(new PdfPCell(new Phrase(value)));
-	        }
-	    }
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(columnLength);
 
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
 
-	    // Add the table to the pdf document
-	    pdfDoc.add(pdfTable);
+		for (String columnName : columnNames) {
+			pdfTable.addCell(Align(columnName));
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < columnLength; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
 
-	    pdfDoc.close();
-	    pdfWriter.flush();
-	    pdfWriter.close();
+		// Iterate through the data and add it to the table
+		for (MasterBank entity : data) {
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					;
+					Method method = MasterBank.class.getMethod(
+							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+					Object result = method.invoke(entity);
+					value = result != null ? result.toString() : "-";
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					// Handle the exception if the method is not found or cannot be invoked
+				}
+				pdfTable.addCell(Align(value));
+			}
+		}
 
-	    response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+
+		pdfDoc.close();
+		pdfWriter.close();
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
+
 	/*
 	 * public void ExportToPdf(HttpServletResponse response) throws Exception{ //
 	 * Call the findAll method to retrieve the data List<MasterBank> data =
@@ -294,39 +289,38 @@ public class MasterBankService {
 	 * response.setHeader("Content-Disposition",
 	 * "attachment; filename=exportedPdf.pdf"); }
 	 */
-	 public void exportToXls(HttpServletResponse response) throws Exception {
-	        // Call the findAll method to retrieve the data
-	        List<MasterBank> data = masterBankRepository.findAll();
+	public void exportToXls(HttpServletResponse response) throws Exception {
+		// Call the findAll method to retrieve the data
+		List<MasterBank> data = masterBankRepository.findAll();
 
-	        // Create a new Apache POI workbook
-	        try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-	            HSSFSheet sheet = workbook.createSheet("Laporan Transaksi Bank");
+		// Create a new Apache POI workbook
+		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
+			HSSFSheet sheet = workbook.createSheet("Laporan Transaksi Bank");
 
-	            // Create the header row
-	            HSSFRow headerRow = sheet.createRow(0);
-	            headerRow.createCell(0).setCellValue("Nomor Rekening");
-	            headerRow.createCell(1).setCellValue("Nama");
-	            headerRow.createCell(2).setCellValue("Alamat");
-	            headerRow.createCell(3).setCellValue("No Telepon");
-	            headerRow.createCell(4).setCellValue("Saldo");
+			// Create the header row
+			HSSFRow headerRow = sheet.createRow(0);
+			headerRow.createCell(0).setCellValue("Nomor Rekening");
+			headerRow.createCell(1).setCellValue("Nama");
+			headerRow.createCell(2).setCellValue("Alamat");
+			headerRow.createCell(3).setCellValue("No Telepon");
+			headerRow.createCell(4).setCellValue("Saldo");
 
-	            // Iterate through the data and add it to the sheet
-	            int rowNum = 1;
-	            for (MasterBank entity : data) {
-	                HSSFRow row = sheet.createRow(rowNum++);
-	                row.createCell(0).setCellValue(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
-	                row.createCell(1).setCellValue(entity.getNama() != null ? entity.getNama() : "-");
-	                row.createCell(2).setCellValue(entity.getAlamat() != null ? entity.getAlamat() : "-");
-	                row.createCell(0).setCellValue(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
-	                row.createCell(0).setCellValue(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
-	            }
+			// Iterate through the data and add it to the sheet
+			int rowNum = 1;
+			for (MasterBank entity : data) {
+				HSSFRow row = sheet.createRow(rowNum++);
+				row.createCell(0).setCellValue(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
+				row.createCell(1).setCellValue(entity.getNama() != null ? entity.getNama() : "-");
+				row.createCell(2).setCellValue(entity.getAlamat() != null ? entity.getAlamat() : "-");
+				row.createCell(0).setCellValue(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
+				row.createCell(0).setCellValue(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
+			}
 
-	            // Write the workbook to the response output stream
-	            response.setContentType("application/vnd.ms-excel");
-	            response.setHeader("Content-Disposition", "attachment; filename=exportedXls.xls");
-	            workbook.write(response.getOutputStream());
-	            response.flushBuffer();
-	        }
-	    }
+			// Write the workbook to the response output stream
+			response.setContentType("application/vnd.ms-excel");
+			response.setHeader("Content-Disposition", "attachment; filename=exportedXls.xls");
+			workbook.write(response.getOutputStream());
+			response.flushBuffer();
+		}
+	}
 }
-
