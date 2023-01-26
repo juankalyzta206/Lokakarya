@@ -185,25 +185,58 @@ public class BayarTelkomNotification {
 //	}
 
 	public ByteArrayOutputStream exportToXLSBayarTelpon() throws Exception {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
 		XSSFSheet sheet = workbook.createSheet("Laporan Bayar Telepon");
 
 		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
-		List<String> header = getHeaderRow();
+//		List<String> header = getHeaderRow();
+		List<String> columnNames = bayarTelponConfigurationProperties.getTelpon();
+		int columnLength = columnNames.size();
 
-		StringBuilder sbHeader = new StringBuilder();
+//		StringBuilder sbHeader = new StringBuilder();
 		XSSFRow headerRow = sheet.createRow(0);
-		XSSFCell cell = headerRow.createCell(0);
-		for (int i = 0; i < header.size(); i++) {
-			sbHeader.append(header.get(i).toString()).append(",");
-			cell.setCellValue(sbHeader.toString());
+
+		for (int i = 0; i < columnLength; i++) {
+			XSSFCell headerCell = headerRow.createCell(i);
+			headerCell.setCellValue(columnNames.get(i).toUpperCase());
+			if (columnNames.get(i).equals("Uang")) {
+				headerCell.setCellValue("NOMINAL");
+			} 
+//			else {
+//				headerCell.setCellValue(columnNames.get(i));
+//			}
 		}
 
-		StringBuilder sbData = new StringBuilder();
-		for (int i = 0; i < data.size(); i++) {
-			XSSFRow dataRow = sheet.createRow(i + 1);
+//		StringBuilder sbData = new StringBuilder();
+		for (HistoryBank entity : data) {
+			XSSFRow dataRow = sheet.createRow(data.size());
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					;
+					Method method = HistoryBank.class.getMethod(
+							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
+					if (columnName.equals("rekening")) {
+						Object result = method.invoke(entity);
 
-			sbData.append(data.get(i).getRekening().getNorek().toString()).append(",");
+						Method rekening = result.getClass().getMethod("getNorek");
+//						System.out.println(rekening);
+						Object hasil = rekening.invoke(method.invoke(entity));
+						value = hasil != null ? hasil.toString() : "-";
+					} else if (columnName.equals("statusKet")) {
+						value = "Bayar Telepon";
+					} else {
+						Object result = method.invoke(entity);
+						value = result != null ? result.toString() : "-";
+					}
+
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					// Handle the exception if the method is not found or cannot be invoked
+				}
+
+//			sbData.append(data.get(i).getRekening().getNorek().toString()).append(",");
 //			dataRow.createCell(0).setCellValue(data.get(i).getRekening().getNorek());
 //			dataRow.createCell(1).setCellValue(data.get(i).getNama());
 //			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
@@ -216,12 +249,13 @@ public class BayarTelkomNotification {
 //			dataRow.createCell(4).setCellValue(data.get(i).getNoTlp());
 //			dataRow.createCell(5).setCellValue("Bayar Telepon");
 
-			for (int j = 0; j < data.size(); j++) {
-				XSSFCell dataCell = dataRow.createCell(data.get(i).getRekening().getNorek().SIZE);
-				dataCell.setCellValue(sbData.toString());
+//			for (int j = 0; j < data.size(); j++) {
+//				XSSFCell dataCell = dataRow.createCell(data.get(i).getRekening().getNorek().SIZE);
+//				dataCell.setCellValue(sbData.toString());
+//			}
+
 			}
 		}
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		workbook.write(outputStream);
 		return outputStream;
 
@@ -248,7 +282,7 @@ public class BayarTelkomNotification {
 	public ByteArrayOutputStream ExportToPdf(List<HistoryBank> data, String fileName) throws Exception {
 		List<String> columnNames = bayarTelponConfigurationProperties.getTelpon();
 		int columnLength = columnNames.size();
-		
+
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -271,7 +305,11 @@ public class BayarTelkomNotification {
 		pdfTable.setSpacingAfter(10f);
 
 		for (String columnName : columnNames) {
-			pdfTable.addCell(Align(columnName));
+			if (columnName.equals("Uang")) {
+				pdfTable.addCell(Align("NOMINAL"));
+			} else {
+				pdfTable.addCell(Align(columnName.toUpperCase()));
+			}
 		}
 		BaseColor color = new BaseColor(135, 206, 235);
 		for (int i = 0; i < columnLength; i++) {
@@ -286,19 +324,20 @@ public class BayarTelkomNotification {
 					;
 					Method method = HistoryBank.class.getMethod(
 							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					if(columnName.equals("rekening")) {
+					if (columnName.equals("rekening")) {
 						Object result = method.invoke(entity);
-						
+
 						Method rekening = result.getClass().getMethod("getNorek");
 //						System.out.println(rekening);
-						Object hasil = method.invoke(rekening.invoke(method.invoke(entity)));
+						Object hasil = rekening.invoke(method.invoke(entity));
 						value = hasil != null ? hasil.toString() : "-";
+					} else if (columnName.equals("statusKet")) {
+						value = "Bayar Telepon";
+					} else {
+						Object result = method.invoke(entity);
+						value = result != null ? result.toString() : "-";
 					}
-					
-					
-					
-					
-					
+
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					// Handle the exception if the method is not found or cannot be invoked
 				}
@@ -306,10 +345,12 @@ public class BayarTelkomNotification {
 			}
 		}
 
-	// Add the table to the pdf document
-	pdfDoc.add(pdfTable);
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
 
-	pdfDoc.close();pdfWriter.close();return baos;
+		pdfDoc.close();
+		pdfWriter.close();
+		return baos;
 
 	}
 
