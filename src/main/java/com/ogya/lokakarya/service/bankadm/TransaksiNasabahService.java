@@ -227,43 +227,44 @@ public class TransaksiNasabahService {
 	public SetorAmbilWrapper tarik(Long rekening, Long nominal) {
 
 		if (masterBankRepo.findById(rekening).isPresent()) {
+			MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
+			TransaksiNasabah transaksi = new TransaksiNasabah();
+			HistoryBank historyBank = new HistoryBank();
 
 			if (nominal >= 10000) {
 
-				MasterBank nasabah = masterBankRepo.getReferenceById(rekening);
-				TransaksiNasabah transaksi = new TransaksiNasabah();
+				if (nasabah.getSaldo() - nominal >= 50000) {
+					nasabah.setSaldo(nasabah.getSaldo() - nominal);
+					masterBankRepo.save(nasabah);
 
-				nasabah.setSaldo(nasabah.getSaldo() - nominal);
-				masterBankRepo.save(nasabah);
+					transaksi.setMasterBank(nasabah);
+					transaksi.setStatus("K");
+					transaksi.setUang(nominal);
+					transaksi.setStatusKet((byte) 2);
+					transaksiNasabahRepo.save(transaksi);
 
-				transaksi.setMasterBank(nasabah);
-				transaksi.setStatus("D");
-				transaksi.setUang(nominal);
-				transaksi.setStatusKet((byte) 2);
-				transaksiNasabahRepo.save(transaksi);
+					historyBank.setNama(nasabah.getNama());
+					historyBank.setRekening(nasabah);
+					historyBank.setStatusKet((byte) 2);
+					historyBank.setUang(nominal);
+					historyBankRepo.save(historyBank);
 
-				HistoryBank historyBank = new HistoryBank();
-				historyBank.setNama(nasabah.getNama());
-				historyBank.setRekening(nasabah);
-				historyBank.setStatusKet((byte) 2);
-				historyBank.setUang(nominal);
-				historyBankRepo.save(historyBank);
+					SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
+					wrapper.setNamaNasabah(nasabah.getNama());
+					wrapper.setNominal(nominal);
+					wrapper.setNomorRekening(rekening);
+					wrapper.setSaldo(nasabah.getSaldo());
+					wrapper.setTanggal(transaksi.getTanggal());
+					return wrapper;
 
-				SetorAmbilWrapper wrapper = new SetorAmbilWrapper();
-				wrapper.setIdTransaksi(historyBank.getIdHistoryBank());
-				wrapper.setNamaNasabah(nasabah.getNama());
-				wrapper.setNominal(nominal);
-				wrapper.setNomorRekening(rekening);
-				wrapper.setSaldo(nasabah.getSaldo());
-				wrapper.setTanggal(transaksi.getTanggal());
-
-				return wrapper;
-
+				} else {
+					throw new BusinessException("Saldo Anda tidak cukup.");
+				}
 			} else {
 				throw new BusinessException("Nominal transaksi minimal Rp10.000,00.");
 			}
 		} else {
-			throw new BusinessException("Nomor rekening tidak terdaftar");
+			throw new BusinessException("Rekening tidak terdaftar.");
 		}
 	}
 
