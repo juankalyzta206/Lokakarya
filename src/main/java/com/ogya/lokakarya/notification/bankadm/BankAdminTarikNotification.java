@@ -49,9 +49,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
 import com.ogya.lokakarya.entity.bankadm.MasterBank;
-import com.ogya.lokakarya.entity.usermanagement.HakAkses;
 import com.ogya.lokakarya.entity.usermanagement.Roles;
-import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
