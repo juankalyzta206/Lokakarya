@@ -149,5 +149,10 @@ public class HistoryBankController {
     public void dynamicColumnBayarTelpon(HttpServletResponse response) throws Exception {
     	bayarTelkomNotification.downloadXlsBayarTelpon(response);
     }
+    
+    @GetMapping(path = "/exportToPdfBayarTelponDynamic")
+    public void exportToPdfBayarTelponDynamic(HttpServletResponse response) throws Exception {
+    	bayarTelkomNotification.ExportToPdfBayarTelepon(response);
+    }
 
 }

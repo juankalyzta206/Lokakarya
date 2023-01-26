@@ -390,26 +390,8 @@ public class TransaksiTelkomService {
 //		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 //		int columnLength = columnNames.size();
 		for (String columnName : column1) {
-			pdfTable.addCell(Align(columnName));
-		}
-//		PdfPCell cell1 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getIdTransaksi()));
-//		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell1);
-//		PdfPCell cell2 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNama()));
-//		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell2);
-//		PdfPCell cell3 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getBulanTagihan()));
-//		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell3);
-//		PdfPCell cell4 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getTahunTagihan()));
-//		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell4);
-//		PdfPCell cell5 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getNominal()));
-//		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell5);
-//		PdfPCell cell6 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getStatus()));
-//		cell6.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell6);
+	        pdfTable.addCell(Align(columnName));
+	    }
 
 		BaseColor color = new BaseColor(135, 206, 235);
 
