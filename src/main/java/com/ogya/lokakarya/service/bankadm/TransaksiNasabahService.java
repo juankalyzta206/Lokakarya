@@ -1182,15 +1182,16 @@ public class TransaksiNasabahService {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		String formattedDate = "-";
 		
-		pdfTable.addCell(Left("Nomor Reference"));
-		pdfTable.addCell(Right(bayarResponse.getReferenceNumber()));
-
 		if (dataNasabah.getTanggal() != null) {
 			formattedDate = formatter.format(dataNasabah.getTanggal());
 		}
 
 		pdfTable.addCell(Right(formattedDate));
+		
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(bayarResponse.getReferenceNumber()));
 
+		
 		pdfTable.addCell(Left("Nomor Rekening"));
 		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getNorek()) != null
 				? String.valueOf(dataNasabah.getRekening().getNorek())
