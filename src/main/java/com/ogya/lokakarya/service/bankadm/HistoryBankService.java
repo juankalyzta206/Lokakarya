@@ -1,3 +1,13 @@
+/*
+* HistoryBankService.java
+*	This class is provide service relate to users table such as
+*	CRUD, pagination, and export to PDF & Excel
+*
+* Version 1.0
+*
+* Copyright : Juan Kalyzta,Dara Ryanti, Backend Team OGYA
+*/
+
 package com.ogya.lokakarya.service.bankadm;
 
 import java.io.ByteArrayOutputStream;
