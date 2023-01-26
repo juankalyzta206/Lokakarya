@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,17 +39,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.nasabah.LaporanBayarTelponConfigurationProperties;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
 import com.ogya.lokakarya.entity.bankadm.MasterBank;
-import com.ogya.lokakarya.entity.usermanagement.HakAkses;
-import com.ogya.lokakarya.entity.usermanagement.Roles;
-import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
-import com.ogya.lokakarya.service.bankadm.HistoryBankService;
 
 @Service
 @Transactional
 public class BayarTelkomNotification {
-	@Autowired
-	HistoryBankService historyBankService;
 	@Autowired
 	private JavaMailSender javaMailSender;
 	@Autowired
@@ -60,7 +53,7 @@ public class BayarTelkomNotification {
 
 //	===========================================KirimEmail=====================================================
 //	Setiap Hari Jam 7
-	@Scheduled(cron = "0 0 7 * * *")
+	@Scheduled(cron = "0 0 7 * * ?")
 	public void sendEmailDay() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -77,13 +70,16 @@ public class BayarTelkomNotification {
 
 		List<HistoryBank> data = historyBankRepository.laporanBayarTeleponToday(yesterday);
 		String fileName = "Laporan Transaksi Bank Bayar Telepon Hari " + dateString;
+		
 		helper.setTo("usernamemeeting@gmail.com");
 		helper.setCc("taerakim.21@gmail.com");
-		helper.setSubject("Laporan Bayar Telepon Hari " + dateString);
-		helper.setText("Laporan Bayar Hari " + dateString, true);
+		helper.setSubject(fileName);
+		helper.setText(fileName, true);
 
-		ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, fileName);
+		ByteArrayOutputStream pdf = ExportToPdf(data, fileName);
+		ByteArrayOutputStream xlsx = exportToXLSBayarTelpon(data, fileName);
 		helper.addAttachment(fileName + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+		helper.addAttachment(fileName + ".xlsx", new ByteArrayResource(xlsx.toByteArray()));
 
 		javaMailSender.send(mailMessage);
 		System.out.println("Email send");
@@ -114,21 +110,23 @@ public class BayarTelkomNotification {
 		String bulan = format.format(dateStart);
 
 		List<HistoryBank> data = historyBankRepository.bayarTeleponRekap(start, end);
-		String title = "Laporan Bayar Telepon Minggu ke-" + weekOfMonth + " " + bulan;
+		String fileName = "Laporan Bayar Telepon Minggu ke-" + weekOfMonth + " " + bulan;
 
 		helper.setTo("usernamemeeting@gmail.com");
 		helper.setCc("taerakim.21@gmail.com");
-		helper.setSubject("Laporan Bayar Telepon Minggu ke-" + weekOfMonth + " " + bulan);
-		helper.setText("Laporan Bayar Telepon Minggu ke-" + weekOfMonth + " " + bulan, true);
+		helper.setSubject(fileName);
+		helper.setText(fileName, true);
 
-		ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, title);
-		helper.addAttachment(title + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+		ByteArrayOutputStream pdf = ExportToPdf(data, fileName);
+		ByteArrayOutputStream xlsx = exportToXLSBayarTelpon(data, fileName);
+		helper.addAttachment(fileName + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+		helper.addAttachment(fileName + ".xlsx", new ByteArrayResource(xlsx.toByteArray()));
 		javaMailSender.send(mailMessage);
 		System.out.println("Email send");
 	}
 
 //	Setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * *")
+	@Scheduled(cron = "0 0 7 1 * ?")
 	public void sendEmailMonth() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -148,44 +146,24 @@ public class BayarTelkomNotification {
 		String bulan = tanggal.format(cal.getTime());
 
 		List<HistoryBank> data = historyBankRepository.bayarTeleponRekap(start, end);
-		String title = "Laporan Bayar Telepon Bulan " + bulan;
+		String fileName = "Laporan Bayar Telepon Bulan " + bulan;
 
 		helper.setTo("usernamemeeting@gmail.com");
 		helper.setCc("taerakim.21@gmail.com");
-		helper.setSubject("Laporan Bayar Telepon Bulan " + bulan);
-		helper.setText("Laporan Bayar Telepon Bulan " + bulan, true);
+		helper.setSubject(fileName);
+		helper.setText(fileName, true);
 
-		ByteArrayOutputStream pdf = historyBankService.ExportToPdfBayarTeleponParam(data, title);
-		helper.addAttachment(title + ".pdf", new ByteArrayResource(pdf.toByteArray()));
-
-		ByteArrayOutputStream xlsx = historyBankService.exportToXLSBayarTelpon(data, title);
-		helper.addAttachment(title + ".xlsx", new ByteArrayResource(xlsx.toByteArray()));
+		ByteArrayOutputStream pdf = ExportToPdf(data, fileName);
+		ByteArrayOutputStream xlsx = exportToXLSBayarTelpon(data, fileName);
+		helper.addAttachment(fileName + ".pdf", new ByteArrayResource(pdf.toByteArray()));
+		helper.addAttachment(fileName + ".xlsx", new ByteArrayResource(xlsx.toByteArray()));
 
 		javaMailSender.send(mailMessage);
 		System.out.println("Email send");
 	}
 
 //	======================================DynamicColumn==================================================
-	List<String> getHeaderRow() {
-		List<String> headerRow = new ArrayList<String>();
-		headerRow.add("Nomor Rekening");
-		headerRow.add("Nama Nasabah");
-		headerRow.add("Tanggal Transaksi");
-		headerRow.add("Nominal");
-		headerRow.add("No. Telepon");
-		headerRow.add("Keterangan");
-		return headerRow;
-	}
 
-//	List<HistoryBank> getDataBayarTelpon(){
-//		List<HistoryBank> dataHistory = historyBankRepository.laporanBayarTelepon();
-//		List<HistoryBank> data = new ArrayList<HistoryBank>();
-//		
-//		for (int i = 0; i < dataHistory.size(); i++) {
-//			data.addAll(dataHistory.get(i).getRekening().getNorek());
-//			
-//		}
-//	}
 	public boolean containsChar(String s, char search) {
 		if (s.length() == 0)
 			return false;
@@ -193,17 +171,14 @@ public class BayarTelkomNotification {
 			return s.charAt(0) == search || containsChar(s.substring(1), search);
 	}
 
-	public ByteArrayOutputStream exportToXLSBayarTelpon() throws Exception {
+	public ByteArrayOutputStream exportToXLSBayarTelpon(List<HistoryBank> data, String fileName) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("Laporan Bayar Telepon");
+		XSSFSheet sheet = workbook.createSheet(fileName);
 
-		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
-//		List<String> header = getHeaderRow();
 		List<String> columnNames = bayarTelponConfigurationProperties.getTelpon();
 		int columnLength = columnNames.size();
 
-//		StringBuilder sbHeader = new StringBuilder();
 		XSSFRow headerRow = sheet.createRow(0);
 
 		for (int i = 0; i < columnLength; i++) {
@@ -215,13 +190,8 @@ public class BayarTelkomNotification {
 			} else {
 				headerCell.setCellValue(columnNames.get(i).toUpperCase());
 			}
-
-//			else {
-//				headerCell.setCellValue(columnNames.get(i));
-//			}
 		}
-
-//		StringBuilder sbData = new StringBuilder();
+		
 		int rowNum = 1;
 		int columnNum = 0;
 		for (HistoryBank entity : data) {
@@ -258,49 +228,16 @@ public class BayarTelkomNotification {
 			sheet.autoSizeColumn(i);
 		}
 
-//					Method method = HistoryBank.class.getMethod(
-//							"get" + columnNameNoSpace);
-//					if (columnName.equals("rekening")) {
-//						Object result = method.invoke(entity);
-//
-//						Method rekening = result.getClass().getMethod("getNorek");
-////						System.out.println(rekening);
-//						Object hasil = rekening.invoke(method.invoke(entity));
-//						value = hasil != null ? hasil.toString() : "-";
-//					} else if (columnName.equals("statusKet")) {
-//						value = "Bayar Telepon";
-//					} else {
-//						Object result = method.invoke(entity);
-//						value = result != null ? result.toString() : "-";
-//					}
-
-//			sbData.append(data.get(i).getRekening().getNorek().toString()).append(",");
-//			dataRow.createCell(0).setCellValue(data.get(i).getRekening().getNorek());
-//			dataRow.createCell(1).setCellValue(data.get(i).getNama());
-//			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//			String formattedDate = "-";
-//			if (data.get(i).getTanggal() != null) {
-//				formattedDate = formatter.format(data.get(i).getTanggal());
-//			}
-//			dataRow.createCell(2).setCellValue(formattedDate);
-//			dataRow.createCell(3).setCellValue(data.get(i).getUang());
-//			dataRow.createCell(4).setCellValue(data.get(i).getNoTlp());
-//			dataRow.createCell(5).setCellValue("Bayar Telepon");
-
-//			for (int j = 0; j < data.size(); j++) {
-//				XSSFCell dataCell = dataRow.createCell(data.get(i).getRekening().getNorek().SIZE);
-//				dataCell.setCellValue(sbData.toString());
-//			}
-
 		workbook.write(outputStream);
 		return outputStream;
-
 	}
 
 	public void downloadXlsBayarTelpon(HttpServletResponse response) throws Exception {
 		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 		response.setHeader("Content-Disposition", "attachment; filename=Laporan Bayar Telepon.xlsx");
-		ByteArrayOutputStream baos = exportToXLSBayarTelpon();
+		List<HistoryBank> data = historyBankRepository.laporanBayarTelepon();
+		String fileName = "Laporan Bayar Telepon";
+		ByteArrayOutputStream baos = exportToXLSBayarTelpon(data, fileName);
 		response.setContentLength(baos.size());
 		OutputStream os = response.getOutputStream();
 		baos.writeTo(os);
