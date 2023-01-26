@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -51,7 +52,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Pdf
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 14 * * * ?")
+	@Scheduled(cron = "0 0 7 1 * *")
 	public void sendEmailDay() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -85,7 +86,7 @@ public class LaporanPenunggakanNotification {
 	
 	//Excel
 	//setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 35 * * * ?")
+	@Scheduled(cron = "0 0 7 1 * *")
 	public void sendEmailDayExcel() throws Exception{
 			MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -113,10 +114,11 @@ public class LaporanPenunggakanNotification {
 			System.out.println("waiting...");
 			//ByteArrayOutputStream pdf = transaksiTelkomService.ExportToPdfParam(data, title);
 			
-			LaporanPenunggakanExcelExporter excelExporter = new LaporanPenunggakanExcelExporter(data);
-			ByteArrayOutputStream excel = excelExporter.export();
+			InputStreamSource laporan = transaksiTelkomService.ExportToExcelParam(data);
+//			LaporanPenunggakanExcelExporter excelExporter = new LaporanPenunggakanExcelExporter(data);
+//			ByteArrayOutputStream excel = excelExporter.export();
 			
-			helper.addAttachment(title + ".xlsx", new ByteArrayResource(excel.toByteArray()));
+			helper.addAttachment(title + ".xlsx", laporan);
 			javaMailSender.send(mailMessage);
 			System.out.println("Email send");
 	}

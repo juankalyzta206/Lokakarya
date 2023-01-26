@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -89,8 +90,8 @@ public class LaporanPelunasanNotification {
 			List<HistoryTelkom> data = historyTelkomRepository.lunasRekap(start, end);
 			String title = "Laporan Pelunasan telpon ke-" + weekOfMonth + " " + bulan;
 			
-			helper.setTo("usernamemeeting@gmail.com");
-			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setTo("haha1hihi2huhu3@gmail.com");
+			//helper.setCc("haha1hihi2huhu3@gmail.com");
 			helper.setSubject("Laporan Bayar Telepon Minggu ke-" + weekOfMonth + " " + bulan);
 			helper.setText("Laporan Pelunasan Telepon Minggu ke-" + weekOfMonth + " " + bulan, true);
 			
@@ -122,8 +123,8 @@ public class LaporanPelunasanNotification {
 			List<HistoryTelkom> data = historyTelkomRepository.lunasRekap(start, end);
 			String title = "Laporan Bayar Telepon Bulan " + bulan;
 			
-			helper.setTo("usernamemeeting@gmail.com");
-			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setTo("haha1hihi2huhu3@gmail.com");
+			//helper.setCc("haha1hihi2huhu3@gmail.com");
 			helper.setSubject("Laporan Bayar Telepon Bulan " + bulan );
 			helper.setText("Laporan Bayar Telepon Bulan "+ bulan, true);
 			
@@ -157,15 +158,15 @@ public class LaporanPelunasanNotification {
 			//List<HistoryTelkom> data = historyTelkomRepository.findAll();
 			String title = "Laporan Bayar Telepon Bulan " + bulan;
 			
-			helper.setTo("usernamemeeting@gmail.com");
-			helper.setCc("haha1hihi2huhu3@gmail.com");
+			helper.setTo("haha1hihi2huhu3@gmail.com");
+			//helper.setCc("haha1hihi2huhu3@gmail.com");
 			helper.setSubject("Laporan Bayar Telepon Bulan " + bulan );
 			helper.setText("Laporan Bayar Telepon Bulan "+ bulan, true);
-			
+			InputStreamSource laporan = historyService.ExportToExcelParam(data);
 			//ByteArrayOutputStream pdf = historyService.ExportToPdfParam(data, title);
-			LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(data);
-			ByteArrayOutputStream excel = excelExporter.export();
-			helper.addAttachment(title + ".xlsx", new ByteArrayResource(excel.toByteArray()));
+//			LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(data);
+//			ByteArrayOutputStream excel = excelExporter.export();
+			helper.addAttachment(title + ".xlsx", laporan);
 			javaMailSender.send(mailMessage);
 			System.out.println("Email send");
 	}
