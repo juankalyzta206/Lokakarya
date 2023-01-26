@@ -1,6 +1,18 @@
+/*
+* BankAdminTarikNotification.java
+*	This class is provide service relate to History Bank table for Notification to email
+*	and Scedule Report per day, week, month
+*
+* Version 1.0
+*
+* Copyright : Juan Kalyzta, Backend Team OGYA
+*/
+
 package com.ogya.lokakarya.notification.bankadm;
 
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -36,6 +48,10 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
+import com.ogya.lokakarya.entity.bankadm.MasterBank;
+import com.ogya.lokakarya.entity.usermanagement.HakAkses;
+import com.ogya.lokakarya.entity.usermanagement.Roles;
+import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
@@ -189,7 +205,7 @@ public class BankAdminTarikNotification {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
 		List<String> columnNames = laporanHistoryBankConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
@@ -222,19 +238,37 @@ public class BankAdminTarikNotification {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
+		/* Iterate through the data and add it to the table */
 		for (HistoryBank entity : data) {
-			pdfTable.addCell(Align(String.valueOf(
-					entity.getRekening().getNorek() != null ? String.valueOf(entity.getRekening().getNorek()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					Boolean isForeignKey = containsChar(columnNameNoSpace, ':');
+					String[] foreignClass = columnNameNoSpace.split(":", 2);
+					if (!isForeignKey) {
+						Method method = HistoryBank.class.getMethod("get" + columnNameNoSpace);
+						Object result = method.invoke(entity);
+						value = result != null ? result.toString() : "-";
+					} else {
+						Method method = HistoryBank.class.getMethod("get" + foreignClass[0]);
+						if (foreignClass[0].equals("Users")) {
+							Method usersMethod = MasterBank.class.getMethod("get" + foreignClass[1]);
+							Object result = usersMethod.invoke(method.invoke(entity));
+							value = result != null ? result.toString() : "-";
+						} else if (foreignClass[0].equals("Roles")) {
+							Method rolesMethod = Roles.class.getMethod("get" + foreignClass[1]);
+							Object result = rolesMethod.invoke(method.invoke(entity));
+							value = result != null ? result.toString() : "-";
+						}
 
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String formattedDate = "-";
-			if (entity.getTanggal() != null) {
-				formattedDate = formatter.format(entity.getTanggal());
+					}
+
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					/* Handle the exception if the method is not found or cannot be invoked */
+				}
+				pdfTable.addCell(Align(value));
 			}
-			pdfTable.addCell(Align(formattedDate));
-			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-			pdfTable.addCell(Align("Tarik Tunai"));
 		}
 
 		// Add the table to the pdf document
@@ -253,6 +287,13 @@ public class BankAdminTarikNotification {
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
+	}
+
+	public boolean containsChar(String s, char search) {
+		if (s.length() == 0)
+			return false;
+		else
+			return s.charAt(0) == search || containsChar(s.substring(1), search);
 	}
 
 	public void ExportToExcelNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
