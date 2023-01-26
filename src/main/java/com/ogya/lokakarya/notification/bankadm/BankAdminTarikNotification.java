@@ -1,8 +1,6 @@
 package com.ogya.lokakarya.notification.bankadm;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -19,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -49,13 +48,20 @@ public class BankAdminTarikNotification {
 	HistoryBankRepository historyBankRepo;
 	@Autowired
 	LaporanHistoryBankConfigurationProperties laporanHistoryBankConfigurationProperties;
+	@Value("${cron.daily}")
+	private String dailyCron;
 
+	@Value("${cron.monthly}")
+	private String monthlyCron;
+
+	@Value("${cron.weekly}")
+	private String weeklyCron;
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
 	private String[] cc = { "taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
-	@Scheduled(cron = "0 0 7 * * *") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "${cron.daily}") // <-- second, minute, hour, day, month
 	public void DailyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
@@ -82,7 +88,7 @@ public class BankAdminTarikNotification {
 
 	}
 
-	@Scheduled(cron = "0 0 7 1 * *") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
@@ -103,7 +109,7 @@ public class BankAdminTarikNotification {
 		ExportToExcelNotification(monthlyData, description);
 	}
 
-	@Scheduled(cron = "0 0 7 * * MON") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "${cron.weekly}") // <-- second, minute, hour, day, month
 	public void WeeklyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);

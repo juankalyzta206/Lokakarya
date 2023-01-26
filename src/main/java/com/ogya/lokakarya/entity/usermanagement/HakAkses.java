@@ -1,3 +1,11 @@
+/*
+* HakAkses.java
+*	This class is hak akses entity/table, getter and setter for each column
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.entity.usermanagement;
 
 import java.util.Date;

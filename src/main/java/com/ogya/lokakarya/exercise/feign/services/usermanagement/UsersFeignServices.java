@@ -1,3 +1,12 @@
+/*
+* UsersFeignServices.java
+*	This class is provide service relate to users table 
+*	that use another service at web service
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.exercise.feign.services.usermanagement;
 
 import org.springframework.beans.factory.annotation.Autowired;

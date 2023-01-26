@@ -13,14 +13,13 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFFont;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -92,6 +91,7 @@ public class TransaksiTelkomService {
 				.findStatus1(Sort.by(Order.by("idTransaksi")).descending());
 		return toWrapperList(transaksiTelkomList);
 	}
+
 	public List<TransaksiTelkom> findAllStatus1NoWrapper() {
 		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
 				.findStatus1(Sort.by(Order.by("idTransaksi")).descending());
@@ -311,70 +311,40 @@ public class TransaksiTelkomService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	public ByteArrayOutputStream ExportToExcelParam (List<TransaksiTelkom> listUsers) throws Exception{
+
+	public InputStreamSource ExportToExcelParam(List<TransaksiTelkom> listUsers) throws Exception {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("Laporan Penunggakan");
-		Row row = sheet.createRow(0);
-		CellStyle style = workbook.createCellStyle();
-		XSSFFont font = workbook.createFont();
-        font.setBold(true);
-        font.setFontHeight(16);
-        style.setFont(font);
-//        List<String> column2 = laporanPenunggakanConfigurationProperties.getColumn();
-//        int i = 0;
-//        for (String columnName : column2) {
-//        	i++;
-//        	createCell(row, i, columnName, style,sheet);
-//	    }
-        createCell(row, 0, "ID Transaksi", style,sheet);      
-        createCell(row, 1, "Nama", style,sheet);       
-        createCell(row, 2, "Bulan Tagihan", style,sheet);    
-        createCell(row, 3, "Tahun Tagihan", style,sheet);
-        createCell(row, 4, "Nominal", style,sheet);
-        createCell(row, 5, "Status", style,sheet);
-        int rowCount = 1;
-        CellStyle style1 = workbook.createCellStyle();
-        XSSFFont font1 = workbook.createFont();
-        font1.setFontHeight(14);
-        style1.setFont(font1);
-                 
-        for (TransaksiTelkom entity : listUsers) {
-            Row row1 = sheet.createRow(rowCount++);
-            int columnCount = 0;
-             
-            createCell(row1, columnCount++, entity.getIdTransaksi(), style,sheet);
-            createCell(row1, columnCount++, entity.getIdPelanggan().getNama(), style,sheet);
-            createCell(row1, columnCount++, entity.getBulanTagihan(), style,sheet);
-            createCell(row1, columnCount++, entity.getTahunTagihan(), style,sheet);
-            NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
-			CurrencyData currencyNominal = new CurrencyData();
-			currencyNominal.setValue(entity.getUang());
-            createCell(row1, columnCount++, String.valueOf(numberFormat.format(currencyNominal.getValue())), style,sheet);
-            createCell(row1, columnCount++, "Belum lunas", style,sheet);
-        }
-        workbook.write(outputStream);
-        workbook.close();
-		return outputStream;
+		Row headerRow = sheet.createRow(0);
+
+		List<String> columnNames = laporanPenunggakanConfigurationProperties.getColumn();
+
+		for (int i = 0; i < 6; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdTransaksi());
+			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			dataRow.createCell(5).setCellValue(listUsers.get(i).getStatus());
+
+		}
+		for (int i = 0; i < 6; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		workbook.write(outputStream);
+		workbook.close();
+		byte[] bytes = outputStream.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+		workbook.close();
+		return attachmentSource;
 	}
-	private void createCell(Row row, int columnCount, Object value, CellStyle style,XSSFSheet sheet) {
-        sheet.autoSizeColumn(columnCount);
-        Cell cell = row.createCell(columnCount);
-        if (value instanceof Long) {
-            cell.setCellValue((Long) value);
-        } else if (value instanceof Boolean) {
-            cell.setCellValue((Boolean) value);
-        }else if(value instanceof Integer) {
-        	cell.setCellValue((Integer) value);
-        }
-        else if (value instanceof Byte) {
-        	cell.setCellValue((Byte) value);
-        }
-        else {
-            cell.setCellValue((String) value);
-        }
-        cell.setCellStyle(style);
-    }
+
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -411,9 +381,9 @@ public class TransaksiTelkomService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		
+
 		List<String> column1 = laporanPenunggakanConfigurationProperties.getColumn();
- 		
+
 //		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPenunggakan.properties");
 //		Properties properties = new Properties();
 //		properties.load(inputStream);
@@ -422,6 +392,7 @@ public class TransaksiTelkomService {
 		for (String columnName : column1) {
 	        pdfTable.addCell(Align(columnName));
 	    }
+
 		BaseColor color = new BaseColor(135, 206, 235);
 
 		for (int i = 0; i < 6; i++) {
@@ -453,6 +424,7 @@ public class TransaksiTelkomService {
 
 		return outputStream;
 	}
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);

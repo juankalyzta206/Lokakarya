@@ -1,3 +1,11 @@
+/*
+* HakAksesLogin.java
+*	This class is hak akses entity/table but only for login, getter and setter for each column
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.entity.usermanagement.login;
 
 import javax.persistence.Entity;
