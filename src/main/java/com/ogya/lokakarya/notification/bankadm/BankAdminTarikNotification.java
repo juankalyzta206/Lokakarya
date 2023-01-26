@@ -71,7 +71,7 @@ public class BankAdminTarikNotification {
 	@Value("${cron.weekly}")
 	private String weeklyCron;
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
-	private String[] cc = { "taerakim.21@gmail.com", "eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
+	private String[] cc = {"eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
