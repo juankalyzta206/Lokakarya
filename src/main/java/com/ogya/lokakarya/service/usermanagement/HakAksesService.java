@@ -1,7 +1,5 @@
 package com.ogya.lokakarya.service.usermanagement;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,7 +55,7 @@ public class HakAksesService {
 
 	@Autowired
 	HakAksesCriteriaRepository hakAksesCriteriaRepository;
-	
+
 	@Autowired
 	HakAksesColumnProperties hakAksesColumnProperties;
 
@@ -147,19 +145,19 @@ public class HakAksesService {
 	public void delete(Long id) {
 		hakAksesRepository.deleteById(id);
 	}
-	
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
 	}
-	
+
 	public boolean containsChar(String s, char search) {
-	    if (s.length() == 0)
-	        return false;
-	    else
-	        return s.charAt(0) == search || containsChar(s.substring(1), search);
+		if (s.length() == 0)
+			return false;
+		else
+			return s.charAt(0) == search || containsChar(s.substring(1), search);
 	}
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
@@ -198,43 +196,11 @@ public class HakAksesService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (HakAkses entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					Boolean isForeignKey = containsChar(columnNameNoSpace,':');
-					String[] foreignClass = columnNameNoSpace.split(":", 2);
-					if (!isForeignKey) {
-						Method method = HakAkses.class.getMethod(
-								"get" + columnNameNoSpace);
-						Object result = method.invoke(entity);
-						value = result != null ? result.toString() : "-";
-					} else {
-						Method method = HakAkses.class.getMethod(
-								"get" + foreignClass[0]);
-						if (foreignClass[0].equals("Users")) {
-							Method usersMethod = Users.class.getMethod(
-		                            "get" + foreignClass[1]);
-							Object result = usersMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						} else if (foreignClass[0].equals("Roles")) {
-							Method rolesMethod = Roles.class.getMethod(
-		                            "get" + foreignClass[1]);
-							Object result = rolesMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						}	
-						
-					}
-					
-					
-					
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+    	String path = "com.ogya.lokakarya.entity.usermanagement.";
+		ParsingColumn<HakAkses> parsing = new ParsingColumn<HakAkses>();
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		
+		
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
