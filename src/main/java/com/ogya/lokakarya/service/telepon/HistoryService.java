@@ -12,7 +12,14 @@ import java.util.Properties;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -31,8 +38,10 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.telepon.LaporanPelunasanConfiguration;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
+import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.repository.telepon.HistoryRepository;
 import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
 import com.ogya.lokakarya.repository.telepon.criteria.HistoryTelkomCriteriaRepository;
@@ -49,6 +58,8 @@ public class HistoryService {
 	MasterPelangganRepository masterPelangganRepository;
 	@Autowired
 	HistoryTelkomCriteriaRepository historyTelkomCriteriaRepository;
+	@Autowired
+	private LaporanPelunasanConfiguration laporanPelunasanConfiguration;
 
 	public Long sumAll() {
 		Long sumAll = historyRepository.sumAll();
@@ -222,6 +233,43 @@ public class HistoryService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 	
+	public InputStreamSource ExportToExcelParam (List<HistoryTelkom> listUsers) throws Exception{
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		Row headerRow = sheet.createRow(0);
+		
+		List<String> columnNames = laporanPelunasanConfiguration.getColumn();
+		
+		for (int i = 0; i < 5; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String formattedDate = "-";
+			if (listUsers.get(i).getTanggalBayar() != null) {
+				formattedDate = formatter.format(listUsers.get(i).getTanggalBayar());
+			}
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(1).setCellValue(formattedDate);
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			
+		}
+		for (int i = 0; i < 5; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		workbook.write(outputStream);
+		workbook.close();
+		byte[] bytes = outputStream.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+		workbook.close();
+		return attachmentSource;
+	}
+	
 	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory , String tittle) throws Exception {
 		// Call the findAll method to retrieve the data
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -260,13 +308,16 @@ public class HistoryService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
-		Properties properties = new Properties();
-		properties.load(inputStream);
-		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
-		int columnLength = columnNames.size();
-		for (String columnName : columnNames) {
-	        pdfTable.addCell(Align(properties.getProperty(columnName)));
+		
+		List<String> column1 = laporanPelunasanConfiguration.getColumn();
+		
+//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
+//		Properties properties = new Properties();
+//		properties.load(inputStream);
+//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
+//		int columnLength = columnNames.size();
+		for (String columnName : column1) {
+	        pdfTable.addCell(Align(columnName));
 	    }
 //		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
 //		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
@@ -286,7 +337,7 @@ public class HistoryService {
 		
 		BaseColor color = new BaseColor(135, 206, 235);
 
-		for (int i = 0; i < columnLength; i++) {
+		for (int i = 0; i < 5; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 

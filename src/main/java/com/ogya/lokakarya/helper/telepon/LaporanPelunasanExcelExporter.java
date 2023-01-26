@@ -16,11 +16,16 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ogya.lokakarya.configuration.telepon.LaporanPelunasanConfiguration;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.util.CurrencyData;
 
 public class LaporanPelunasanExcelExporter {
+	@Autowired
+	LaporanPelunasanConfiguration laporanPelunasanConfiguration;
+	
 	 private XSSFWorkbook workbook;
 	    private XSSFSheet sheet;
 	    private List<HistoryTelkom> listUsers;
@@ -39,13 +44,21 @@ public class LaporanPelunasanExcelExporter {
 	        font.setBold(true);
 	        font.setFontHeight(16);
 	        style.setFont(font);
-	         
-	        createCell(row, 0, "ID History", style);      
-	        createCell(row, 1, "Nama", style);       
-	        createCell(row, 2, "Bulan Tagihan", style);    
-	        createCell(row, 3, "Tahun Tagihan", style);
-	        createCell(row, 4, "Nominal", style);
-	        createCell(row, 5, "Tanggal Bayar", style);
+	        
+	        List<String> column2 = laporanPelunasanConfiguration.getColumn();
+	        int i = 0;
+	        for (String columnName : column2) {
+	        	i++;
+	        	
+	        	createCell(row, i, columnName, style);
+		    }
+	        
+//	        createCell(row, 0, "ID History", style);      
+//	        createCell(row, 1, "Nama", style);       
+//	        createCell(row, 2, "Bulan Tagihan", style);    
+//	        createCell(row, 3, "Tahun Tagihan", style);
+//	        createCell(row, 4, "Nominal", style);
+//	        createCell(row, 5, "Tanggal Bayar", style);
 	         
 	    }
 	     

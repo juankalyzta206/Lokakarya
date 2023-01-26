@@ -1,7 +1,6 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,13 +8,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -86,6 +90,12 @@ public class TransaksiTelkomService {
 		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
 				.findStatus1(Sort.by(Order.by("idTransaksi")).descending());
 		return toWrapperList(transaksiTelkomList);
+	}
+
+	public List<TransaksiTelkom> findAllStatus1NoWrapper() {
+		List<TransaksiTelkom> transaksiTelkomList = transaksiTelkomRepository
+				.findStatus1(Sort.by(Order.by("idTransaksi")).descending());
+		return transaksiTelkomList;
 	}
 
 	// service untuk memasukkan/mengubah entity
@@ -302,6 +312,39 @@ public class TransaksiTelkomService {
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
 
+	public InputStreamSource ExportToExcelParam(List<TransaksiTelkom> listUsers) throws Exception {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		Row headerRow = sheet.createRow(0);
+
+		List<String> columnNames = laporanPenunggakanConfigurationProperties.getColumn();
+
+		for (int i = 0; i < 6; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdTransaksi());
+			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			dataRow.createCell(5).setCellValue(listUsers.get(i).getStatus());
+
+		}
+		for (int i = 0; i < 6; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		workbook.write(outputStream);
+		workbook.close();
+		byte[] bytes = outputStream.toByteArray();
+		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
+		workbook.close();
+		return attachmentSource;
+	}
+
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -338,17 +381,17 @@ public class TransaksiTelkomService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		
+
 		List<String> column1 = laporanPenunggakanConfigurationProperties.getColumn();
- 		
+
 //		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPenunggakan.properties");
 //		Properties properties = new Properties();
 //		properties.load(inputStream);
 //		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 //		int columnLength = columnNames.size();
 		for (String columnName : column1) {
-	        pdfTable.addCell(Align(columnName));
-	    }
+			pdfTable.addCell(Align(columnName));
+		}
 //		PdfPCell cell1 = new PdfPCell(new Phrase(laporanPenunggakanConfigurationProperties.getIdTransaksi()));
 //		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 //		pdfTable.addCell(cell1);
@@ -399,6 +442,7 @@ public class TransaksiTelkomService {
 
 		return outputStream;
 	}
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
