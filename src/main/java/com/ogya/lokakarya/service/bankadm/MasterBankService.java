@@ -1,3 +1,14 @@
+/*
+* MasterBankService.java
+*	This class is provide service relate to master_bank table such as
+*	CRUD, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Juan Kalyzta, Backend Team OGYA
+*/
+
+
 package com.ogya.lokakarya.service.bankadm;
 
 import java.lang.reflect.InvocationTargetException;
