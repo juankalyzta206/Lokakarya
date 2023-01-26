@@ -9,6 +9,8 @@
 */
 package com.ogya.lokakarya.service.usermanagement;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,8 +35,11 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.ogya.lokakarya.configuration.usermanagement.SubMenuColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Menu;
 import com.ogya.lokakarya.entity.usermanagement.SubMenu;
 import com.ogya.lokakarya.exception.BusinessException;
@@ -56,6 +61,9 @@ public class SubMenuService {
 
 	@Autowired
 	SubMenuCriteriaRepository subMenuCriteriaRepository;
+	
+	@Autowired
+	SubMenuColumnProperties subMenuColumnProperties;
 
 	public PaginationList<SubMenuWrapper, SubMenu> ListWithPaging(PagingRequestWrapper request) {
 		List<SubMenu> subMenuList = subMenuCriteriaRepository.findByFilter(request);
@@ -139,72 +147,89 @@ public class SubMenuService {
 		subMenuRepository.deleteById(id);
 	}
 
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
+	
+	public boolean containsChar(String s, char search) {
+	    if (s.length() == 0)
+	        return false;
+	    else
+	        return s.charAt(0) == search || containsChar(s.substring(1), search);
+	}
+	
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
-		// Call the findAll method to retrieve the data
-		List<SubMenu> data = subMenuRepository.findAll();
+		/* Call the findAll method to retrieve the data */
+		List<SubMenu> data = subMenuRepository.findAll(Sort.by(Order.by("subMenuId")).ascending());
 
-		// Now create a new iText PDF document
+		List<String> columnNames = subMenuColumnProperties.getColumn();
+		int columnLength = columnNames.size();
+
+		/* Create a new iText PDF document */
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("List Users", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("List Sub Menu", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		// Add the generation date
+		/* Add the generation date */
 		pdfDoc.add(new Paragraph(
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(8);
+		/* Create a pdf table */
+		PdfPTable pdfTable = new PdfPTable(columnLength);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
-		pdfTable.addCell("Menu");
-		pdfTable.addCell("Nama");
-		pdfTable.addCell("Url");
-		pdfTable.addCell("Program Name");
-		pdfTable.addCell("Created Date");
-		pdfTable.addCell("Created By");
-		pdfTable.addCell("Updated Date");
-		pdfTable.addCell("Updated By");
+		for (String columnName : columnNames) {
+			pdfTable.addCell(Align(columnName));
+		}
 		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < columnLength; i++) {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
-		// Iterate through the data and add it to the table
+		/* Iterate through the data and add it to the table */
 		for (SubMenu entity : data) {
-			pdfTable.addCell(String
-					.valueOf(entity.getMenu().getNama() != null ? String.valueOf(entity.getMenu().getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getUrl() != null ? String.valueOf(entity.getUrl()) : "-"));
-			pdfTable.addCell(
-					String.valueOf(entity.getProgramName() != null ? String.valueOf(entity.getProgramName()) : "-"));
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String createdDate = "-";
-			if (entity.getCreatedDate() != null) {
-				createdDate = formatter.format(entity.getCreatedDate());
+			for (String columnName : columnNames) {
+				String value = "-";
+				try {
+					String columnNameNoSpace = columnName.replaceAll("\\s", "");
+					Boolean isForeignKey = containsChar(columnNameNoSpace,':');
+					String[] foreignClass = columnNameNoSpace.split(":", 2);
+					if (!isForeignKey) {
+						Method method = SubMenu.class.getMethod(
+								"get" + columnNameNoSpace);
+						Object result = method.invoke(entity);
+						value = result != null ? result.toString() : "-";
+					} else {
+						Method method = SubMenu.class.getMethod(
+								"get" + foreignClass[0]);
+						if (foreignClass[0].equals("Menu")) {
+							Method rolesMethod = Menu.class.getMethod(
+		                            "get" + foreignClass[1]);
+							Object result = rolesMethod.invoke(method.invoke(entity));
+							value = result != null ? result.toString() : "-";
+						} 	
+					}
+					
+					
+					
+				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+					/* Handle the exception if the method is not found or cannot be invoked */
+				}
+				pdfTable.addCell(Align(value));
 			}
-			pdfTable.addCell(createdDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getCreatedBy() != null ? String.valueOf(entity.getCreatedBy()) : "-"));
-
-			String updatedDate = "-";
-			if (entity.getUpdatedDate() != null) {
-				updatedDate = formatter.format(entity.getUpdatedDate());
-			}
-			pdfTable.addCell(updatedDate);
-			pdfTable.addCell(
-					String.valueOf(entity.getUpdatedBy() != null ? String.valueOf(entity.getUpdatedBy()) : "-"));
-
 		}
 
-		// Add the table to the pdf document
+		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
