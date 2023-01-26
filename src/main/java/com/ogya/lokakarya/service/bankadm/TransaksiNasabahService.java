@@ -324,7 +324,7 @@ public class TransaksiNasabahService {
 							throw new BusinessException("Saldo Anda tidak cukup");
 						}
 					} else {
-						throw new BusinessException("Nominal transaksi minimal 10.000");
+						throw new BusinessException("Nominal transaksi minimal Rp10.000,00");
 					}
 				} else {
 					throw new BusinessException("Nomor rekening pemilik dan tujuan tidak boleh sama");

@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -50,10 +51,18 @@ public class BayarTelkomNotification {
 	HistoryBankRepository historyBankRepository;
 	@Autowired
 	LaporanBayarTelponConfigurationProperties bayarTelponConfigurationProperties;
+	@Value("${cron.daily}")
+	private String dailyCron;
+	
+	@Value("${cron.weekly}")
+	private String weeklyCron;
+
+	@Value("${cron.monthly}")
+	private String monthlyCron;
 
 //	===========================================KirimEmail=====================================================
 //	Setiap Hari Jam 7
-	@Scheduled(cron = "0 0 7 * * ?")
+	@Scheduled(cron = "${cron.daily}")
 	public void sendEmailDay() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -86,7 +95,7 @@ public class BayarTelkomNotification {
 	}
 
 //	Setiap Hari Senin Jam 7
-	@Scheduled(cron = "0 0 7 * * MON")
+	@Scheduled(cron = "${cron.weekly}")
 	public void sendEmailWeek() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -126,7 +135,7 @@ public class BayarTelkomNotification {
 	}
 
 //	Setiap tanggal 1 jam 7
-	@Scheduled(cron = "0 0 7 1 * ?")
+	@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailMonth() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
