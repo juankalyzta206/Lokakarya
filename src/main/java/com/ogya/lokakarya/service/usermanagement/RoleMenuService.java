@@ -29,7 +29,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.RoleMenuColumnProperties;
-import com.ogya.lokakarya.entity.usermanagement.HakAkses;
 import com.ogya.lokakarya.entity.usermanagement.Menu;
 import com.ogya.lokakarya.entity.usermanagement.RoleMenu;
 import com.ogya.lokakarya.entity.usermanagement.Roles;
