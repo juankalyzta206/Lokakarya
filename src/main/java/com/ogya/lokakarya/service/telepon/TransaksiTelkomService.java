@@ -390,8 +390,8 @@ public class TransaksiTelkomService {
 //		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 //		int columnLength = columnNames.size();
 		for (String columnName : column1) {
-	        pdfTable.addCell(Align(columnName));
-	    }
+			pdfTable.addCell(Align(columnName));
+		}
 
 		BaseColor color = new BaseColor(135, 206, 235);
 
