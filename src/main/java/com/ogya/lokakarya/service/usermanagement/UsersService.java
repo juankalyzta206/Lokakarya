@@ -378,7 +378,7 @@ public class UsersService {
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
 		/* Call the findAll method to retrieve the data */
-		List<Users> data = usersRepository.findAll();
+		List<Users> data = usersRepository.findAll(Sort.by(Order.by("userId")).ascending());
 
 		List<String> columnNames = usersColumnProperties.getColumn();
 		int columnLength = columnNames.size();

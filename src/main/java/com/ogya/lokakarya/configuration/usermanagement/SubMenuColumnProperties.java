@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "users")
+@ConfigurationProperties(prefix = "sub-menu")
 @PropertySource("classpath:column/columnUsermanagement.properties")
-public class UsersColumnProperties {
-	@Value("#{'${column.users}'.split(',')}")
+public class SubMenuColumnProperties {
+	@Value("#{'${column.sub-menu}'.split(',')}")
 	private List<String> column;
 	
 	public List<String> getColumn() {

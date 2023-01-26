@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableConfigurationProperties
 @ConfigurationProperties(prefix = "hak-akses")
-@PropertySource("classpath:column/usermanagement/columnHakAkses.properties")
+@PropertySource("classpath:column/columnUsermanagement.properties")
 public class HakAksesColumnProperties {
 	@Value("#{'${column.hak-akses}'.split(',')}")
 	private List<String> column;

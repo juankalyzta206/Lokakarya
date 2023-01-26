@@ -164,7 +164,7 @@ public class HakAksesService {
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
 		/* Call the findAll method to retrieve the data */
-		List<HakAkses> data = hakAksesRepository.findAll();
+		List<HakAkses> data = hakAksesRepository.findAll(Sort.by(Order.by("hakAksesId")).ascending());
 
 		List<String> columnNames = hakAksesColumnProperties.getColumn();
 		int columnLength = columnNames.size();
