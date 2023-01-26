@@ -15,6 +15,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -39,6 +40,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.nasabah.LaporanBayarTelponConfigurationProperties;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
 import com.ogya.lokakarya.entity.bankadm.MasterBank;
+import com.ogya.lokakarya.entity.usermanagement.HakAkses;
+import com.ogya.lokakarya.entity.usermanagement.Roles;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
 import com.ogya.lokakarya.service.bankadm.HistoryBankService;
@@ -183,6 +186,12 @@ public class BayarTelkomNotification {
 //			
 //		}
 //	}
+	public boolean containsChar(String s, char search) {
+		if (s.length() == 0)
+			return false;
+		else
+			return s.charAt(0) == search || containsChar(s.substring(1), search);
+	}
 
 	public ByteArrayOutputStream exportToXLSBayarTelpon() throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -199,42 +208,71 @@ public class BayarTelkomNotification {
 
 		for (int i = 0; i < columnLength; i++) {
 			XSSFCell headerCell = headerRow.createCell(i);
-			headerCell.setCellValue(columnNames.get(i).toUpperCase());
-			if (columnNames.get(i).equals("Uang")) {
+			if (columnNames.get(i).equals("Rekening:Norek")) {
+				headerCell.setCellValue("REKENING");
+			} else if (columnNames.get(i).equals("Uang")) {
 				headerCell.setCellValue("NOMINAL");
-			} 
+			} else {
+				headerCell.setCellValue(columnNames.get(i).toUpperCase());
+			}
+
 //			else {
 //				headerCell.setCellValue(columnNames.get(i));
 //			}
 		}
 
 //		StringBuilder sbData = new StringBuilder();
+		int rowNum = 1;
+		int columnNum = 0;
 		for (HistoryBank entity : data) {
-			XSSFRow dataRow = sheet.createRow(data.size());
+			Row row = sheet.createRow(rowNum++);
+			columnNum = 0;
 			for (String columnName : columnNames) {
 				String value = "-";
 				try {
 					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = HistoryBank.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					if (columnName.equals("rekening")) {
-						Object result = method.invoke(entity);
-
-						Method rekening = result.getClass().getMethod("getNorek");
-//						System.out.println(rekening);
-						Object hasil = rekening.invoke(method.invoke(entity));
-						value = hasil != null ? hasil.toString() : "-";
-					} else if (columnName.equals("statusKet")) {
-						value = "Bayar Telepon";
-					} else {
+					Boolean isForeignKey = containsChar(columnNameNoSpace, ':');
+					String[] foreignClass = columnNameNoSpace.split(":", 2);
+					if (!isForeignKey) {
+						Method method = HistoryBank.class.getMethod("get" + columnNameNoSpace);
 						Object result = method.invoke(entity);
 						value = result != null ? result.toString() : "-";
+					} else {
+						Method method = HistoryBank.class.getMethod("get" + foreignClass[0]);
+						if (foreignClass[0].equals("Rekening")) {
+							Method masterBankMethod = MasterBank.class.getMethod("get" + foreignClass[1]);
+							Object result = masterBankMethod.invoke(method.invoke(entity));
+							value = result != null ? result.toString() : "-";
+						}
 					}
-
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					// Handle the exception if the method is not found or cannot be invoked
 				}
+				row.createCell(columnNum).setCellValue(value);
+				columnNum++;
+			}
+		}
+
+		/* Resize the columns to fit the contents */
+		for (int i = 0; i < columnLength; i++) {
+			sheet.autoSizeColumn(i);
+		}
+
+//					Method method = HistoryBank.class.getMethod(
+//							"get" + columnNameNoSpace);
+//					if (columnName.equals("rekening")) {
+//						Object result = method.invoke(entity);
+//
+//						Method rekening = result.getClass().getMethod("getNorek");
+////						System.out.println(rekening);
+//						Object hasil = rekening.invoke(method.invoke(entity));
+//						value = hasil != null ? hasil.toString() : "-";
+//					} else if (columnName.equals("statusKet")) {
+//						value = "Bayar Telepon";
+//					} else {
+//						Object result = method.invoke(entity);
+//						value = result != null ? result.toString() : "-";
+//					}
 
 //			sbData.append(data.get(i).getRekening().getNorek().toString()).append(",");
 //			dataRow.createCell(0).setCellValue(data.get(i).getRekening().getNorek());
@@ -254,8 +292,6 @@ public class BayarTelkomNotification {
 //				dataCell.setCellValue(sbData.toString());
 //			}
 
-			}
-		}
 		workbook.write(outputStream);
 		return outputStream;
 
@@ -307,6 +343,8 @@ public class BayarTelkomNotification {
 		for (String columnName : columnNames) {
 			if (columnName.equals("Uang")) {
 				pdfTable.addCell(Align("NOMINAL"));
+			} else if (columnName.equals("Rekening:Norek")) {
+				pdfTable.addCell(Align("REKENING"));
 			} else {
 				pdfTable.addCell(Align(columnName.toUpperCase()));
 			}
@@ -321,25 +359,24 @@ public class BayarTelkomNotification {
 				String value = "-";
 				try {
 					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = HistoryBank.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					if (columnName.equals("rekening")) {
-						Object result = method.invoke(entity);
-
-						Method rekening = result.getClass().getMethod("getNorek");
-//						System.out.println(rekening);
-						Object hasil = rekening.invoke(method.invoke(entity));
-						value = hasil != null ? hasil.toString() : "-";
-					} else if (columnName.equals("statusKet")) {
-						value = "Bayar Telepon";
-					} else {
+					Boolean isForeignKey = containsChar(columnNameNoSpace, ':');
+					String[] foreignClass = columnNameNoSpace.split(":", 2);
+					if (!isForeignKey) {
+						Method method = HistoryBank.class.getMethod("get" + columnNameNoSpace);
 						Object result = method.invoke(entity);
 						value = result != null ? result.toString() : "-";
+					} else {
+						Method method = HistoryBank.class.getMethod("get" + foreignClass[0]);
+						if (foreignClass[0].equals("Rekening")) {
+							Method masterBankMethod = MasterBank.class.getMethod("get" + foreignClass[1]);
+							Object result = masterBankMethod.invoke(method.invoke(entity));
+							value = result != null ? result.toString() : "-";
+						}
+
 					}
 
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
+					/* Handle the exception if the method is not found or cannot be invoked */
 				}
 				pdfTable.addCell(Align(value));
 			}
