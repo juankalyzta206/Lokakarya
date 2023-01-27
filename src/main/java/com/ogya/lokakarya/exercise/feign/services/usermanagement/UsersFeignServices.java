@@ -54,7 +54,7 @@ public class UsersFeignServices {
 	public DataResponseFeign<UsersAddWrapper> callUserRoleRecord(UsersAddWrapper wrapper) {
 		try {
 			UsersFeignToWebServiceRequest requestWebService = new UsersFeignToWebServiceRequest();
-			requestWebService.setAlamat(wrapper.getAlamat());
+			requestWebService.setAlamat(wrapper.getAlamat().toString());
 			requestWebService.setNama(wrapper.getNama());
 			requestWebService.setEmail(wrapper.getEmail());
 			requestWebService.setTelpon(wrapper.getTelp().toString());

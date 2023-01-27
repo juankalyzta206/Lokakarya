@@ -19,6 +19,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
@@ -27,6 +29,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ogya.lokakarya.entity.usermanagement.alamat.Kecamatan;
 import com.ogya.lokakarya.entity.usermanagement.login.HakAksesLogin;
 
 @Entity
@@ -36,7 +39,7 @@ public class Users {
 	private String username;
 	private String password;
 	private String nama;
-	private String alamat;
+	private Kecamatan alamat;
 	private String email;
 	private Long telp;
 	private String programName;
@@ -88,12 +91,14 @@ public class Users {
 	}
 
 	// --------------------------------------------------------------------------------------------------------
-	@Column(name = "ALAMAT")
-	public String getAlamat() {
+	@ManyToOne
+	@JoinColumn(name = "ALAMAT")
+	@JsonIgnore
+	public Kecamatan getAlamat() {
 		return alamat;
 	}
 
-	public void setAlamat(String alamat) {
+	public void setAlamat(Kecamatan alamat) {
 		this.alamat = alamat;
 	}
 

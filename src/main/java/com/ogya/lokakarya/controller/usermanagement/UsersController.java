@@ -92,7 +92,7 @@ public class UsersController {
 	@PostMapping(value = "/findAllWithPaginationAndFilter")
 	public DataResponsePagination<UsersWrapper, Users> findAllWithPaginationAndFilter(
 			@RequestBody(required = true) PagingRequestWrapper request) {
-		return new DataResponsePagination<UsersWrapper, Users>(userService.ListWithPaging(request));
+		return new DataResponsePagination<UsersWrapper, Users>(userService.listWithPaging(request));
 	}
 
 }
