@@ -350,17 +350,17 @@ public class TransaksiTelkomService {
 		}
 		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
 		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
-		
+
 		ServletOutputStream outputStream = response.getOutputStream();
 		workbook.write(outputStream);
 		workbook.close();
 		outputStream.close();
 	}
-	
+
 	public void ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, HttpServletResponse response) throws Exception {
-		
+
 		// Now create a new iText PDF document
-		
+
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ServletOutputStream outputStream = response.getOutputStream();
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -393,30 +393,13 @@ public class TransaksiTelkomService {
 		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
-		
+
 		pdfDoc.close();
 		outputStream.close();
 	}
-	
+
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-		List<TransaksiTelkomWrapper> wrapperList = new ArrayList<TransaksiTelkomWrapper>();
-
-		for (int i = 0; i < dataTransaksi.size(); i++) {
-			TransaksiTelkomWrapper wrapper = new TransaksiTelkomWrapper();
-			wrapper.setIdPelanggan(dataTransaksi.get(i).getIdPelanggan().getIdPelanggan());
-			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
-
-			wrapper.setNama(masterPelanggan.getNama());
-			wrapper.setBulanTagihan(dataTransaksi.get(i).getBulanTagihan());
-			wrapper.setTahunTagihan(dataTransaksi.get(i).getTahunTagihan());
-			wrapper.setUang(dataTransaksi.get(i).getUang());
-			wrapper.setStatus(dataTransaksi.get(i).getStatus());
-			wrapper.setIdTransaksi(dataTransaksi.get(i).getIdTransaksi());
-			wrapperList.add(wrapper);
-		}
-
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -453,22 +436,8 @@ public class TransaksiTelkomService {
 		}
 
 		// Iterate through the data and add it to the table
-		for (TransaksiTelkomWrapper entity : wrapperList) {
-			pdfTable.addCell(Align(
-					String.valueOf(entity.getIdTransaksi() != null ? String.valueOf(entity.getIdTransaksi()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
-			pdfTable.addCell(Align(
-					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
-			pdfTable.addCell(Align(
-					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
-			NumberFormat numberFormat = NumberFormat.getCurrencyInstance(new Locale("in", "ID"));
-			CurrencyData currencyNominal = new CurrencyData();
-			currencyNominal.setValue(entity.getUang());
-			pdfTable.addCell(Align(String.valueOf(numberFormat.format(currencyNominal.getValue()) != null
-					? String.valueOf(numberFormat.format(currencyNominal.getValue()))
-					: "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getStatus() != null ? "Belum Lunas" : "-")));
-		}
+		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
+		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);

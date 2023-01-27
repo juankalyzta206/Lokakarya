@@ -175,9 +175,6 @@ public class LaporanPelunasanNotification {
 		helper.setSubject("Laporan Bayar Telepon Bulan " + bulan);
 		helper.setText("Laporan Bayar Telepon Bulan " + bulan, true);
 		InputStreamSource laporan = historyService.ExportToExcelParam(data);
-		// ByteArrayOutputStream pdf = historyService.ExportToPdfParam(data, title);
-//			LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(data);
-//			ByteArrayOutputStream excel = excelExporter.export();
 		helper.addAttachment(title + ".xlsx", laporan);
 		javaMailSender.send(mailMessage);
 		System.out.println("Email send");
