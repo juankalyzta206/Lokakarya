@@ -163,12 +163,6 @@ public class HakAksesService {
 		return cell;
 	}
 
-	public boolean containsChar(String s, char search) {
-		if (s.length() == 0)
-			return false;
-		else
-			return s.charAt(0) == search || containsChar(s.substring(1), search);
-	}
 
 	public void ExportToPdf(HttpServletResponse response) throws Exception {
 		/* Call the findAll method to retrieve the data */
