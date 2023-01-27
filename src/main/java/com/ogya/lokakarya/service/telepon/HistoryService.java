@@ -132,7 +132,7 @@ public class HistoryService {
 		List<HistoryWrapper> historyWrapperList = toWrapperList(historyList);
 		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyWrapperList, historyPage);
 	}
-	
+
 	public List<HistoryWrapper> testData() {
 		List<HistoryTelkom> dataHistory = historyRepository.findAll();
 		List<HistoryWrapper> historyList = new ArrayList<HistoryWrapper>();
@@ -140,10 +140,9 @@ public class HistoryService {
 		for (int i = 0; i < dataHistory.size(); i++) {
 			HistoryWrapper wrapper = new HistoryWrapper();
 			wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan().getIdPelanggan());
-			
-			MasterPelanggan masterPelanggan = masterPelangganRepository
-					.findByIdPelanggan(wrapper.getIdPelanggan());
-			
+
+			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
+
 			wrapper.setNama(masterPelanggan.getNama());
 			wrapper.setBulanTagihan(dataHistory.get(i).getBulanTagihan());
 			wrapper.setTanggalBayar(dataHistory.get(i).getTanggalBayar());
@@ -164,9 +163,8 @@ public class HistoryService {
 		for (int i = 0; i < dataHistory.size(); i++) {
 			HistoryWrapper wrapper = new HistoryWrapper();
 			wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan().getIdPelanggan());
-			MasterPelanggan masterPelanggan = masterPelangganRepository
-					.findByIdPelanggan(wrapper.getIdPelanggan());
-			
+			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
+
 			wrapper.setNama(masterPelanggan.getNama());
 			wrapper.setBulanTagihan(dataHistory.get(i).getBulanTagihan());
 			wrapper.setTanggalBayar(dataHistory.get(i).getTanggalBayar());
@@ -200,7 +198,7 @@ public class HistoryService {
 		pdfTable.addCell("Bulan Tagihan");
 		pdfTable.addCell("Tahun Tagihan");
 		pdfTable.addCell("Nominal");
-		
+
 		BaseColor color = new BaseColor(135, 206, 235);
 
 		for (int i = 0; i < 5; i++) {
@@ -210,16 +208,18 @@ public class HistoryService {
 		// Iterate through the data and add it to the table
 		for (HistoryWrapper entity : historyList) {
 			pdfTable.addCell(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-"));
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			String tanggalBayar = "-";
 			if (entity.getTanggalBayar() != null) {
 				tanggalBayar = formatter.format(entity.getTanggalBayar());
 			}
 			pdfTable.addCell(tanggalBayar);
-			
-			pdfTable.addCell(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
-			pdfTable.addCell(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
+
+			pdfTable.addCell(
+					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-"));
+			pdfTable.addCell(
+					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-"));
 			pdfTable.addCell(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-"));
 		}
 
@@ -232,15 +232,15 @@ public class HistoryService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
-	public InputStreamSource ExportToExcelParam (List<HistoryTelkom> listUsers) throws Exception{
+
+	public InputStreamSource ExportToExcelParam(List<HistoryTelkom> listUsers) throws Exception {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Setor");
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		Row headerRow = sheet.createRow(0);
-		
+
 		List<String> columnNames = laporanPelunasanConfiguration.getColumn();
-		
+
 		for (int i = 0; i < 5; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
@@ -257,7 +257,7 @@ public class HistoryService {
 			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
 			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
 			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
-			
+
 		}
 		for (int i = 0; i < 5; i++) {
 			sheet.autoSizeColumn(i);
@@ -269,8 +269,8 @@ public class HistoryService {
 		workbook.close();
 		return attachmentSource;
 	}
-	
-	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory , String tittle) throws Exception {
+
+	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory, String tittle) throws Exception {
 		// Call the findAll method to retrieve the data
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		List<HistoryWrapper> historyList = new ArrayList<HistoryWrapper>();
@@ -278,9 +278,8 @@ public class HistoryService {
 		for (int i = 0; i < dataHistory.size(); i++) {
 			HistoryWrapper wrapper = new HistoryWrapper();
 			wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan().getIdPelanggan());
-			MasterPelanggan masterPelanggan = masterPelangganRepository
-					.findByIdPelanggan(wrapper.getIdPelanggan());
-			
+			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
+
 			wrapper.setNama(masterPelanggan.getNama());
 			wrapper.setBulanTagihan(dataHistory.get(i).getBulanTagihan());
 			wrapper.setTanggalBayar(dataHistory.get(i).getTanggalBayar());
@@ -308,17 +307,17 @@ public class HistoryService {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-		
+
 		List<String> column1 = laporanPelunasanConfiguration.getColumn();
-		
+
 //		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
 //		Properties properties = new Properties();
 //		properties.load(inputStream);
 //		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 //		int columnLength = columnNames.size();
 		for (String columnName : column1) {
-	        pdfTable.addCell(Align(columnName));
-	    }
+			pdfTable.addCell(Align(columnName));
+		}
 //		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
 //		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 //		pdfTable.addCell(cell1);
@@ -334,7 +333,7 @@ public class HistoryService {
 //		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
 //		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 //		pdfTable.addCell(cell5);
-		
+
 		BaseColor color = new BaseColor(135, 206, 235);
 
 		for (int i = 0; i < 5; i++) {
@@ -344,16 +343,18 @@ public class HistoryService {
 		// Iterate through the data and add it to the table
 		for (HistoryWrapper entity : historyList) {
 			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
-			
+
 			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 			String tanggalBayar = "-";
 			if (entity.getTanggalBayar() != null) {
 				tanggalBayar = formatter.format(entity.getTanggalBayar());
 			}
 			pdfTable.addCell(Align(tanggalBayar));
-			
-			pdfTable.addCell(Align(String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
+
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
+			pdfTable.addCell(Align(
+					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
 			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
 		}
 
@@ -363,23 +364,26 @@ public class HistoryService {
 		pdfDoc.close();
 		return outputStream;
 	}
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
 		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
 		return cell;
 	}
-	public PaginationList<HistoryWrapper, HistoryTelkom> ListWithPaging(PagingRequestWrapper request) { 
+
+	public PaginationList<HistoryWrapper, HistoryTelkom> ListWithPaging(PagingRequestWrapper request) {
 		List<HistoryTelkom> historyTelkomList = historyTelkomCriteriaRepository.findByFilter(request);
-		
-		int fromIndex = (request.getPage())* (request.getSize());
+
+		int fromIndex = (request.getPage()) * (request.getSize());
 		int toIndex = Math.min(fromIndex + request.getSize(), historyTelkomList.size());
-		Page<HistoryTelkom> historyTelkomPage = new PageImpl<>(historyTelkomList.subList(fromIndex, toIndex), PageRequest.of(request.getPage(), request.getSize()), historyTelkomList.size());
+		Page<HistoryTelkom> historyTelkomPage = new PageImpl<>(historyTelkomList.subList(fromIndex, toIndex),
+				PageRequest.of(request.getPage(), request.getSize()), historyTelkomList.size());
 		List<HistoryWrapper> historyTelkomWrapperList = new ArrayList<HistoryWrapper>();
-		for(HistoryTelkom entity : historyTelkomPage) {
+		for (HistoryTelkom entity : historyTelkomPage) {
 			HistoryWrapper wrapper = toWrapper(entity);
-		    historyTelkomWrapperList.add(wrapper);
+			historyTelkomWrapperList.add(wrapper);
 		}
-		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyTelkomWrapperList, historyTelkomPage);	
+		return new PaginationList<HistoryWrapper, HistoryTelkom>(historyTelkomWrapperList, historyTelkomPage);
 	}
 }

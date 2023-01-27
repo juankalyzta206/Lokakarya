@@ -745,14 +745,14 @@ public class TransaksiNasabahService {
 		ValidateRekeningFeignResponse rekValidate = transferService.callValidateRekening(rekAsal.toString());
 
 		if (rekValidate.getRegistered() == true) {
-			
+
 			List<BayarTeleponWrapper> bayarTelponList = bayarTelponPerbulan(rekAsal, noTelpon, bulanTagihan);
-			
+
 			BayarRequest bayarRequest = new BayarRequest();
 			bayarRequest.setBulan((int) bulanTagihan);
 			bayarRequest.setNoRekening(rekAsal.toString());
 			bayarRequest.setNoTelepon(noTelpon.toString());
-			
+
 			BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
 
 			MasterBank pengirim = masterBankRepo.getReferenceById(rekAsal);
@@ -1100,7 +1100,7 @@ public class TransaksiNasabahService {
 
 		pdfTable.addCell(Left("Nomor Reference"));
 		pdfTable.addCell(Right(transferFeignResponse.getReferenceNumber()));
-		
+
 		pdfTable.addCell(Left("Nomor Rekening Pengirim"));
 		pdfTable.addCell(Right(
 				String.valueOf(data.getRekening().getNorek()) != null ? String.valueOf(data.getRekening().getNorek())
@@ -1142,12 +1142,12 @@ public class TransaksiNasabahService {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		HistoryTelkom dataTelepon = historyTelkomRepo.getReferenceById(idHistoryTelp);
 		HistoryBank dataNasabah = historyBankRepo.getReferenceById(idHistoryBank);
-		
+
 		BayarRequest bayarRequest = new BayarRequest();
 		bayarRequest.setBulan((int) dataTelepon.getBulanTagihan());
 		bayarRequest.setNoRekening(dataNasabah.getRekening().getNorek().toString());
 		bayarRequest.setNoTelepon(dataTelepon.getIdPelanggan().getNoTelp().toString());
-		
+
 		BayarResponse bayarResponse = telkomFeignServices.callBayarTelkom(bayarRequest);
 
 		// Now create a new iText PDF document
@@ -1181,15 +1181,15 @@ public class TransaksiNasabahService {
 		pdfTable.addCell(Left("Tanggal"));
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 		String formattedDate = "-";
-		
-		pdfTable.addCell(Left("Nomor Reference"));
-		pdfTable.addCell(Right(bayarResponse.getReferenceNumber()));
 
 		if (dataNasabah.getTanggal() != null) {
 			formattedDate = formatter.format(dataNasabah.getTanggal());
 		}
 
 		pdfTable.addCell(Right(formattedDate));
+
+		pdfTable.addCell(Left("Nomor Reference"));
+		pdfTable.addCell(Right(bayarResponse.getReferenceNumber()));
 
 		pdfTable.addCell(Left("Nomor Rekening"));
 		pdfTable.addCell(Right(String.valueOf(dataNasabah.getRekening().getNorek()) != null
@@ -1309,49 +1309,50 @@ public class TransaksiNasabahService {
 			e.printStackTrace();
 		}
 	}
-	
+
 //	==========================================DownloadPDF======================================================
 	public void ExportToPdfSetor(HttpServletResponse response, Long idHistory) throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Setor Tunai.pdf");
-	    ByteArrayOutputStream baos = ExportToPdfSetorParam(idHistory);
-	    response.setContentLength(baos.size());
-	    OutputStream os = response.getOutputStream();
-	    baos.writeTo(os);
-	    os.flush();
-	    os.close();
+		response.setHeader("Content-Disposition", "attachment; filename=Setor Tunai.pdf");
+		ByteArrayOutputStream baos = ExportToPdfSetorParam(idHistory);
+		response.setContentLength(baos.size());
+		OutputStream os = response.getOutputStream();
+		baos.writeTo(os);
+		os.flush();
+		os.close();
 	}
-	
+
 	public void ExportToPdfTarik(HttpServletResponse response, Long idHistory) throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
-	    ByteArrayOutputStream baos = ExportToPdfTarikParam(idHistory);
-	    response.setContentLength(baos.size());
-	    OutputStream os = response.getOutputStream();
-	    baos.writeTo(os);
-	    os.flush();
-	    os.close();
+		response.setHeader("Content-Disposition", "attachment; filename=Tarik Tunai.pdf");
+		ByteArrayOutputStream baos = ExportToPdfTarikParam(idHistory);
+		response.setContentLength(baos.size());
+		OutputStream os = response.getOutputStream();
+		baos.writeTo(os);
+		os.flush();
+		os.close();
 	}
-	
+
 	public void ExportToPdfTransfer(HttpServletResponse response, Long idHistory, Long saldo) throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Transfer.pdf");
-	    ByteArrayOutputStream baos = ExportToPdfTransferParam(idHistory,saldo);
-	    response.setContentLength(baos.size());
-	    OutputStream os = response.getOutputStream();
-	    baos.writeTo(os);
-	    os.flush();
-	    os.close();
+		response.setHeader("Content-Disposition", "attachment; filename=Transfer.pdf");
+		ByteArrayOutputStream baos = ExportToPdfTransferParam(idHistory, saldo);
+		response.setContentLength(baos.size());
+		OutputStream os = response.getOutputStream();
+		baos.writeTo(os);
+		os.flush();
+		os.close();
 	}
-	
-	public void ExportToPdfBayarTelepon(HttpServletResponse response, Long idHistoryBank, Long idHistoryTelp) throws Exception {
+
+	public void ExportToPdfBayarTelepon(HttpServletResponse response, Long idHistoryBank, Long idHistoryTelp)
+			throws Exception {
 		response.setContentType("application/pdf");
-	    response.setHeader("Content-Disposition", "attachment; filename=Bayar Telepon.pdf");
-	    ByteArrayOutputStream baos = ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
-	    response.setContentLength(baos.size());
-	    OutputStream os = response.getOutputStream();
-	    baos.writeTo(os);
-	    os.flush();
-	    os.close();
+		response.setHeader("Content-Disposition", "attachment; filename=Bayar Telepon.pdf");
+		ByteArrayOutputStream baos = ExportToPdfBayarTeleponParam(idHistoryBank, idHistoryTelp);
+		response.setContentLength(baos.size());
+		OutputStream os = response.getOutputStream();
+		baos.writeTo(os);
+		os.flush();
+		os.close();
 	}
 }
