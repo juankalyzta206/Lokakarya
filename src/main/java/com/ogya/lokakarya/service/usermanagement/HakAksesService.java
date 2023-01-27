@@ -1,3 +1,12 @@
+/*
+* HakAksesService.java
+*	This class is provide service relate to hak akses table such as
+*	CRUD, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.service.usermanagement;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +48,7 @@ import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.HakAksesCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.HakAksesWrapper;
 
 @Service
@@ -196,9 +206,8 @@ public class HakAksesService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
-		ParsingColumn<HakAkses> parsing = new ParsingColumn<HakAkses>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		ExportData<HakAkses> parsing = new ExportData<HakAkses>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 		
 		
 

@@ -46,6 +46,7 @@ import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.UsersCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.UsersAddWrapper;
 import com.ogya.lokakarya.wrapper.usermanagement.UsersRegisterWrapper;
 import com.ogya.lokakarya.wrapper.usermanagement.UsersUpdateWrapper;
@@ -410,9 +411,8 @@ public class UsersService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
-		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		ExportData<Users> parsing = new ExportData<Users>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);

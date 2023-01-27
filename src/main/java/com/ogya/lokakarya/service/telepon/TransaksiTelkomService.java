@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
@@ -343,6 +345,36 @@ public class TransaksiTelkomService {
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
 		workbook.close();
 		return attachmentSource;
+	}
+
+	public void ExportToExcelParam(List<TransaksiTelkom> listUsers, HttpServletResponse response) throws Exception {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
+		Row headerRow = sheet.createRow(0);
+
+		List<String> columnNames = laporanPenunggakanConfigurationProperties.getColumn();
+
+		for (int i = 0; i < 6; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdTransaksi());
+			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			dataRow.createCell(5).setCellValue(listUsers.get(i).getStatus());
+
+		}
+		for (int i = 0; i < 6; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		ServletOutputStream outputStream = response.getOutputStream();
+		workbook.write(outputStream);
+		workbook.close();
+		outputStream.close();
 	}
 
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {

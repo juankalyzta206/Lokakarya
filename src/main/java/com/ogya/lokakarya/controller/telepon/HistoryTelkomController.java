@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
+import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.helper.telepon.LaporanPelunasanExcelExporter;
-import com.ogya.lokakarya.helper.telepon.LaporanPenunggakanExcelExporter;
+
 import com.ogya.lokakarya.repository.telepon.HistoryTelkomRepository;
 import com.ogya.lokakarya.service.telepon.HistoryService;
 import com.ogya.lokakarya.util.DataResponse;
@@ -30,7 +31,6 @@ import com.ogya.lokakarya.util.DataResponseList;
 import com.ogya.lokakarya.util.DataResponsePagination;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
-import com.ogya.lokakarya.wrapper.telepon.TransaksiTelkomWrapper;
 
 @RestController
 @RequestMapping(value = "/historytelkom")
@@ -77,28 +77,30 @@ public class HistoryTelkomController {
 	public void exportToPdf(HttpServletResponse response) throws Exception {
 		historyService.ExportToPdf(response);
 	}
-	
+
 	@GetMapping(path = "/testData")
 	public DataResponseList<HistoryWrapper> testData() {
 		return new DataResponseList<HistoryWrapper>(historyService.testData());
 	}
+
 	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
-	public DataResponsePagination<HistoryWrapper, HistoryTelkom> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
+	public DataResponsePagination<HistoryWrapper, HistoryTelkom> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
 		return new DataResponsePagination<HistoryWrapper, HistoryTelkom>(historyService.ListWithPaging(request));
 	}
-	 @GetMapping("/download")
-   public void exportToExcel(HttpServletResponse response) throws IOException {
-       response.setContentType("application/octet-stream");
-       DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-       String currentDateTime = dateFormatter.format(new Date());
-        
-       String headerKey = "Content-Disposition";
-       String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
-       response.setHeader(headerKey, headerValue);
-        
-       List<HistoryTelkom> listUsers = historyTelkomRepository.findAll();
-       LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(listUsers);
-        
-       excelExporter.export(response);    
-   }
+
+	@GetMapping("/download")
+	public void exportToExcel(HttpServletResponse response) throws Exception {
+		response.setContentType("application/octet-stream");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
+
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+		response.setHeader(headerKey, headerValue);
+
+		List<HistoryTelkom> listUsers = historyTelkomRepository.findAll();
+		//List<HistoryTelkom> listUsers = historyService.findAllStatus1NoWrapper();
+		historyService.ExportToExcelParam(listUsers, response);
+	}
 }

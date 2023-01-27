@@ -1,3 +1,13 @@
+/*
+* MenuService.java
+*	This class is provide service relate to menu table such as
+*	CRUD, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
+
 package com.ogya.lokakarya.service.usermanagement;
 
 
@@ -35,6 +45,7 @@ import com.ogya.lokakarya.repository.usermanagement.MenuRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.MenuCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.MenuWrapper;
 
 @Service
@@ -171,9 +182,8 @@ public class MenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
-		ParsingColumn<Menu> parsing = new ParsingColumn<Menu>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		ExportData<Menu> parsing = new ExportData<Menu>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);

@@ -102,10 +102,6 @@ public class TransaksiTelkomController {
 		response.setHeader(headerKey, headerValue);
 
 		List<TransaksiTelkom> listUsers = transaksiTelkomService.findAllStatus1NoWrapper();
-		transaksiTelkomService.ExportToExcelParam(listUsers);
-		// LaporanPenunggakanExcelExporter excelExporter = new
-		// LaporanPenunggakanExcelExporter(listUsers);
-
-		// excelExporter.export(response);
+		transaksiTelkomService.ExportToExcelParam(listUsers, response);
 	}
 }

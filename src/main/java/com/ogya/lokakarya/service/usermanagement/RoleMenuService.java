@@ -1,3 +1,12 @@
+/*
+* RoleMenuService.java
+*	This class is provide service relate to role menu table such as
+*	CRUD, pagination, and export to PDF
+*
+* Version 1.0
+*
+* Copyright : Irzan Maulana, Backend Team OGYA
+*/
 package com.ogya.lokakarya.service.usermanagement;
 
 import java.text.SimpleDateFormat;
@@ -39,6 +48,7 @@ import com.ogya.lokakarya.repository.usermanagement.RolesRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.RoleMenuCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.RoleMenuWrapper;
 
 @Service
@@ -198,9 +208,8 @@ public class RoleMenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
-		ParsingColumn<RoleMenu> parsing = new ParsingColumn<RoleMenu>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		ExportData<RoleMenu> parsing = new ExportData<RoleMenu>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 
 		/* Add the table to the pdf document */

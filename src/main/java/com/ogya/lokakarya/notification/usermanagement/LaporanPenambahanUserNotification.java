@@ -12,8 +12,6 @@ package com.ogya.lokakarya.notification.usermanagement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +30,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -52,6 +51,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
 @Service
@@ -65,6 +65,15 @@ public class LaporanPenambahanUserNotification {
 
 	@Autowired
 	UsersColumnProperties laporanPenambahanUserConfigurationProperties;
+	
+	@Value("${cron.daily}")
+	private String dailyCron;
+
+	@Value("${cron.monthly}")
+	private String monthlyCron;
+
+	@Value("${cron.weekly}")
+	private String weeklyCron;
 
 	/* array receiver and cc email for notification service */
 	private String[] receiver = { "maulanairzan5@gmail.com" };
@@ -72,7 +81,7 @@ public class LaporanPenambahanUserNotification {
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
-	@Scheduled(cron = "0 0 7 * * *")
+	@Scheduled(cron ="${cron.daily}")
 	/* run daily notification everyday at 7 am */
 	public void DailyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -100,7 +109,7 @@ public class LaporanPenambahanUserNotification {
 
 	}
 
-	@Scheduled(cron = "0 0 7 1 * ?") 
+	@Scheduled(cron = "${cron.monthly}") 
 	/* run monthly notification every date 1 of the month at 7 am */
 	public void MonthlyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -127,7 +136,7 @@ public class LaporanPenambahanUserNotification {
 		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	@Scheduled(cron = "0 0 7 * * MON")
+	@Scheduled(cron = "${cron.weekly}")
 	/* run weekly notification every monday 7 am */
 	public void WeeklyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -237,22 +246,8 @@ public class LaporanPenambahanUserNotification {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (Users entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = Users.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+		ExportData<Users> parsing = new ExportData<Users>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
@@ -279,33 +274,10 @@ public class LaporanPenambahanUserNotification {
 			cell.setCellValue(columnNames.get(i));
 		}
 
-		/* Write data to the sheet */
-		int rowNum = 1;
-		int columnNum = 0;
-		for (Users entity : data) {
-			Row row = sheet.createRow(rowNum++);
-			columnNum = 0;
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = Users.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
-				}
-				row.createCell(columnNum).setCellValue(value);
-				columnNum++;
-			}
-		}
-
-		/* Resize the columns to fit the contents */
-		for (int i = 0; i < columnLength; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		/* Iterate through the data and add it to the sheet */
+		ExportData<Users> parsing = new ExportData<Users>();
+		sheet = parsing.exportExcel(columnNames, data, sheet);
+		
 
 		/* Write the workbook to the output file */
 		workbook.write(baos);

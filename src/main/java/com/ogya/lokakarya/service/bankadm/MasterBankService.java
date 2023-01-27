@@ -11,8 +11,6 @@
 
 package com.ogya.lokakarya.service.bankadm;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,9 +19,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,6 +49,7 @@ import com.ogya.lokakarya.exercise.feign.services.bankadm.BankAdminFeignServices
 import com.ogya.lokakarya.repository.bankadm.MasterBankCriteriaRepository;
 import com.ogya.lokakarya.repository.bankadm.MasterBankRepository;
 import com.ogya.lokakarya.util.DataResponseFeign;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 import com.ogya.lokakarya.wrapper.bankadm.MasterBankWrapper;
@@ -197,7 +196,7 @@ public class MasterBankService {
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, response.getOutputStream());
 		pdfDoc.open();
 
-		Paragraph title = new Paragraph("List Users", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		Paragraph title = new Paragraph("List Nasabah", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
@@ -220,23 +219,9 @@ public class MasterBankService {
 			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
 		}
 
-		// Iterate through the data and add it to the table
-		for (MasterBank entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = MasterBank.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+		/* Iterate through the data and add it to the table */
+		ExportData<MasterBank> parsing = new ExportData<MasterBank>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
@@ -303,29 +288,25 @@ public class MasterBankService {
 	public void exportToXls(HttpServletResponse response) throws Exception {
 		// Call the findAll method to retrieve the data
 		List<MasterBank> data = masterBankRepository.findAll();
+		
+		List<String> columnNames = laporanMasterBankConfigurationProperties.getColumn();
 
 		// Create a new Apache POI workbook
+		
 		try (HSSFWorkbook workbook = new HSSFWorkbook()) {
-			HSSFSheet sheet = workbook.createSheet("Laporan Transaksi Bank");
+			Sheet sheet = workbook.createSheet("Laporan Transaksi Bank");
 
 			// Create the header row
-			HSSFRow headerRow = sheet.createRow(0);
+			Row headerRow = sheet.createRow(0);
 			headerRow.createCell(0).setCellValue("Nomor Rekening");
 			headerRow.createCell(1).setCellValue("Nama");
 			headerRow.createCell(2).setCellValue("Alamat");
 			headerRow.createCell(3).setCellValue("No Telepon");
 			headerRow.createCell(4).setCellValue("Saldo");
 
-			// Iterate through the data and add it to the sheet
-			int rowNum = 1;
-			for (MasterBank entity : data) {
-				HSSFRow row = sheet.createRow(rowNum++);
-				row.createCell(0).setCellValue(entity.getNorek() != null ? String.valueOf(entity.getNorek()) : "-");
-				row.createCell(1).setCellValue(entity.getNama() != null ? entity.getNama() : "-");
-				row.createCell(2).setCellValue(entity.getAlamat() != null ? entity.getAlamat() : "-");
-				row.createCell(0).setCellValue(entity.getNotlp() != null ? String.valueOf(entity.getNotlp()) : "-");
-				row.createCell(0).setCellValue(entity.getSaldo() != null ? String.valueOf(entity.getSaldo()) : "-");
-			}
+			/* Iterate through the data and add it to the table */
+			ExportData<MasterBank> parsing = new ExportData<MasterBank>();
+			sheet = parsing.exportExcel(columnNames, data, sheet);
 
 			// Write the workbook to the response output stream
 			response.setContentType("application/vnd.ms-excel");
