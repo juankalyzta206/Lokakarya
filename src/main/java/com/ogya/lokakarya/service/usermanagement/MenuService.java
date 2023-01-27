@@ -169,18 +169,6 @@ public class MenuService {
 		/* Create a pdf table */
 		PdfPTable pdfTable = new PdfPTable(columnLength);
 
-		pdfTable.setWidthPercentage(100);
-		pdfTable.setSpacingBefore(10f);
-		pdfTable.setSpacingAfter(10f);
-
-		for (String columnName : columnNames) {
-			pdfTable.addCell(Align(columnName));
-		}
-		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < columnLength; i++) {
-			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-		}
-
 		/* Iterate through the data and add it to the table */
 		ExportData<Menu> parsing = new ExportData<Menu>();
 		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
