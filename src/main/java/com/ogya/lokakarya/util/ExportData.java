@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -31,17 +32,35 @@ public class ExportData<T> {
     }
 
     public PdfPTable exportPdf(List<String> columnNames, List<T> data, PdfPTable pdfTable) {
-        /* Iterate through the data and add it to the table */
+    	pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+		
+		
+		for (String columnName : columnNames) {
+			String[] columnAlias = columnName.split(">>>", 2);
+			if (columnAlias.length > 1) {
+				pdfTable.addCell(Align(columnAlias[1]));
+			} else {
+				pdfTable.addCell(Align(columnName));
+			}
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+		for (int i = 0; i < columnNames.size(); i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+    	
+    	/* Iterate through the data and add it to the table */
         for (T entity : data) {
             for (String columnName : columnNames) {
                 String value = "-";
                 try {
                     String columnNameNoSpace = columnName.replaceAll("\\s", "");
-                    String[] methodArray = columnNameNoSpace.split(":", 5);
+                    String[] columnNotAlias = columnNameNoSpace.split(">>>", 2);
+                    String[] methodArray = columnNotAlias[0].split(":", 5);
                     String previousMethod = "";
                     Object finalResult = "";
                     for (String methodName : methodArray) {
-                
                             if (previousMethod.equals("")) {
                                 Method method = entity.getClass().getMethod("get" + methodName);
                                 Object result = method.invoke(entity);
@@ -77,7 +96,7 @@ public class ExportData<T> {
 				String value = "-";
 				try {
                     String columnNameNoSpace = columnName.replaceAll("\\s", "");
-                    String[] methodArray = columnNameNoSpace.split(":", 5);
+                    String[] methodArray = columnNameNoSpace.split(".", 5);
                     String previousMethod = "";
                     Object finalResult = "";
                     for (String methodName : methodArray) {
