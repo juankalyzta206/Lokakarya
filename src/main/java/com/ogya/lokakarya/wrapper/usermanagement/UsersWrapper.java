@@ -6,6 +6,7 @@ public class UsersWrapper {
 	private Long userId;
 	private String username;
 	private String nama;
+	private Long alamatId;
 	private String alamat;
 	private String email;
 	private Long telp;
@@ -114,9 +115,19 @@ public class UsersWrapper {
 		this.updatedBy = updatedBy;
 	}
 
+	
+	
+	public Long getAlamatId() {
+		return alamatId;
+	}
+
+	public void setAlamatId(Long alamatId) {
+		this.alamatId = alamatId;
+	}
+
 	@Override
 	public String toString() {
-		return "UsersWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamat
+		return "UsersWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamatId
 				+ ", email=" + email + ", telp=" + telp + ", programName=" + programName + ", createdDate="
 				+ createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate + ", updatedBy=" + updatedBy
 				+ "]";

@@ -71,7 +71,7 @@ public class BankAdminTarikNotification {
 
 	@Value("${cron.weekly}")
 	private String weeklyCron;
-	
+
 //	@Value("${cron.train}")
 //	private String trainCron;
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
@@ -111,7 +111,7 @@ public class BankAdminTarikNotification {
 	}
 
 	@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
-//	@Scheduled(cron = "${cron.train}")
+	// @Scheduled(cron = "${cron.train}")
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
@@ -224,6 +224,7 @@ public class BankAdminTarikNotification {
 			e.printStackTrace();
 		}
 	}
+
 	public PdfPCell Align(String title) {
 		PdfPCell cell = new PdfPCell(new Phrase(title));
 		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);

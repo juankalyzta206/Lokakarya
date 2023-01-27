@@ -7,6 +7,7 @@ public class UsersRegisterWrapper {
 	private String username;
 	private String password;
 	private String nama;
+	private Long alamatId;
 	private String alamat;
 	private String email;
 	private Long telp;
@@ -52,12 +53,12 @@ public class UsersRegisterWrapper {
 	}
 	// --------------------------------------------------------------------------------------------------------
 
-	public String getAlamat() {
-		return alamat;
+	public Long getAlamatId() {
+		return alamatId;
 	}
 
-	public void setAlamat(String alamat) {
-		this.alamat = alamat;
+	public void setAlamatId(Long alamat) {
+		this.alamatId = alamat;
 	}
 	// --------------------------------------------------------------------------------------------------------
 
@@ -123,10 +124,21 @@ public class UsersRegisterWrapper {
 		this.updatedBy = updatedBy;
 	}
 
+	
+	
+	
+	public String getAlamat() {
+		return alamat;
+	}
+
+	public void setAlamat(String alamat) {
+		this.alamat = alamat;
+	}
+
 	@Override
 	public String toString() {
 		return "UsersWrapper [userId=" + userId + ", username=" + username + ", password=" + password + ", nama=" + nama
-				+ ", alamat=" + alamat + ", email=" + email + ", telp=" + telp + ", programName=" + programName
+				+ ", alamat=" + alamatId + ", email=" + email + ", telp=" + telp + ", programName=" + programName
 				+ ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate
 				+ ", updatedBy=" + updatedBy + ", sameUsername=" + "]";
 	}
