@@ -44,7 +44,7 @@ import com.ogya.lokakarya.repository.usermanagement.RolesRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.RolesCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
-import com.ogya.lokakarya.util.ParsingColumn;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.RolesWrapper;
 
 @Service
@@ -185,8 +185,8 @@ public class RolesService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		ParsingColumn<Roles> parsing = new ParsingColumn<Roles>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		ExportData<Roles> parsing = new ExportData<Roles>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 		
 
 		/* Add the table to the pdf document */

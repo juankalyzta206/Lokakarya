@@ -46,7 +46,7 @@ import com.ogya.lokakarya.repository.usermanagement.SubMenuRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.SubMenuCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
-import com.ogya.lokakarya.util.ParsingColumn;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.SubMenuWrapper;
 
 @Service
@@ -196,8 +196,8 @@ public class SubMenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		ParsingColumn<SubMenu> parsing = new ParsingColumn<SubMenu>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		ExportData<SubMenu> parsing = new ExportData<SubMenu>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
