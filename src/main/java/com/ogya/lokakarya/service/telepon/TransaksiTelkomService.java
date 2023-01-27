@@ -50,6 +50,7 @@ import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
 import com.ogya.lokakarya.repository.telepon.TransaksiTelkomRepository;
 import com.ogya.lokakarya.repository.telepon.criteria.TransaksiTelkomCriteriaRepository;
 import com.ogya.lokakarya.util.CurrencyData;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
@@ -326,19 +327,8 @@ public class TransaksiTelkomService {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
-		for (int i = 0; i < listUsers.size(); i++) {
-			Row dataRow = sheet.createRow(i + 1);
-			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdTransaksi());
-			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
-			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
-			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
-			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
-			dataRow.createCell(5).setCellValue(listUsers.get(i).getStatus());
-
-		}
-		for (int i = 0; i < 6; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
+		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
 		workbook.write(outputStream);
 		workbook.close();
 		byte[] bytes = outputStream.toByteArray();
@@ -358,25 +348,56 @@ public class TransaksiTelkomService {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
-		for (int i = 0; i < listUsers.size(); i++) {
-			Row dataRow = sheet.createRow(i + 1);
-			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdTransaksi());
-			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
-			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
-			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
-			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
-			dataRow.createCell(5).setCellValue(listUsers.get(i).getStatus());
-
-		}
-		for (int i = 0; i < 6; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
+		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
+		
 		ServletOutputStream outputStream = response.getOutputStream();
 		workbook.write(outputStream);
 		workbook.close();
 		outputStream.close();
 	}
+	
+	public void ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, HttpServletResponse response) throws Exception {
+		
+		// Now create a new iText PDF document
+		
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		ServletOutputStream outputStream = response.getOutputStream();
+		PdfWriter.getInstance(pdfDoc, outputStream);
+		pdfDoc.open();
+		Paragraph title = new Paragraph("Laporan Penunggakan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
 
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(6);
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+		List<String> column1 = laporanPenunggakanConfigurationProperties.getColumn();
+		for (String columnName : column1) {
+			pdfTable.addCell(Align(columnName));
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+
+		for (int i = 0; i < 6; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
+		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+		
+		pdfDoc.close();
+		outputStream.close();
+	}
+	
 	public ByteArrayOutputStream ExportToPdfParam(List<TransaksiTelkom> dataTransaksi, String tittle) throws Exception {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

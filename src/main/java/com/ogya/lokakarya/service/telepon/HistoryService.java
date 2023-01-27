@@ -264,6 +264,48 @@ public class HistoryService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
+	
+public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletResponse response) throws Exception {
+		
+		// Now create a new iText PDF document
+		
+		Document pdfDoc = new Document(PageSize.A4.rotate());
+		ServletOutputStream outputStream = response.getOutputStream();
+		PdfWriter.getInstance(pdfDoc, outputStream);
+		pdfDoc.open();
+		Paragraph title = new Paragraph("Laporan Penunggakan", new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+		title.setAlignment(Element.ALIGN_CENTER);
+		pdfDoc.add(title);
+
+		// Add the generation date
+		pdfDoc.add(new Paragraph(
+				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+
+		// Create a table
+		PdfPTable pdfTable = new PdfPTable(6);
+		pdfTable.setWidthPercentage(100);
+		pdfTable.setSpacingBefore(10f);
+		pdfTable.setSpacingAfter(10f);
+		List<String> column1 = laporanPelunasanConfiguration.getColumn();
+		for (String columnName : column1) {
+			pdfTable.addCell(Align(columnName));
+		}
+		BaseColor color = new BaseColor(135, 206, 235);
+
+		for (int i = 0; i < 5; i++) {
+			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
+		}
+
+		// Iterate through the data and add it to the table
+		ExportData<HistoryTelkom> parsing = new ExportData<HistoryTelkom>();
+		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
+		// Add the table to the pdf document
+		pdfDoc.add(pdfTable);
+		
+		pdfDoc.close();
+		outputStream.close();
+	}
+	
 
 	public InputStreamSource ExportToExcelParam(List<HistoryTelkom> listUsers) throws Exception {
 		Workbook workbook = new XSSFWorkbook();
@@ -277,23 +319,8 @@ public class HistoryService {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
-		for (int i = 0; i < listUsers.size(); i++) {
-			Row dataRow = sheet.createRow(i + 1);
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String formattedDate = "-";
-			if (listUsers.get(i).getTanggalBayar() != null) {
-				formattedDate = formatter.format(listUsers.get(i).getTanggalBayar());
-			}
-			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
-			dataRow.createCell(1).setCellValue(formattedDate);
-			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
-			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
-			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
-
-		}
-		for (int i = 0; i < 5; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		ExportData<HistoryTelkom> parsing = new ExportData<HistoryTelkom>();
+		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
 		workbook.write(outputStream);
 		workbook.close();
 		byte[] bytes = outputStream.toByteArray();
