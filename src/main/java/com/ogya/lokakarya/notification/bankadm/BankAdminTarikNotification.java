@@ -110,8 +110,8 @@ public class BankAdminTarikNotification {
 		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	//@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
-	@Scheduled(cron = "${cron.train}")
+@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
+	//@Scheduled(cron = "${cron.train}")
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
