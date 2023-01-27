@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
@@ -152,6 +153,35 @@ public class HistoryService {
 			historyList.add(wrapper);
 		}
 		return historyList;
+	}
+	
+	public void ExportToExcelParam(List<HistoryTelkom> listUsers, HttpServletResponse response) throws Exception {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Setor");
+		Row headerRow = sheet.createRow(0);
+
+		List<String> columnNames = laporanPelunasanConfiguration.getColumn();
+
+		for (int i = 0; i < 6; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+		for (int i = 0; i < listUsers.size(); i++) {
+			Row dataRow = sheet.createRow(i + 1);
+			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdHistory());
+			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
+			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
+			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
+			dataRow.createCell(4).setCellValue(listUsers.get(i).getTanggalBayar());
+		}
+		for (int i = 0; i < 6; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		ServletOutputStream outputStream = response.getOutputStream();
+		workbook.write(outputStream);
+		workbook.close();
+		outputStream.close();
 	}
 
 //	Export To PDF
