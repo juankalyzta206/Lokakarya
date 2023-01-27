@@ -12,8 +12,6 @@ package com.ogya.lokakarya.notification.usermanagement;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,6 +51,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
+import com.ogya.lokakarya.util.ParsingColumn;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
 @Service
@@ -247,22 +246,8 @@ public class LaporanPenambahanUserNotification {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (Users entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = Users.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
+		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
+		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
@@ -289,33 +274,10 @@ public class LaporanPenambahanUserNotification {
 			cell.setCellValue(columnNames.get(i));
 		}
 
-		/* Write data to the sheet */
-		int rowNum = 1;
-		int columnNum = 0;
-		for (Users entity : data) {
-			Row row = sheet.createRow(rowNum++);
-			columnNum = 0;
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					;
-					Method method = Users.class.getMethod(
-							"get" + columnNameNoSpace.substring(0, 1).toUpperCase() + columnNameNoSpace.substring(1));
-					Object result = method.invoke(entity);
-					value = result != null ? result.toString() : "-";
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					// Handle the exception if the method is not found or cannot be invoked
-				}
-				row.createCell(columnNum).setCellValue(value);
-				columnNum++;
-			}
-		}
-
-		/* Resize the columns to fit the contents */
-		for (int i = 0; i < columnLength; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		/* Iterate through the data and add it to the sheet */
+		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
+		sheet = parsing.inputExcel(columnNames, data, sheet);
+		
 
 		/* Write the workbook to the output file */
 		workbook.write(baos);

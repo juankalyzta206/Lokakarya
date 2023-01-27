@@ -209,7 +209,7 @@ public class RoleMenuService {
 
 		/* Iterate through the data and add it to the table */
 		ParsingColumn<RoleMenu> parsing = new ParsingColumn<RoleMenu>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 
 
 		/* Add the table to the pdf document */

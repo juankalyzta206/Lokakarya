@@ -186,7 +186,7 @@ public class RolesService {
 
 		/* Iterate through the data and add it to the table */
 		ParsingColumn<Roles> parsing = new ParsingColumn<Roles>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 		
 
 		/* Add the table to the pdf document */

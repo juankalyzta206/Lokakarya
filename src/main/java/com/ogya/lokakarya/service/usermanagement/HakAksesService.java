@@ -207,7 +207,7 @@ public class HakAksesService {
 
 		/* Iterate through the data and add it to the table */
 		ParsingColumn<HakAkses> parsing = new ParsingColumn<HakAkses>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 		
 		
 

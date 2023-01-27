@@ -183,7 +183,7 @@ public class MenuService {
 
 		/* Iterate through the data and add it to the table */
 		ParsingColumn<Menu> parsing = new ParsingColumn<Menu>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
+		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
