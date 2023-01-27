@@ -32,6 +32,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -65,6 +66,15 @@ public class LaporanPenambahanUserNotification {
 
 	@Autowired
 	UsersColumnProperties laporanPenambahanUserConfigurationProperties;
+	
+	@Value("${cron.daily}")
+	private String dailyCron;
+
+	@Value("${cron.monthly}")
+	private String monthlyCron;
+
+	@Value("${cron.weekly}")
+	private String weeklyCron;
 
 	/* array receiver and cc email for notification service */
 	private String[] receiver = { "maulanairzan5@gmail.com" };
@@ -72,7 +82,7 @@ public class LaporanPenambahanUserNotification {
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
-	@Scheduled(cron = "0 0 7 * * *")
+	@Scheduled(cron ="${cron.daily}")
 	/* run daily notification everyday at 7 am */
 	public void DailyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -100,7 +110,7 @@ public class LaporanPenambahanUserNotification {
 
 	}
 
-	@Scheduled(cron = "0 0 7 1 * ?") 
+	@Scheduled(cron = "${cron.monthly}") 
 	/* run monthly notification every date 1 of the month at 7 am */
 	public void MonthlyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
@@ -127,7 +137,7 @@ public class LaporanPenambahanUserNotification {
 		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	@Scheduled(cron = "0 0 7 * * MON")
+	@Scheduled(cron = "${cron.weekly}")
 	/* run weekly notification every monday 7 am */
 	public void WeeklyNotification() throws Exception {
 		Date date = FindPrevDay(new Date());
