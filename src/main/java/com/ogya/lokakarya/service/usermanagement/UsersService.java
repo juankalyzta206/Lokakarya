@@ -70,11 +70,11 @@ public class UsersService {
 
 	@Autowired
 	UsersColumnProperties usersColumnProperties;
-	
+
 	@Autowired
 	KecamatanRepository kecamatanRepository;
 
-	public PaginationList<UsersWrapper, Users> ListWithPaging(PagingRequestWrapper request) {
+	public PaginationList<UsersWrapper, Users> listWithPaging(PagingRequestWrapper request) {
 		/* query users table with pagination */
 		List<Users> usersList = usersCriteriaRepository.findByFilter(request);
 		int fromIndex = (request.getPage()) * (request.getSize());
@@ -139,7 +139,10 @@ public class UsersService {
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setNama(entity.getNama());
 		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getKecamatanId() : null);
-		wrapper.setAlamat(entity.getAlamat() != null ? entity.getAlamat().getNama() : null);
+		wrapper.setAlamat(entity.getAlamat() != null
+				? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKota().getNama()
+				+ ", " + entity.getAlamat().getKota().getProvinsi().getNama()
+				+ ", " + entity.getAlamat().getKota().getProvinsi().getNegara().getNama(): null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
 		wrapper.setProgramName(entity.getProgramName());
