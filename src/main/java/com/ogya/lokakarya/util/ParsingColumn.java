@@ -27,7 +27,7 @@ public class ParsingColumn<T> {
         this.t = t;
     }
 
-    public PdfPTable ParsePdf(List<String> columnNames, List<T> data, PdfPTable pdfTable, String path) {
+    public PdfPTable ParsePdf(List<String> columnNames, List<T> data, PdfPTable pdfTable) {
         /* Iterate through the data and add it to the table */
         for (T entity : data) {
             for (String columnName : columnNames) {
@@ -38,7 +38,7 @@ public class ParsingColumn<T> {
                     String previousMethod = "";
                     Object finalResult = "";
                     for (String methodName : methodArray) {
-                        try {
+                
                             if (previousMethod.equals("")) {
                                 Method method = entity.getClass().getMethod("get" + methodName);
                                 Object result = method.invoke(entity);
@@ -46,17 +46,12 @@ public class ParsingColumn<T> {
                                 value = finalResult != null ? finalResult.toString() : "-";
                                 previousMethod = methodName;
                             } else {
-								Class<?> classes = Class.forName(path+previousMethod);
-                                Method method = classes.getMethod("get" + methodName);
+                                Method method = finalResult.getClass().getMethod("get" + methodName);
                                 Object result = method.invoke(finalResult);
                                 finalResult = result;
                                 value = finalResult != null ? finalResult.toString() : "-";
                                 previousMethod = methodName;
                             }
-
-                        } catch (ClassNotFoundException e) {
-                            // e.printStackTrace();
-                        }
 
                     }
                 } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {

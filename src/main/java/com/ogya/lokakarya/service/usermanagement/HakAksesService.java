@@ -206,9 +206,8 @@ public class HakAksesService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
 		ParsingColumn<HakAkses> parsing = new ParsingColumn<HakAkses>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
 		
 		
 

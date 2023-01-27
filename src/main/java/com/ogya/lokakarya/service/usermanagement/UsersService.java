@@ -411,9 +411,8 @@ public class UsersService {
 		}
 
 		/* Iterate through the data and add it to the table */
-    	String path = "com.ogya.lokakarya.entity.usermanagement.";
 		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
-		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable, path);
+		pdfTable = parsing.ParsePdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
