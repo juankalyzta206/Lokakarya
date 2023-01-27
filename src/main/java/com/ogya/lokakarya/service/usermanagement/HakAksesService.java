@@ -207,7 +207,7 @@ public class HakAksesService {
 
 		/* Iterate through the data and add it to the table */
 		ExportData<HakAkses> parsing = new ExportData<HakAkses>();
-		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 		
 		
 

@@ -247,7 +247,7 @@ public class LaporanPenambahanUserNotification {
 
 		/* Iterate through the data and add it to the table */
 		ExportData<Users> parsing = new ExportData<Users>();
-		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
@@ -276,7 +276,7 @@ public class LaporanPenambahanUserNotification {
 
 		/* Iterate through the data and add it to the sheet */
 		ExportData<Users> parsing = new ExportData<Users>();
-		sheet = parsing.inputExcel(columnNames, data, sheet);
+		sheet = parsing.exportExcel(columnNames, data, sheet);
 		
 
 		/* Write the workbook to the output file */

@@ -183,7 +183,7 @@ public class MenuService {
 
 		/* Iterate through the data and add it to the table */
 		ExportData<Menu> parsing = new ExportData<Menu>();
-		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);

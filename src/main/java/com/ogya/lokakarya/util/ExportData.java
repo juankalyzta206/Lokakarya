@@ -30,7 +30,7 @@ public class ExportData<T> {
         this.t = t;
     }
 
-    public PdfPTable inputPdf(List<String> columnNames, List<T> data, PdfPTable pdfTable) {
+    public PdfPTable exportPdf(List<String> columnNames, List<T> data, PdfPTable pdfTable) {
         /* Iterate through the data and add it to the table */
         for (T entity : data) {
             for (String columnName : columnNames) {
@@ -66,7 +66,7 @@ public class ExportData<T> {
         return pdfTable;
     }
     
-    public Sheet inputExcel(List<String> columnNames, List<T> data, Sheet sheet) {
+    public Sheet exportExcel(List<String> columnNames, List<T> data, Sheet sheet) {
     	/* Write data to the sheet */
 		int rowNum = 1;
 		int columnNum = 0;
