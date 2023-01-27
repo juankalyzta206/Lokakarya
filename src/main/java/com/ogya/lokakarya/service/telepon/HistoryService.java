@@ -80,7 +80,7 @@ public class HistoryService {
 		HistoryTelkom historyTelkom = historyRepository.save(toEntity(wrapper));
 		return toWrapper(historyTelkom);
 	}
-	
+
 	public List<HistoryTelkom> findAllStatus1NoWrapper() {
 		List<HistoryTelkom> transaksiTelkomList = historyRepository
 				.findAll(Sort.by(Order.by("idTransaksi")).descending());
@@ -162,7 +162,7 @@ public class HistoryService {
 		}
 		return historyList;
 	}
-	
+
 	public void ExportToExcelParam(List<HistoryTelkom> listUsers, HttpServletResponse response) throws Exception {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Setor");
@@ -174,12 +174,11 @@ public class HistoryService {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
-		
+
 		/* Iterate through the data and add it to the sheet */
 		ExportData<HistoryTelkom> parsing = new ExportData<HistoryTelkom>();
 		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
-		
-		
+
 		ServletOutputStream outputStream = response.getOutputStream();
 		workbook.write(outputStream);
 		workbook.close();
@@ -264,11 +263,11 @@ public class HistoryService {
 		response.setContentType("application/pdf");
 		response.setHeader("Content-Disposition", "attachment; filename=exportedPdf.pdf");
 	}
-	
-public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletResponse response) throws Exception {
-		
+
+	public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletResponse response) throws Exception {
+
 		// Now create a new iText PDF document
-		
+
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ServletOutputStream outputStream = response.getOutputStream();
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -282,7 +281,7 @@ public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletRespo
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
 		// Create a table
-		PdfPTable pdfTable = new PdfPTable(6);
+		PdfPTable pdfTable = new PdfPTable(5);
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
@@ -301,11 +300,10 @@ public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletRespo
 		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
-		
+
 		pdfDoc.close();
 		outputStream.close();
 	}
-	
 
 	public InputStreamSource ExportToExcelParam(List<HistoryTelkom> listUsers) throws Exception {
 		Workbook workbook = new XSSFWorkbook();
@@ -332,21 +330,6 @@ public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletRespo
 	public ByteArrayOutputStream ExportToPdfParam(List<HistoryTelkom> dataHistory, String tittle) throws Exception {
 		// Call the findAll method to retrieve the data
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		List<HistoryWrapper> historyList = new ArrayList<HistoryWrapper>();
-
-		for (int i = 0; i < dataHistory.size(); i++) {
-			HistoryWrapper wrapper = new HistoryWrapper();
-			wrapper.setIdPelanggan(dataHistory.get(i).getIdPelanggan().getIdPelanggan());
-			MasterPelanggan masterPelanggan = masterPelangganRepository.findByIdPelanggan(wrapper.getIdPelanggan());
-
-			wrapper.setNama(masterPelanggan.getNama());
-			wrapper.setBulanTagihan(dataHistory.get(i).getBulanTagihan());
-			wrapper.setTanggalBayar(dataHistory.get(i).getTanggalBayar());
-			wrapper.setTahunTagihan(dataHistory.get(i).getTahunTagihan());
-			wrapper.setUang(dataHistory.get(i).getUang());
-			historyList.add(wrapper);
-		}
-
 		// Now create a new iText PDF document
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		PdfWriter.getInstance(pdfDoc, outputStream);
@@ -359,40 +342,17 @@ public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletRespo
 		// Add the generation date
 		pdfDoc.add(new Paragraph(
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
-
 		// Create a table
 		PdfPTable pdfTable = new PdfPTable(5);
-
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
 
 		List<String> column1 = laporanPelunasanConfiguration.getColumn();
-
-//		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("column/columnLaporanPelunasan.properties");
-//		Properties properties = new Properties();
-//		properties.load(inputStream);
-//		List<String> columnNames = new ArrayList<>(properties.stringPropertyNames());
 //		int columnLength = columnNames.size();
 		for (String columnName : column1) {
 			pdfTable.addCell(Align(columnName));
 		}
-//		PdfPCell cell1 = new PdfPCell(new Phrase("Nama Pelanggan"));
-//		cell1.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell1);
-//		PdfPCell cell2 = new PdfPCell(new Phrase("Tanggal bayar"));
-//		cell2.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell2);
-//		PdfPCell cell3 = new PdfPCell(new Phrase("Bulan Tagihan"));
-//		cell3.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell3);
-//		PdfPCell cell4 = new PdfPCell(new Phrase("Tahun Tagihan"));
-//		cell4.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell4);
-//		PdfPCell cell5 = new PdfPCell(new Phrase("Nominal"));
-//		cell5.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-//		pdfTable.addCell(cell5);
-
 		BaseColor color = new BaseColor(135, 206, 235);
 
 		for (int i = 0; i < 5; i++) {
@@ -400,26 +360,11 @@ public void ExportToPdfParam(List<HistoryTelkom> dataTransaksi, HttpServletRespo
 		}
 
 		// Iterate through the data and add it to the table
-		for (HistoryWrapper entity : historyList) {
-			pdfTable.addCell(Align(String.valueOf(entity.getNama() != null ? String.valueOf(entity.getNama()) : "-")));
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String tanggalBayar = "-";
-			if (entity.getTanggalBayar() != null) {
-				tanggalBayar = formatter.format(entity.getTanggalBayar());
-			}
-			pdfTable.addCell(Align(tanggalBayar));
-
-			pdfTable.addCell(Align(
-					String.valueOf(entity.getBulanTagihan() != null ? String.valueOf(entity.getBulanTagihan()) : "-")));
-			pdfTable.addCell(Align(
-					String.valueOf(entity.getTahunTagihan() != null ? String.valueOf(entity.getTahunTagihan()) : "-")));
-			pdfTable.addCell(Align(String.valueOf(entity.getUang() != null ? String.valueOf(entity.getUang()) : "-")));
-		}
+		ExportData<HistoryTelkom> parsing = new ExportData<HistoryTelkom>();
+		pdfTable = parsing.exportPdf(column1, dataHistory, pdfTable);
 
 		// Add the table to the pdf document
 		pdfDoc.add(pdfTable);
-
 		pdfDoc.close();
 		return outputStream;
 	}
