@@ -6,6 +6,7 @@ public class UsersAddWrapper {
 	private Long userId;
 	private String username;
 	private String nama;
+	private Long alamatId;
 	private String alamat;
 	private String email;
 	private String password;
@@ -44,12 +45,12 @@ public class UsersAddWrapper {
 	}
 	// --------------------------------------------------------------------------------------------------------
 
-	public String getAlamat() {
-		return alamat;
+	public Long getAlamatId() {
+		return alamatId;
 	}
 
-	public void setAlamat(String alamat) {
-		this.alamat = alamat;
+	public void setAlamatId(Long alamat) {
+		this.alamatId = alamat;
 	}
 	// --------------------------------------------------------------------------------------------------------
 
@@ -123,9 +124,19 @@ public class UsersAddWrapper {
 		this.password = password;
 	}
 
+	
+	
+	public String getAlamat() {
+		return alamat;
+	}
+
+	public void setAlamat(String alamat) {
+		this.alamat = alamat;
+	}
+
 	@Override
 	public String toString() {
-		return "UsersAddWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamat
+		return "UsersAddWrapper [userId=" + userId + ", username=" + username + ", nama=" + nama + ", alamat=" + alamatId
 				+ ", email=" + email + ", password=" + password + ", telp=" + telp + ", programName=" + programName
 				+ ", createdDate=" + createdDate + ", createdBy=" + createdBy + ", updatedDate=" + updatedDate
 				+ ", updatedBy=" + updatedBy + "]";
