@@ -18,6 +18,7 @@ import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.util.FilterWrapper;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+
 @Repository
 public class MasterPelangganCriteriaRepository {
 	@Autowired
@@ -28,31 +29,32 @@ public class MasterPelangganCriteriaRepository {
 		CriteriaQuery<MasterPelanggan> criteriaQuery = cb.createQuery(MasterPelanggan.class);
 		Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
 		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
-		if(request.getSortField().toLowerCase().equals("userid")) {
-			if(request.getSortOrder().equalsIgnoreCase("asc")) {
-				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
-			else {
-				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
+		if (request.getSortField().toLowerCase().equals("userid")) {
+			if (request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));
+			} else {
+				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));
+			}
+		} else {
+			if (request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
+			} else {
+				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+			}
 		}
-		else {
-			if(request.getSortOrder().equalsIgnoreCase("asc")) {
-				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
-			else {
-				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
+
+		@SuppressWarnings("rawtypes")
+		List<FilterWrapper> filterList = request.getFilters();
+		for (@SuppressWarnings("rawtypes")
+		FilterWrapper filter : filterList) {
+			Predicate[] predicates = new Predicate[filter.getValue().size()];
+			for (int j = 0; j < filter.getValue().size(); j++) {
+				Join<MasterPelanggan, Users> join2 = root.join("users", JoinType.INNER);
+				String value = (String) filter.getValue().get(j).toString().toLowerCase();
+				predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%" + value + "%");
+			}
+			criteriaQuery.where(cb.or(predicates));
 		}
-		
-			
-	    @SuppressWarnings("rawtypes")
-    	List<FilterWrapper> filterList = request.getFilters();
-	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	Predicate[] predicates = new Predicate[filter.getValue().size()];
-	    	for (int j=0; j<filter.getValue().size(); j++) {
-	    		Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
-	    		String value = (String) filter.getValue().get(j).toString().toLowerCase();
-		        predicates[j] = cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%");
-	    	}
-	    	criteriaQuery.where(cb.or(predicates));
-	    }
 //	    @SuppressWarnings("rawtypes")
 //		List<FilterWrapper> filterList = request.getFilters();
 //	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
@@ -69,49 +71,49 @@ public class MasterPelangganCriteriaRepository {
 //	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
 //	    predicatesList.toArray(finalPredicates);
 //	    criteriaQuery.where(finalPredicates);
-	
+
 		List<MasterPelanggan> result = entityManager.createQuery(criteriaQuery).getResultList();
 
 		return result;
 	}
-	
-	public Long countAll(PagingRequestWrapper request){ 	
+
+	public Long countAll(PagingRequestWrapper request) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-	    CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
-	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
+		CriteriaQuery<Long> criteriaQuery = cb.createQuery(Long.class);
+		Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
 		Join<MasterPelanggan, Users> join = root.join("users", JoinType.INNER);
-		if(request.getSortField().toLowerCase().equals("userid")) {
-			if(request.getSortOrder().equalsIgnoreCase("asc")) {
-				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));}
-			else {
-				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));}
+		if (request.getSortField().toLowerCase().equals("userid")) {
+			if (request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(join.get(request.getSortField())));
+			} else {
+				criteriaQuery.orderBy(cb.desc(join.get(request.getSortField())));
+			}
+		} else {
+			if (request.getSortOrder().equalsIgnoreCase("asc")) {
+				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));
+			} else {
+				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));
+			}
 		}
-		else {
-			if(request.getSortOrder().equalsIgnoreCase("asc")) {
-				criteriaQuery.orderBy(cb.asc(root.get(request.getSortField())));}
-			else {
-				criteriaQuery.orderBy(cb.desc(root.get(request.getSortField())));}
-		}
-		
-				
-	    List<Predicate> predicatesList = new ArrayList<>();
-	    
-	    @SuppressWarnings("rawtypes")
+
+		List<Predicate> predicatesList = new ArrayList<>();
+
+		@SuppressWarnings("rawtypes")
 		List<FilterWrapper> filterList = request.getFilters();
-	    for (@SuppressWarnings("rawtypes") FilterWrapper filter : filterList) {
-	    	String value = (String) filter.getValue().toString().toLowerCase();
-	    	Join<MasterPelanggan,Users > join2 = root.join("users", JoinType.INNER);
-	    	if(filter.getName().toLowerCase().equals("userid") ) {
-	    		predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
-	    	else {
-	    		predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%"+value+"%"));
-	    	}
+		for (@SuppressWarnings("rawtypes")
+		FilterWrapper filter : filterList) {
+			String value = (String) filter.getValue().toString().toLowerCase();
+			Join<MasterPelanggan, Users> join2 = root.join("users", JoinType.INNER);
+			if (filter.getName().toLowerCase().equals("userid")) {
+				predicatesList.add(cb.like(cb.lower(join2.get(filter.getName()).as(String.class)), "%" + value + "%"));
+			} else {
+				predicatesList.add(cb.like(cb.lower(root.get(filter.getName()).as(String.class)), "%" + value + "%"));
+			}
 		}
-	    
-	    Predicate[] finalPredicates = new Predicate[predicatesList.size()];
-	    predicatesList.toArray(finalPredicates);
-	    criteriaQuery.where(finalPredicates);
+
+		Predicate[] finalPredicates = new Predicate[predicatesList.size()];
+		predicatesList.toArray(finalPredicates);
+		criteriaQuery.where(finalPredicates);
 //	    Root<MasterPelanggan> root = criteriaQuery.from(MasterPelanggan.class);
 //	    
 //	    List<Predicate> predicatesList = new ArrayList<>();
@@ -125,8 +127,8 @@ public class MasterPelangganCriteriaRepository {
 //	    predicatesList.toArray(finalPredicates);
 //	    criteriaQuery.select(cb.count(root));
 //	    criteriaQuery.where(finalPredicates);
-	    
-	    Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
+
+		Long result = entityManager.createQuery(criteriaQuery).getSingleResult();
 		return result;
 	}
 }

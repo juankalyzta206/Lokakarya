@@ -10,5 +10,6 @@ import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 public interface HistoryRepository extends JpaRepository<HistoryTelkom, Long> {
 	@Query(value = "SELECT SUM(UANG) FROM HISTORY_TELKOM", nativeQuery = true)
 	Long sumAll();
+
 	Page<HistoryTelkom> findAll(Pageable page);
 }

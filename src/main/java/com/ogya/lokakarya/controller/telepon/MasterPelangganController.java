@@ -35,32 +35,37 @@ import com.ogya.lokakarya.wrapper.telepon.TeleponPagingRequestWrapper;
 public class MasterPelangganController {
 	@Autowired
 	MasterPelangganService masterPelangganService;
-	
-	
+
 	@GetMapping(path = "/findAllPlan")
 	public List<MasterPelangganWrapper> findAllPlan() {
 		return masterPelangganService.findAll();
 	}
+
 	@GetMapping(path = "/findName")
 	public MasterPelanggan findName(@RequestParam("nama") String nama) {
 		return masterPelangganService.findByNama(nama);
 	}
+
 	@PostMapping(path = "/")
 	public DataResponse<MasterPelangganWrapper> save(@RequestBody MasterPelangganWrapper wrapper) {
 		return new DataResponse<MasterPelangganWrapper>(masterPelangganService.save(wrapper));
 	}
+
 	@PutMapping(path = "/")
 	public DataResponse<MasterPelangganWrapper> update(@RequestBody MasterPelangganWrapper wrapper) {
 		return new DataResponse<MasterPelangganWrapper>(masterPelangganService.save(wrapper));
 	}
+
 	@DeleteMapping(path = "/deleteById")
 	public void delete(@RequestParam("id") Long masterPelangganId) {
 		masterPelangganService.deleteById(masterPelangganId);
 	}
+
 	@GetMapping(path = "/findAllWithPagination")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
-			@RequestParam("size") int size) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPagination(page, size));
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(
+			@RequestParam("page") int page, @RequestParam("size") int size) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(
+				masterPelangganService.findAllWithPagination(page, size));
 	}
 //	@GetMapping(path = "/findAllWithPaginationFilter")
 //	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPagination(@RequestParam("page") int page,
@@ -80,40 +85,46 @@ public class MasterPelangganController {
 //			throw new BusinessException("filter tidak ditemukan");
 //		}
 //	}
-	
+
 	@PostMapping(path = "/findAllWithPaginationFilter")
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody TeleponPagingRequestWrapper wrapper) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.findAllWithPaginationFilter(wrapper));
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(
+			@RequestBody TeleponPagingRequestWrapper wrapper) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(
+				masterPelangganService.findAllWithPaginationFilter(wrapper));
 	}
+
 	@RequestMapping(value = "/findAllWithPaginationAndFilter", method = RequestMethod.POST)
-	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(@RequestBody(required = true) PagingRequestWrapper request) {
-		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(masterPelangganService.ListWithPaging(request));
+	public DataResponsePagination<MasterPelangganWrapper, MasterPelanggan> findAllWithPaginationAndFilter(
+			@RequestBody(required = true) PagingRequestWrapper request) {
+		return new DataResponsePagination<MasterPelangganWrapper, MasterPelanggan>(
+				masterPelangganService.ListWithPaging(request));
 	}
-    @GetMapping("/download")
-    public void exportToExcel(HttpServletResponse response) throws IOException {
-        response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-         
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
-        response.setHeader(headerKey, headerValue);
-         
-        List<MasterPelangganWrapper> listUsers = masterPelangganService.findAll();
-        MasterPelangganExcelExporter excelExporter = new MasterPelangganExcelExporter(listUsers);
-         
-        excelExporter.export(response);    
-    }
-    @RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
+
+	@GetMapping("/download")
+	public void exportToExcel(HttpServletResponse response) throws IOException {
+		response.setContentType("application/octet-stream");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
+
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+		response.setHeader(headerKey, headerValue);
+
+		List<MasterPelangganWrapper> listUsers = masterPelangganService.findAll();
+		MasterPelangganExcelExporter excelExporter = new MasterPelangganExcelExporter(listUsers);
+
+		excelExporter.export(response);
+	}
+
+	@RequestMapping(value = "/exportToPdfALL", method = RequestMethod.GET)
 	public void exportToPdf(HttpServletResponse response) throws Exception {
 		masterPelangganService.ExportToPdf(response);
 	}
-    
+
 //	@GetMapping(path = "/findByname")
 //	public List<MasterPelangganWrapper> findByName(@RequestParam("nama") String nama,@RequestParam("id") Long idPelanggan,
 //			@RequestParam("alamat") String alamat,@RequestParam("noTelp") Long noTelp,@RequestParam("userId") Long userId) {
 //		return masterPelangganService.findByNama(nama,idPelanggan,alamat,noTelp,userId);
 //	}
-    
-    
+
 }
