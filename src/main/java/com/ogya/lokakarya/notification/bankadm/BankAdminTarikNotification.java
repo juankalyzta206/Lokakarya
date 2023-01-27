@@ -72,8 +72,8 @@ public class BankAdminTarikNotification {
 	@Value("${cron.weekly}")
 	private String weeklyCron;
 	
-	@Value("${cron.train}")
-	private String trainCron;
+//	@Value("${cron.train}")
+//	private String trainCron;
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
 	private String[] cc = { "eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
 
@@ -110,8 +110,8 @@ public class BankAdminTarikNotification {
 		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	//@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
-	@Scheduled(cron = "${cron.train}")
+	@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
+//	@Scheduled(cron = "${cron.train}")
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
