@@ -45,6 +45,7 @@ import com.ogya.lokakarya.repository.usermanagement.MenuRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.MenuCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ParsingColumn;
 import com.ogya.lokakarya.wrapper.usermanagement.MenuWrapper;
 
 @Service

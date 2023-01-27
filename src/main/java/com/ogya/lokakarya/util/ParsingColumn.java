@@ -1,4 +1,4 @@
-package com.ogya.lokakarya.service.usermanagement;
+package com.ogya.lokakarya.util;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

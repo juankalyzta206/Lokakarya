@@ -44,6 +44,7 @@ import com.ogya.lokakarya.repository.usermanagement.RolesRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.RolesCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
+import com.ogya.lokakarya.util.ParsingColumn;
 import com.ogya.lokakarya.wrapper.usermanagement.RolesWrapper;
 
 @Service
