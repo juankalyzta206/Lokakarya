@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
+import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
 import com.ogya.lokakarya.helper.telepon.LaporanPelunasanExcelExporter;
 
 import com.ogya.lokakarya.repository.telepon.HistoryTelkomRepository;
@@ -89,7 +90,7 @@ public class HistoryTelkomController {
 	}
 
 	@GetMapping("/download")
-	public void exportToExcel(HttpServletResponse response) throws IOException {
+	public void exportToExcel(HttpServletResponse response) throws Exception {
 		response.setContentType("application/octet-stream");
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 		String currentDateTime = dateFormatter.format(new Date());
@@ -99,8 +100,7 @@ public class HistoryTelkomController {
 		response.setHeader(headerKey, headerValue);
 
 		List<HistoryTelkom> listUsers = historyTelkomRepository.findAll();
-		LaporanPelunasanExcelExporter excelExporter = new LaporanPelunasanExcelExporter(listUsers);
-
-		excelExporter.export(response);
+		//List<HistoryTelkom> listUsers = historyService.findAllStatus1NoWrapper();
+		historyService.ExportToExcelParam(listUsers, response);
 	}
 }
