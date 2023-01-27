@@ -48,7 +48,7 @@ import com.ogya.lokakarya.repository.usermanagement.RolesRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.RoleMenuCriteriaRepository;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
-import com.ogya.lokakarya.util.ParsingColumn;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.RoleMenuWrapper;
 
 @Service
@@ -208,7 +208,7 @@ public class RoleMenuService {
 		}
 
 		/* Iterate through the data and add it to the table */
-		ParsingColumn<RoleMenu> parsing = new ParsingColumn<RoleMenu>();
+		ExportData<RoleMenu> parsing = new ExportData<RoleMenu>();
 		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 
 

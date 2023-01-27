@@ -11,7 +11,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 
-public class ParsingColumn<T> {
+public class ExportData<T> {
 
     private T t;
 

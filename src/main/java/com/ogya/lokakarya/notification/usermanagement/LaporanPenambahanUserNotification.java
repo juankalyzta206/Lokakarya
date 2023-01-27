@@ -51,7 +51,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
-import com.ogya.lokakarya.util.ParsingColumn;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
 @Service
@@ -246,7 +246,7 @@ public class LaporanPenambahanUserNotification {
 		}
 
 		/* Iterate through the data and add it to the table */
-		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
+		ExportData<Users> parsing = new ExportData<Users>();
 		pdfTable = parsing.inputPdf(columnNames, data, pdfTable);
 
 		/* Add the table to the pdf document */
@@ -275,7 +275,7 @@ public class LaporanPenambahanUserNotification {
 		}
 
 		/* Iterate through the data and add it to the sheet */
-		ParsingColumn<Users> parsing = new ParsingColumn<Users>();
+		ExportData<Users> parsing = new ExportData<Users>();
 		sheet = parsing.inputExcel(columnNames, data, sheet);
 		
 
