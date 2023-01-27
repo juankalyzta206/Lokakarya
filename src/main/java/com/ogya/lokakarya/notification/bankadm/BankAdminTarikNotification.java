@@ -11,10 +11,10 @@
 package com.ogya.lokakarya.notification.bankadm;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -25,8 +25,10 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,9 +50,8 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.entity.bankadm.HistoryBank;
-import com.ogya.lokakarya.entity.bankadm.MasterBank;
-import com.ogya.lokakarya.entity.usermanagement.Roles;
 import com.ogya.lokakarya.repository.bankadm.HistoryBankRepository;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.NotificationWrapper;
 
 @Service
@@ -70,8 +71,11 @@ public class BankAdminTarikNotification {
 
 	@Value("${cron.weekly}")
 	private String weeklyCron;
+	
+	@Value("${cron.train}")
+	private String trainCron;
 	private String[] receiver = { "1811500071@student.budiluhur.ac.id" };
-	private String[] cc = {"eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
+	private String[] cc = { "eonjejjeumilkka@gmail.com", "maulanairzan5@gmail.com" };
 
 	private static final long MILLIS_IN_A_DAY = 1000 * 60 * 60 * 24;
 
@@ -97,12 +101,17 @@ public class BankAdminTarikNotification {
 				"Laporan Tarik Tunai Harian(" + dayName + ", " + day + " " + getMonthForInt(month) + " " + year + ")");
 		description.setFileName("LaporanTarikTunaiHarian(" + day + "/" + month + "/" + year + ")");
 		List<HistoryBank> dailyData = historyBankRepo.newTarikDaily();
-		ExportToPdfNotification(dailyData, description);
-		ExportToExcelNotification(dailyData, description);
-
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(dailyData, description));
+		attachmentsName.add(description.getFileName() + ".pdf");
+		attachments.add(WriteExcelToEmail(dailyData, description));
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
-	@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
+	//@Scheduled(cron = "${cron.monthly}") // <-- second, minute, hour, day, month
+	@Scheduled(cron = "${cron.train}")
 	public void MonthlyNotification() throws Exception {
 		Date date = new Date();
 		date = FindPrevDay(date);
@@ -119,8 +128,13 @@ public class BankAdminTarikNotification {
 		description.setTitlePdf("Laporan Tarik Tunai Bulanan(" + getMonthForInt(month) + " " + year + ")");
 		description.setFileName("LaporanTarikTunaiBulanan(" + month + "/" + year + ")");
 		List<HistoryBank> monthlyData = historyBankRepo.newTarikMonthly();
-		ExportToPdfNotification(monthlyData, description);
-		ExportToExcelNotification(monthlyData, description);
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(monthlyData, description));
+		attachmentsName.add(description.getFileName() + ".pdf");
+		attachments.add(WriteExcelToEmail(monthlyData, description));
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
 	@Scheduled(cron = "${cron.weekly}") // <-- second, minute, hour, day, month
@@ -154,8 +168,13 @@ public class BankAdminTarikNotification {
 		description.setFileName("LaporanTarik unaiMingguan(" + dayNameStartWeek + ", " + dayStartWeek + "/"
 				+ monthStartWeek + "/" + yearStartWeek + "-" + dayName + ", " + day + "/" + month + "/" + year + ")");
 		List<HistoryBank> weeklyData = historyBankRepo.newTarikWeekly();
-		ExportToPdfNotification(weeklyData, description);
-		ExportToExcelNotification(weeklyData, description);
+		List<InputStreamSource> attachments = new ArrayList<>();
+		List<String> attachmentsName = new ArrayList<>();
+		attachments.add(ExportToPdfNotification(weeklyData, description));
+		attachmentsName.add(description.getFileName() + ".pdf");
+		attachments.add(WriteExcelToEmail(weeklyData, description));
+		attachmentsName.add(description.getFileName() + ".xls");
+		SendEmailWithAttachment(attachments, attachmentsName, description);
 	}
 
 	String getMonthForInt(int num) {
@@ -178,9 +197,9 @@ public class BankAdminTarikNotification {
 		return new Date(date.getTime() - 6 * MILLIS_IN_A_DAY);
 	}
 
-	public void SendEmailWithAttachment(InputStreamSource pdfData, InputStreamSource xlsData,
+	public void SendEmailWithAttachment(List<InputStreamSource> data, List<String> fileNames,
 			NotificationWrapper description) {
-
+		/* service for send email with attachment */
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		try {
 			MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
@@ -194,8 +213,10 @@ public class BankAdminTarikNotification {
 			String body = buffer.toString();
 			mimeMessageHelper.setText(body, true);
 
-			mimeMessageHelper.addAttachment(description.getFileName() + ".pdf", pdfData);
-			mimeMessageHelper.addAttachment(description.getFileName() + ".xls", xlsData);
+			for (int i = 0; i < data.size(); i++) {
+				String fileName = fileNames.get(i);
+				mimeMessageHelper.addAttachment(fileName, data.get(i));
+			}
 			javaMailSender.send(mimeMessage);
 			System.out.println("Email sent");
 		} catch (MessagingException e) {
@@ -203,11 +224,19 @@ public class BankAdminTarikNotification {
 			e.printStackTrace();
 		}
 	}
+	public PdfPCell Align(String title) {
+		PdfPCell cell = new PdfPCell(new Phrase(title));
+		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
+		return cell;
+	}
 
-	public void ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
+	public InputStreamSource ExportToPdfNotification(List<HistoryBank> data, NotificationWrapper description)
+			throws Exception {
 		List<String> columnNames = laporanHistoryBankConfigurationProperties.getColumn();
 		int columnLength = columnNames.size();
-		// Now create a new iText PDF document
+
+		/* Create a new iText PDF document */
 		Document pdfDoc = new Document(PageSize.A4.rotate());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc, baos);
@@ -217,12 +246,12 @@ public class BankAdminTarikNotification {
 		title.setAlignment(Element.ALIGN_CENTER);
 		pdfDoc.add(title);
 
-		// Add the generation date
+		/* Add the generation date */
 		pdfDoc.add(new Paragraph(
 				"Report generated on: " + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
 
-		// Create a table
-		PdfPTable pdfTable = new PdfPTable(5);
+		/* Create a table */
+		PdfPTable pdfTable = new PdfPTable(columnLength);
 
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
@@ -237,107 +266,146 @@ public class BankAdminTarikNotification {
 		}
 
 		/* Iterate through the data and add it to the table */
-		for (HistoryBank entity : data) {
-			for (String columnName : columnNames) {
-				String value = "-";
-				try {
-					String columnNameNoSpace = columnName.replaceAll("\\s", "");
-					Boolean isForeignKey = containsChar(columnNameNoSpace, ':');
-					String[] foreignClass = columnNameNoSpace.split(":", 2);
-					if (!isForeignKey) {
-						Method method = HistoryBank.class.getMethod("get" + columnNameNoSpace);
-						Object result = method.invoke(entity);
-						value = result != null ? result.toString() : "-";
-					} else {
-						Method method = HistoryBank.class.getMethod("get" + foreignClass[0]);
-						if (foreignClass[0].equals("Users")) {
-							Method usersMethod = MasterBank.class.getMethod("get" + foreignClass[1]);
-							Object result = usersMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						} else if (foreignClass[0].equals("Roles")) {
-							Method rolesMethod = Roles.class.getMethod("get" + foreignClass[1]);
-							Object result = rolesMethod.invoke(method.invoke(entity));
-							value = result != null ? result.toString() : "-";
-						}
+		ExportData<HistoryBank> parsing = new ExportData<HistoryBank>();
+		pdfTable = parsing.exportPdf(columnNames, data, pdfTable);
 
-					}
-
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-					/* Handle the exception if the method is not found or cannot be invoked */
-				}
-				pdfTable.addCell(Align(value));
-			}
-		}
-
-		// Add the table to the pdf document
+		/* Add the table to the pdf document */
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
 		pdfWriter.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
-		// SendEmailWithAttachmentPDF(attachmentSource, description);
-		SendEmailWithAttachment(attachmentSource, attachmentSource, description);
+		return attachmentSource;
 	}
 
-	public PdfPCell Align(String title) {
-		PdfPCell cell = new PdfPCell(new Phrase(title));
-		cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-		cell.setVerticalAlignment(PdfPCell.ALIGN_CENTER);
-		return cell;
-	}
-
-	public boolean containsChar(String s, char search) {
-		if (s.length() == 0)
-			return false;
-		else
-			return s.charAt(0) == search || containsChar(s.substring(1), search);
-	}
-
-	public void ExportToExcelNotification(List<HistoryBank> data, NotificationWrapper description) throws Exception {
-		XSSFWorkbook workbook = new XSSFWorkbook();
-		XSSFSheet sheet = workbook.createSheet("Transactions");
-
-		// Create the header row
-		XSSFRow headerRow = sheet.createRow(0);
-		headerRow.createCell(0).setCellValue("Nomor Rekening");
-		headerRow.createCell(1).setCellValue("Nama Nasabah");
-		headerRow.createCell(2).setCellValue("Tanggal Transaksi");
-		headerRow.createCell(3).setCellValue("Nominal");
-		headerRow.createCell(4).setCellValue("Keterangan");
-
-		// Iterate through the data and add it to the sheet
-		for (int i = 0; i < data.size(); i++) {
-			XSSFRow row = sheet.createRow(i + 1);
-			HistoryBank entity = data.get(i);
-			row.createCell(0).setCellValue(entity.getRekening().getNorek());
-			row.createCell(1).setCellValue(entity.getNama());
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-			String formattedDate = "-";
-			if (entity.getTanggal() != null) {
-				formattedDate = formatter.format(entity.getTanggal());
-			}
-			row.createCell(2).setCellValue(formattedDate);
-			row.createCell(3).setCellValue(entity.getUang());
-			row.createCell(4).setCellValue("Tarik Tunai");
-		}
-
-		// Autosize the columns
-		for (int i = 0; i < 5; i++) {
-			sheet.autoSizeColumn(i);
-		}
-
-		// Write the workbook to a file
+	public InputStreamSource WriteExcelToEmail(List<HistoryBank> data, NotificationWrapper description)
+			throws IOException {
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Tarik");
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		/* Create the header row */
+		Row headerRow = sheet.createRow(0);
+		List<String> columnNames = laporanHistoryBankConfigurationProperties.getColumn();
+		int columnLength = columnNames.size();
+
+		for (int i = 0; i < columnLength; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnNames.get(i));
+		}
+
+		/* Iterate through the data and add it to the sheet */
+		ExportData<HistoryBank> parsing = new ExportData<HistoryBank>();
+		sheet = parsing.exportExcel(columnNames, data, sheet);
+
+		/* Write the workbook to the output file */
 		workbook.write(baos);
+		baos.flush();
+		baos.close();
 		byte[] bytes = baos.toByteArray();
 		InputStreamSource attachmentSource = new ByteArrayResource(bytes);
 		workbook.close();
-		description.setFileName(description.getFileName() + ".xlsx");
-		// SendEmailWithAttachmentXLS(attachmentSource, description);
-		SendEmailWithAttachment(attachmentSource, attachmentSource, description);
-
+		return attachmentSource;
 	}
+
+	/*
+	 * public void ExportToPdfNotification(List<HistoryBank> data,
+	 * NotificationWrapper description) throws Exception { List<String> columnNames
+	 * = laporanHistoryBankConfigurationProperties.getColumn(); int columnLength =
+	 * columnNames.size(); // Now create a new iText PDF document Document pdfDoc =
+	 * new Document(PageSize.A4.rotate()); ByteArrayOutputStream baos = new
+	 * ByteArrayOutputStream(); PdfWriter pdfWriter = PdfWriter.getInstance(pdfDoc,
+	 * baos); pdfDoc.open();
+	 * 
+	 * Paragraph title = new Paragraph(description.getTitlePdf(), new
+	 * Font(Font.FontFamily.HELVETICA, 18, Font.BOLD));
+	 * title.setAlignment(Element.ALIGN_CENTER); pdfDoc.add(title);
+	 * 
+	 * // Add the generation date pdfDoc.add(new Paragraph( "Report generated on: "
+	 * + new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date())));
+	 * 
+	 * // Create a table PdfPTable pdfTable = new PdfPTable(5);
+	 * 
+	 * pdfTable.setWidthPercentage(100); pdfTable.setSpacingBefore(10f);
+	 * pdfTable.setSpacingAfter(10f);
+	 * 
+	 * for (String columnName : columnNames) { pdfTable.addCell(Align(columnName));
+	 * } BaseColor color = new BaseColor(135, 206, 235); for (int i = 0; i <
+	 * columnLength; i++) {
+	 * pdfTable.getRow(0).getCells()[i].setBackgroundColor(color); }
+	 * 
+	 * Iterate through the data and add it to the table for (HistoryBank entity :
+	 * data) { for (String columnName : columnNames) { String value = "-"; try {
+	 * String columnNameNoSpace = columnName.replaceAll("\\s", ""); Boolean
+	 * isForeignKey = containsChar(columnNameNoSpace, ':'); String[] foreignClass =
+	 * columnNameNoSpace.split(":", 2); if (!isForeignKey) { Method method =
+	 * HistoryBank.class.getMethod("get" + columnNameNoSpace); Object result =
+	 * method.invoke(entity); value = result != null ? result.toString() : "-"; }
+	 * else { Method method = HistoryBank.class.getMethod("get" + foreignClass[0]);
+	 * if (foreignClass[0].equals("Users")) { Method usersMethod =
+	 * MasterBank.class.getMethod("get" + foreignClass[1]); Object result =
+	 * usersMethod.invoke(method.invoke(entity)); value = result != null ?
+	 * result.toString() : "-"; } else if (foreignClass[0].equals("Roles")) { Method
+	 * rolesMethod = Roles.class.getMethod("get" + foreignClass[1]); Object result =
+	 * rolesMethod.invoke(method.invoke(entity)); value = result != null ?
+	 * result.toString() : "-"; }
+	 * 
+	 * }
+	 * 
+	 * } catch (NoSuchMethodException | IllegalAccessException |
+	 * InvocationTargetException e) { Handle the exception if the method is not
+	 * found or cannot be invoked } pdfTable.addCell(Align(value)); } }
+	 * 
+	 * // Add the table to the pdf document pdfDoc.add(pdfTable);
+	 * 
+	 * pdfDoc.close(); pdfWriter.close(); byte[] bytes = baos.toByteArray();
+	 * InputStreamSource attachmentSource = new ByteArrayResource(bytes); //
+	 * SendEmailWithAttachmentPDF(attachmentSource, description);
+	 * SendEmailWithAttachment(attachmentSource, attachmentSource, description); }
+	 * 
+	 * 
+	 * 
+	 * public boolean containsChar(String s, char search) { if (s.length() == 0)
+	 * return false; else return s.charAt(0) == search ||
+	 * containsChar(s.substring(1), search); }
+	 * 
+	 * public void ExportToExcelNotification(List<HistoryBank> data,
+	 * NotificationWrapper description) throws Exception { XSSFWorkbook workbook =
+	 * new XSSFWorkbook(); XSSFSheet sheet = workbook.createSheet("Transactions");
+	 * 
+	 * // Create the header row XSSFRow headerRow = sheet.createRow(0);
+	 * headerRow.createCell(0).setCellValue("Nomor Rekening");
+	 * headerRow.createCell(1).setCellValue("Nama Nasabah");
+	 * headerRow.createCell(2).setCellValue("Tanggal Transaksi");
+	 * headerRow.createCell(3).setCellValue("Nominal");
+	 * headerRow.createCell(4).setCellValue("Keterangan");
+	 * 
+	 * // Iterate through the data and add it to the sheet for (int i = 0; i <
+	 * data.size(); i++) { XSSFRow row = sheet.createRow(i + 1); HistoryBank entity
+	 * = data.get(i);
+	 * row.createCell(0).setCellValue(entity.getRekening().getNorek());
+	 * row.createCell(1).setCellValue(entity.getNama());
+	 * 
+	 * SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	 * String formattedDate = "-"; if (entity.getTanggal() != null) { formattedDate
+	 * = formatter.format(entity.getTanggal()); }
+	 * row.createCell(2).setCellValue(formattedDate);
+	 * row.createCell(3).setCellValue(entity.getUang());
+	 * row.createCell(4).setCellValue("Tarik Tunai"); }
+	 * 
+	 * // Autosize the columns for (int i = 0; i < 5; i++) {
+	 * sheet.autoSizeColumn(i); }
+	 * 
+	 * // Write the workbook to a file ByteArrayOutputStream baos = new
+	 * ByteArrayOutputStream(); workbook.write(baos); byte[] bytes =
+	 * baos.toByteArray(); InputStreamSource attachmentSource = new
+	 * ByteArrayResource(bytes); workbook.close();
+	 * description.setFileName(description.getFileName() + ".xlsx"); //
+	 * SendEmailWithAttachmentXLS(attachmentSource, description);
+	 * SendEmailWithAttachment(attachmentSource, attachmentSource, description);
+	 * 
+	 * }
+	 */
 
 }

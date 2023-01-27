@@ -43,9 +43,11 @@ import com.ogya.lokakarya.configuration.telepon.LaporanPelunasanConfiguration;
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
 import com.ogya.lokakarya.entity.telepon.MasterPelanggan;
 import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
+import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.repository.telepon.HistoryRepository;
 import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
 import com.ogya.lokakarya.repository.telepon.criteria.HistoryTelkomCriteriaRepository;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
 import com.ogya.lokakarya.wrapper.telepon.HistoryWrapper;
@@ -77,6 +79,12 @@ public class HistoryService {
 	public HistoryWrapper save(HistoryWrapper wrapper) {
 		HistoryTelkom historyTelkom = historyRepository.save(toEntity(wrapper));
 		return toWrapper(historyTelkom);
+	}
+	
+	public List<HistoryTelkom> findAllStatus1NoWrapper() {
+		List<HistoryTelkom> transaksiTelkomList = historyRepository
+				.findAll(Sort.by(Order.by("idTransaksi")).descending());
+		return transaksiTelkomList;
 	}
 
 	// service untuk menghapus entity
@@ -162,22 +170,16 @@ public class HistoryService {
 
 		List<String> columnNames = laporanPelunasanConfiguration.getColumn();
 
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < 5; i++) {
 			Cell cell = headerRow.createCell(i);
 			cell.setCellValue(columnNames.get(i));
 		}
-		for (int i = 0; i < listUsers.size(); i++) {
-			Row dataRow = sheet.createRow(i + 1);
-			dataRow.createCell(0).setCellValue(listUsers.get(i).getIdHistory());
-			dataRow.createCell(1).setCellValue(listUsers.get(i).getIdPelanggan().getNama());
-			dataRow.createCell(2).setCellValue(listUsers.get(i).getBulanTagihan());
-			dataRow.createCell(3).setCellValue(listUsers.get(i).getTahunTagihan());
-			dataRow.createCell(4).setCellValue(listUsers.get(i).getUang());
-			dataRow.createCell(4).setCellValue(listUsers.get(i).getTanggalBayar());
-		}
-		for (int i = 0; i < 6; i++) {
-			sheet.autoSizeColumn(i);
-		}
+		
+		/* Iterate through the data and add it to the sheet */
+		ExportData<HistoryTelkom> parsing = new ExportData<HistoryTelkom>();
+		sheet = parsing.exportExcel(columnNames, listUsers, sheet);
+		
+		
 		ServletOutputStream outputStream = response.getOutputStream();
 		workbook.write(outputStream);
 		workbook.close();

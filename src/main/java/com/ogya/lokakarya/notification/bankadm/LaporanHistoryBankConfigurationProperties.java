@@ -9,10 +9,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 @Component
 @EnableConfigurationProperties
-@ConfigurationProperties(prefix = "column")
+@ConfigurationProperties(prefix = "history-bank")
 @PropertySource("classpath:column/columnHistoryBank.properties")
 public class LaporanHistoryBankConfigurationProperties {
-	@Value("#{'${column.column}'.split(',')}")
+	@Value("#{'${column.history-bank}'.split(',')}")
 	private List<String> column;
 	
 	public List<String> getColumn() {
