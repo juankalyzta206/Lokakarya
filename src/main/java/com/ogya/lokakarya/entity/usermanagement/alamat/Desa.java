@@ -42,7 +42,7 @@ public class Desa {
 		return desaId;
 	}
 
-	public void setDesanId(Long desaId) {
+	public void setDesaId(Long desaId) {
 		this.desaId = desaId;
 	}
 
