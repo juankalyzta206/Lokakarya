@@ -113,7 +113,7 @@ public class Desa {
 		return kecamatan;
 	}
 
-	public void setKota(Kecamatan kecamatan) {
+	public void setKecamatan(Kecamatan kecamatan) {
 		this.kecamatan = kecamatan;
 	}
 
