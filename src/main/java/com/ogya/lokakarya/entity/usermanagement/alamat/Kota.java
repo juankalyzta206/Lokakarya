@@ -42,8 +42,8 @@ public class Kota {
 		return kotaId;
 	}
 
-	public void setKotaId(Long subMenuId) {
-		this.kotaId = subMenuId;
+	public void setKotaId(Long kotaId) {
+		this.kotaId = kotaId;
 	}
 
 	// --------------------------------------------------------------------------------------------------------

@@ -15,15 +15,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
-@Table(name = "REGION")
-public class Region {
-	private Long regionId;
+@Table(name = "DESA")
+public class Desa {
+	private Long desaId;
 	private String nama;
+	private Kecamatan kecamatan;
 	private String programName;
 	private Date createdDate;
 	private String createdBy;
@@ -31,14 +36,14 @@ public class Region {
 	private String updatedBy;
 
 	@Id
-	@GeneratedValue(generator = "REGION_GEN", strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "REGION_GEN", sequenceName = "REGION_SEQ", initialValue = 1, allocationSize = 1)
-	public Long getRegionId() {
-		return regionId;
+	@GeneratedValue(generator = "DESA_GEN", strategy = GenerationType.SEQUENCE)
+	@SequenceGenerator(name = "DESA_GEN", sequenceName = "DESA_SEQ", initialValue = 1, allocationSize = 1)
+	public Long getDesaId() {
+		return desaId;
 	}
 
-	public void setRegionId(Long regionId) {
-		this.regionId = regionId;
+	public void setDesanId(Long desaId) {
+		this.desaId = desaId;
 	}
 
 	// --------------------------------------------------------------------------------------------------------
@@ -101,6 +106,16 @@ public class Region {
 		this.updatedBy = updatedBy;
 	}
 
+	@ManyToOne
+	@JoinColumn(name = "KECAMATAN_ID")
+	@JsonIgnore
+	public Kecamatan getKecamatan() {
+		return kecamatan;
+	}
+
+	public void setKota(Kecamatan kecamatan) {
+		this.kecamatan = kecamatan;
+	}
 
 	@PrePersist
 	private void onCreate() {

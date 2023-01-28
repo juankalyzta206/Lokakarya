@@ -42,8 +42,8 @@ public class Kecamatan {
 		return kecamatanId;
 	}
 
-	public void setKecamatanId(Long subMenuId) {
-		this.kecamatanId = subMenuId;
+	public void setKecamatanId(Long kecamatanId) {
+		this.kecamatanId = kecamatanId;
 	}
 
 	// --------------------------------------------------------------------------------------------------------

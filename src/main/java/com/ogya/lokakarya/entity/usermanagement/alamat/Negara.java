@@ -42,8 +42,8 @@ public class Negara {
 		return negaraId;
 	}
 
-	public void setNegaraId(Long subMenuId) {
-		this.negaraId = subMenuId;
+	public void setNegaraId(Long negaraId) {
+		this.negaraId = negaraId;
 	}
 
 	// --------------------------------------------------------------------------------------------------------

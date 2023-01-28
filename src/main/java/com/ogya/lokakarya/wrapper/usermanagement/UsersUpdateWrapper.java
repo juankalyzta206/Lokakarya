@@ -6,7 +6,8 @@ public class UsersUpdateWrapper {
 	private Long userId;
 	private String username;
 	private String nama;
-	private Long alamat;
+	private String alamat;
+	private Long alamatId;
 	private String email;
 	private Long telp;
 	private String programName;
@@ -46,14 +47,24 @@ public class UsersUpdateWrapper {
 	}
 	// --------------------------------------------------------------------------------------------------------
 
-	public Long getAlamat() {
+	public String getAlamat() {
 		return alamat;
 	}
 
-	public void setAlamat(Long alamat) {
+	public void setAlamat(String alamat) {
 		this.alamat = alamat;
 	}
+	
+	
 	// --------------------------------------------------------------------------------------------------------
+
+	public Long getAlamatId() {
+		return alamatId;
+	}
+
+	public void setAlamatId(Long alamatId) {
+		this.alamatId = alamatId;
+	}
 
 	public String getEmail() {
 		return email;

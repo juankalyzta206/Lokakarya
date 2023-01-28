@@ -29,7 +29,6 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -41,10 +40,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
+import com.ogya.lokakarya.entity.usermanagement.alamat.Desa;
 import com.ogya.lokakarya.entity.usermanagement.alamat.Kecamatan;
 import com.ogya.lokakarya.exception.BusinessException;
+import com.ogya.lokakarya.repository.usermanagement.DesaRepository;
 import com.ogya.lokakarya.repository.usermanagement.HakAksesRepository;
-import com.ogya.lokakarya.repository.usermanagement.KecamatanRepository;
 import com.ogya.lokakarya.repository.usermanagement.UsersRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.UsersCriteriaRepository;
 import com.ogya.lokakarya.util.ExportData;
@@ -72,7 +72,7 @@ public class UsersService {
 	UsersColumnProperties usersColumnProperties;
 
 	@Autowired
-	KecamatanRepository kecamatanRepository;
+	DesaRepository desaRepository;
 
 	public PaginationList<UsersWrapper, Users> listWithPaging(PagingRequestWrapper request) {
 		/* query users table with pagination */
@@ -138,11 +138,11 @@ public class UsersService {
 		wrapper.setUserId(entity.getUserId());
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setNama(entity.getNama());
-		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getKecamatanId() : null);
+		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
 		wrapper.setAlamat(entity.getAlamat() != null
-				? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKota().getNama()
-				+ ", " + entity.getAlamat().getKota().getProvinsi().getNama()
-				+ ", " + entity.getAlamat().getKota().getProvinsi().getNegara().getNama(): null);
+				? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKecamatan().getKota().getNama()
+				+ ", " + entity.getAlamat().getKecamatan().getKota().getProvinsi().getNama()
+				+ ", " + entity.getAlamat().getKecamatan().getKota().getProvinsi().getNegara().getNama(): null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
 		wrapper.setProgramName(entity.getProgramName());
@@ -160,7 +160,7 @@ public class UsersService {
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setNama(entity.getNama());
-		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getKecamatanId() : null);
+		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
 		wrapper.setAlamat(entity.getAlamat() != null ? entity.getAlamat().getNama() : null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
@@ -179,7 +179,7 @@ public class UsersService {
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setNama(entity.getNama());
-		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getKecamatanId() : null);
+		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
 		wrapper.setAlamat(entity.getAlamat() != null ? entity.getAlamat().getNama() : null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
@@ -238,8 +238,8 @@ public class UsersService {
 		}
 		entity.setUsername(wrapper.getUsername());
 		entity.setNama(wrapper.getNama());
-		Optional<Kecamatan> optionalAlamat = kecamatanRepository.findById(wrapper.getAlamat());
-		Kecamatan alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
+		Optional<Desa> optionalAlamat = desaRepository.findById(wrapper.getAlamatId());
+		Desa alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
 		entity.setAlamat(alamat);
 		entity.setEmail(wrapper.getEmail());
 		entity.setTelp(wrapper.getTelp());
@@ -260,8 +260,8 @@ public class UsersService {
 		entity.setUsername(wrapper.getUsername());
 		entity.setPassword(wrapper.getPassword());
 		entity.setNama(wrapper.getNama());
-		Optional<Kecamatan> optionalAlamat = kecamatanRepository.findById(wrapper.getAlamatId());
-		Kecamatan alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
+		Optional<Desa> optionalAlamat = desaRepository.findById(wrapper.getAlamatId());
+		Desa alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
 		entity.setAlamat(alamat);
 		entity.setEmail(wrapper.getEmail());
 		entity.setTelp(wrapper.getTelp());
@@ -282,8 +282,8 @@ public class UsersService {
 		entity.setUsername(wrapper.getUsername());
 		entity.setPassword(wrapper.getPassword());
 		entity.setNama(wrapper.getNama());
-		Optional<Kecamatan> optionalAlamat = kecamatanRepository.findById(wrapper.getAlamatId());
-		Kecamatan alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
+		Optional<Desa> optionalAlamat = desaRepository.findById(wrapper.getAlamatId());
+		Desa alamat = optionalAlamat.isPresent() ? optionalAlamat.get() : null;
 		entity.setAlamat(alamat);
 		entity.setEmail(wrapper.getEmail());
 		entity.setTelp(wrapper.getTelp());

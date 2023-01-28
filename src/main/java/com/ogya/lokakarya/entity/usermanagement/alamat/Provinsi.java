@@ -42,8 +42,8 @@ public class Provinsi {
 		return provinsiId;
 	}
 
-	public void setProvinsiId(Long subMenuId) {
-		this.provinsiId = subMenuId;
+	public void setProvinsiId(Long provinsiId) {
+		this.provinsiId = provinsiId;
 	}
 
 	// --------------------------------------------------------------------------------------------------------

@@ -29,6 +29,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ogya.lokakarya.entity.usermanagement.alamat.Desa;
 import com.ogya.lokakarya.entity.usermanagement.alamat.Kecamatan;
 import com.ogya.lokakarya.entity.usermanagement.login.HakAksesLogin;
 
@@ -39,7 +40,7 @@ public class Users {
 	private String username;
 	private String password;
 	private String nama;
-	private Kecamatan alamat;
+	private Desa alamat;
 	private String email;
 	private Long telp;
 	private String programName;
@@ -94,11 +95,11 @@ public class Users {
 	@ManyToOne
 	@JoinColumn(name = "ALAMAT")
 	@JsonIgnore
-	public Kecamatan getAlamat() {
+	public Desa getAlamat() {
 		return alamat;
 	}
 
-	public void setAlamat(Kecamatan alamat) {
+	public void setAlamat(Desa alamat) {
 		this.alamat = alamat;
 	}
 
