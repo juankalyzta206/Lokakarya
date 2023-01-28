@@ -11,7 +11,6 @@ import java.util.Locale;
 import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -90,6 +89,7 @@ public class LaporanPenunggakanNotification {
 
 	// Excel
 	// setiap tanggal 1 jam 7
+	// @Scheduled(cron = "0 0 7 1 * *")
 	@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailDayExcel() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
