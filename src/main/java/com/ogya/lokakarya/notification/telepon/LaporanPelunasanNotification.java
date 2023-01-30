@@ -44,7 +44,7 @@ public class LaporanPelunasanNotification {
 
 //PDF	
 //	Setiap hari jam 7
-	@Scheduled(cron = "${cron.daily}")
+	//@Scheduled(cron = "${cron.daily}")
 	public void sendEmailDay() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -74,7 +74,7 @@ public class LaporanPelunasanNotification {
 	}
 
 //	Setiap Hari Senin Jam 7
-	@Scheduled(cron = "${cron.weekly}")
+	//@Scheduled(cron = "${cron.weekly}")
 	public void sendEmailWeek() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -112,7 +112,7 @@ public class LaporanPelunasanNotification {
 	}
 
 //	Setiap tanggal 1 jam 7
-	@Scheduled(cron = "${cron.monthly}")
+	//@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailMonth() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -147,7 +147,7 @@ public class LaporanPelunasanNotification {
 
 //EXCEL
 	// setiap tanggal 1 jam 7
-	@Scheduled(cron = "${cron.monthly}")
+	//@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailMonthExcel() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
