@@ -103,13 +103,7 @@ public class TransaksiTelkomController {
 	
 	@GetMapping("/downloadPdf")
 	public void exportToPdfParam(HttpServletResponse response) throws Exception {
-		response.setContentType("application/octet-stream");
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
-		String currentDateTime = dateFormatter.format(new Date());
-
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
-		response.setHeader(headerKey, headerValue);
+		
 
 		List<TransaksiTelkom> listUsers = transaksiTelkomService.findAllStatus1NoWrapper();
 		transaksiTelkomService.ExportToPdfParam(listUsers, response);

@@ -1,6 +1,7 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -388,6 +389,14 @@ public class TransaksiTelkomService {
 		ExportData<TransaksiTelkom> parsing = new ExportData<TransaksiTelkom>();
 		pdfTable = parsing.exportPdf(column1, dataTransaksi, pdfTable);
 		// Add the table to the pdf document
+		response.setContentType("application/pdf");
+		//response.setContentType("application/octet-stream");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+		String currentDateTime = dateFormatter.format(new Date());
+
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+		response.setHeader(headerKey, headerValue);
 		pdfDoc.add(pdfTable);
 
 		pdfDoc.close();
