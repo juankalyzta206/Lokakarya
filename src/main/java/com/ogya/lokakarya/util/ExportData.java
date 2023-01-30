@@ -81,18 +81,25 @@ public class ExportData<T> {
 						}
 						arrayValue = Arrays.copyOf(arrayValue, arrayValue.length + 1);
 						arrayValue[arrayValue.length - 1] = value;
+						previousMethod = "";
 					}	
 				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 					/* Handle the exception if the method is not found or cannot be invoked */
 				}
 				if (arrayValue.length>1) {
+					int i = 0;
 					for (String singleValue : arrayValue) {
-						finalValue += singleValue + ",";
+						i++;
+						if (i<arrayValue.length) {
+							finalValue += singleValue + ", ";
+						} else {
+							finalValue += singleValue;
+						}
+						
 					}
 				} else {
 					finalValue = arrayValue[0];
 				}
-				
 				pdfTable.addCell(Align(finalValue));
 			}
 		}

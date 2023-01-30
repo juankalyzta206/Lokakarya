@@ -30,7 +30,6 @@ import javax.persistence.TemporalType;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ogya.lokakarya.entity.usermanagement.alamat.Desa;
-import com.ogya.lokakarya.entity.usermanagement.alamat.Kecamatan;
 import com.ogya.lokakarya.entity.usermanagement.login.HakAksesLogin;
 
 @Entity
