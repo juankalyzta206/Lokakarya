@@ -144,7 +144,6 @@ public class ExportData<T> {
 				columnNum++;
 			}
 		}
-		/* Resize the columns to fit the contents */
 		for (int i = 0; i < columnNames.size(); i++) {
 			sheet.autoSizeColumn(i);
 		}

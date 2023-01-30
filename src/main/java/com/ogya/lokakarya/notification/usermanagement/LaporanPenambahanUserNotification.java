@@ -38,7 +38,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -236,14 +235,6 @@ public class LaporanPenambahanUserNotification {
 		pdfTable.setWidthPercentage(100);
 		pdfTable.setSpacingBefore(10f);
 		pdfTable.setSpacingAfter(10f);
-
-		for (String columnName : columnNames) {
-			pdfTable.addCell(Align(columnName));
-		}
-		BaseColor color = new BaseColor(135, 206, 235);
-		for (int i = 0; i < columnLength; i++) {
-			pdfTable.getRow(0).getCells()[i].setBackgroundColor(color);
-		}
 
 		/* Iterate through the data and add it to the table */
 		ExportData<Users> parsing = new ExportData<Users>();
