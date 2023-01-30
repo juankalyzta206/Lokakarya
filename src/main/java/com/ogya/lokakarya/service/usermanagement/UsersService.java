@@ -41,7 +41,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.ogya.lokakarya.configuration.usermanagement.UsersColumnProperties;
 import com.ogya.lokakarya.entity.usermanagement.Users;
 import com.ogya.lokakarya.entity.usermanagement.alamat.Desa;
-import com.ogya.lokakarya.entity.usermanagement.alamat.Kecamatan;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.repository.usermanagement.DesaRepository;
 import com.ogya.lokakarya.repository.usermanagement.HakAksesRepository;
@@ -139,10 +138,13 @@ public class UsersService {
 		wrapper.setUsername(entity.getUsername());
 		wrapper.setNama(entity.getNama());
 		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
-		wrapper.setAlamat(entity.getAlamat() != null
-				? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKecamatan().getKota().getNama()
-				+ ", " + entity.getAlamat().getKecamatan().getKota().getProvinsi().getNama()
-				+ ", " + entity.getAlamat().getKecamatan().getKota().getProvinsi().getNegara().getNama(): null);
+		wrapper.setAlamat(
+				entity.getAlamat() != null
+						? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKecamatan().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNegara().getNama()
+						: null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
 		wrapper.setProgramName(entity.getProgramName());
@@ -161,7 +163,13 @@ public class UsersService {
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setNama(entity.getNama());
 		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
-		wrapper.setAlamat(entity.getAlamat() != null ? entity.getAlamat().getNama() : null);
+		wrapper.setAlamat(
+				entity.getAlamat() != null
+				? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKecamatan().getNama() + ", "
+						+ entity.getAlamat().getKecamatan().getKota().getNama() + ", "
+						+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNama() + ", "
+						+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNegara().getNama()
+				: null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
 		wrapper.setProgramName(entity.getProgramName());
@@ -180,7 +188,13 @@ public class UsersService {
 		wrapper.setPassword(entity.getPassword());
 		wrapper.setNama(entity.getNama());
 		wrapper.setAlamatId(entity.getAlamat() != null ? entity.getAlamat().getDesaId() : null);
-		wrapper.setAlamat(entity.getAlamat() != null ? entity.getAlamat().getNama() : null);
+		wrapper.setAlamat(
+				entity.getAlamat() != null
+						? entity.getAlamat().getNama() + ", " + entity.getAlamat().getKecamatan().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNama() + ", "
+								+ entity.getAlamat().getKecamatan().getKota().getProvinsi().getNegara().getNama()
+						: null);
 		wrapper.setEmail(entity.getEmail());
 		wrapper.setTelp(entity.getTelp());
 		wrapper.setProgramName(entity.getProgramName());
@@ -415,7 +429,6 @@ public class UsersService {
 
 		/* Create a pdf table */
 		PdfPTable pdfTable = new PdfPTable(columnLength);
-
 
 		/* Iterate through the data and add it to the table */
 		ExportData<Users> parsing = new ExportData<Users>();
