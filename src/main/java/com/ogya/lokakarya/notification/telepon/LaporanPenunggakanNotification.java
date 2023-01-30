@@ -56,7 +56,7 @@ public class LaporanPenunggakanNotification {
 	// Pdf
 	// setiap tanggal 1 jam 7
 	// @Scheduled(cron = "0 0 7 1 * *")
-	@Scheduled(cron = "${cron.monthly}")
+	//@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailDay() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
@@ -90,7 +90,7 @@ public class LaporanPenunggakanNotification {
 	// Excel
 	// setiap tanggal 1 jam 7
 	// @Scheduled(cron = "0 0 7 1 * *")
-	@Scheduled(cron = "${cron.monthly}")
+	//@Scheduled(cron = "${cron.monthly}")
 	public void sendEmailDayExcel() throws Exception {
 		MimeMessage mailMessage = javaMailSender.createMimeMessage();
 
