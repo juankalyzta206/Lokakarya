@@ -238,6 +238,7 @@ public class BayarTelkomNotification {
 		}
 
 		workbook.write(outputStream);
+		workbook.close();
 		return outputStream;
 	}
 

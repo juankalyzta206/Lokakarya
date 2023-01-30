@@ -27,7 +27,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -42,9 +41,9 @@ import com.ogya.lokakarya.entity.usermanagement.Roles;
 import com.ogya.lokakarya.exception.BusinessException;
 import com.ogya.lokakarya.repository.usermanagement.RolesRepository;
 import com.ogya.lokakarya.repository.usermanagement.criteria.RolesCriteriaRepository;
+import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;
-import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.wrapper.usermanagement.RolesWrapper;
 
 @Service

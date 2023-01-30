@@ -1,7 +1,6 @@
 package com.ogya.lokakarya.configuration.telepon;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;

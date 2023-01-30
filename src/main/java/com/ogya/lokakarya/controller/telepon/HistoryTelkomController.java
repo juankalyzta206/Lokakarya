@@ -1,6 +1,5 @@
 package com.ogya.lokakarya.controller.telepon;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,9 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ogya.lokakarya.entity.telepon.HistoryTelkom;
-import com.ogya.lokakarya.entity.telepon.TransaksiTelkom;
-import com.ogya.lokakarya.helper.telepon.LaporanPelunasanExcelExporter;
-
 import com.ogya.lokakarya.repository.telepon.HistoryTelkomRepository;
 import com.ogya.lokakarya.service.telepon.HistoryService;
 import com.ogya.lokakarya.util.DataResponse;

@@ -1,13 +1,10 @@
 package com.ogya.lokakarya.service.telepon;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.ServletOutputStream;
@@ -49,7 +46,6 @@ import com.ogya.lokakarya.repository.telepon.HistoryRepository;
 import com.ogya.lokakarya.repository.telepon.MasterPelangganRepository;
 import com.ogya.lokakarya.repository.telepon.TransaksiTelkomRepository;
 import com.ogya.lokakarya.repository.telepon.criteria.TransaksiTelkomCriteriaRepository;
-import com.ogya.lokakarya.util.CurrencyData;
 import com.ogya.lokakarya.util.ExportData;
 import com.ogya.lokakarya.util.PaginationList;
 import com.ogya.lokakarya.util.PagingRequestWrapper;

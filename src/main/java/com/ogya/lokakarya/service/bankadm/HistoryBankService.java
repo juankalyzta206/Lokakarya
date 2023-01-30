@@ -632,6 +632,7 @@ public class HistoryBankService {
 		}
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		workbook.write(outputStream);
+		workbook.close();
 		return outputStream;
 		
 	}
